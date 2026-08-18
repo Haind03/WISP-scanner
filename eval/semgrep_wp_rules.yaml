@@ -1,0 +1,597 @@
+rules:
+- id: wisp-wp-xss
+  mode: taint
+  languages:
+  - php
+  severity: WARNING
+  message: 'WordPress xss: request-tainted data reaches a xss sink (WISP vocabulary transplanted into Semgrep taint mode).'
+  metadata:
+    wisp-class: xss
+  pattern-sources:
+  - pattern: $_GET
+  - pattern: $_POST
+  - pattern: $_REQUEST
+  - pattern: $_COOKIE
+  - pattern: $_FILES
+  - pattern: $_SERVER
+  - pattern: $_ENV
+  - pattern: $REQ->get_param(...)
+  - pattern: $REQ->get_params(...)
+  - pattern: $REQ->get_json_params(...)
+  - pattern: $REQ->get_body_params(...)
+  - pattern: $REQ->get_query_params(...)
+  pattern-sanitizers:
+  - pattern: esc_html(...)
+  - pattern: esc_html__(...)
+  - pattern: esc_html_e(...)
+  - pattern: esc_attr(...)
+  - pattern: esc_attr__(...)
+  - pattern: esc_attr_e(...)
+  - pattern: esc_url(...)
+  - pattern: esc_url_raw(...)
+  - pattern: esc_js(...)
+  - pattern: esc_textarea(...)
+  - pattern: esc_xml(...)
+  - pattern: wp_kses(...)
+  - pattern: wp_kses_post(...)
+  - pattern: wp_kses_data(...)
+  - pattern: wp_strip_all_tags(...)
+  - pattern: tag_escape(...)
+  - pattern: htmlspecialchars(...)
+  - pattern: htmlentities(...)
+  - pattern: absint(...)
+  - pattern: intval(...)
+  - pattern: floatval(...)
+  - pattern: boolval(...)
+  - pattern: is_numeric(...)
+  - pattern: ctype_digit(...)
+  - pattern: number_format(...)
+  - pattern: zeroise(...)
+  - pattern: sanitize_text_field(...)
+  - pattern: sanitize_key(...)
+  - pattern: sanitize_email(...)
+  - pattern: filter_var(...)
+  - pattern: json_encode(...)
+  - pattern: md5(...)
+  - pattern: sha1(...)
+  - pattern: hash(...)
+  - pattern: wp_hash(...)
+  - pattern: preg_quote(...)
+  pattern-sinks:
+  - pattern: echo $SINK;
+    focus-metavariable: $SINK
+  - pattern: print($SINK)
+    focus-metavariable: $SINK
+  - pattern: printf(...)
+  - pattern: vprintf(...)
+  - pattern: print_r(...)
+- id: wisp-wp-sqli
+  mode: taint
+  languages:
+  - php
+  severity: ERROR
+  message: 'WordPress sqli: request-tainted data reaches a sqli sink (WISP vocabulary transplanted into Semgrep taint mode).'
+  metadata:
+    wisp-class: sqli
+  pattern-sources:
+  - pattern: $_GET
+  - pattern: $_POST
+  - pattern: $_REQUEST
+  - pattern: $_COOKIE
+  - pattern: $_FILES
+  - pattern: $_SERVER
+  - pattern: $_ENV
+  - pattern: $REQ->get_param(...)
+  - pattern: $REQ->get_params(...)
+  - pattern: $REQ->get_json_params(...)
+  - pattern: $REQ->get_body_params(...)
+  - pattern: $REQ->get_query_params(...)
+  pattern-sanitizers:
+  - pattern: esc_sql(...)
+  - pattern: esc_like(...)
+  - pattern: sanitize_sql_orderby(...)
+  - pattern: mysqli_real_escape_string(...)
+  - pattern: mysql_real_escape_string(...)
+  - pattern: real_escape_string(...)
+  - pattern: addslashes(...)
+  - pattern: absint(...)
+  - pattern: intval(...)
+  - pattern: floatval(...)
+  - pattern: boolval(...)
+  - pattern: is_numeric(...)
+  - pattern: ctype_digit(...)
+  - pattern: number_format(...)
+  - pattern: zeroise(...)
+  - pattern: sanitize_text_field(...)
+  - pattern: sanitize_key(...)
+  - pattern: sanitize_email(...)
+  - pattern: filter_var(...)
+  - pattern: json_encode(...)
+  - pattern: md5(...)
+  - pattern: sha1(...)
+  - pattern: hash(...)
+  - pattern: wp_hash(...)
+  - pattern: preg_quote(...)
+  pattern-sinks:
+  - pattern: $WPDB->query(...)
+  - pattern: $WPDB->get_results(...)
+  - pattern: $WPDB->get_row(...)
+  - pattern: $WPDB->get_var(...)
+  - pattern: $WPDB->get_col(...)
+  - pattern: $WPDB->get_blog_prefix(...)
+  - pattern: mysqli_query(...)
+  - pattern: mysql_query(...)
+  - pattern: mysqli_multi_query(...)
+  - pattern: mysqli_real_query(...)
+  - pattern: pg_query(...)
+  - pattern: sqlsrv_query(...)
+  - pattern: mssql_query(...)
+- id: wisp-wp-lfi
+  mode: taint
+  languages:
+  - php
+  severity: ERROR
+  message: 'WordPress lfi: request-tainted data reaches a lfi sink (WISP vocabulary transplanted into Semgrep taint mode).'
+  metadata:
+    wisp-class: lfi
+  pattern-sources:
+  - pattern: $_GET
+  - pattern: $_POST
+  - pattern: $_REQUEST
+  - pattern: $_COOKIE
+  - pattern: $_FILES
+  - pattern: $_SERVER
+  - pattern: $_ENV
+  - pattern: $REQ->get_param(...)
+  - pattern: $REQ->get_params(...)
+  - pattern: $REQ->get_json_params(...)
+  - pattern: $REQ->get_body_params(...)
+  - pattern: $REQ->get_query_params(...)
+  pattern-sanitizers:
+  - pattern: basename(...)
+  - pattern: sanitize_file_name(...)
+  - pattern: validate_file(...)
+  - pattern: realpath(...)
+  - pattern: absint(...)
+  - pattern: intval(...)
+  - pattern: floatval(...)
+  - pattern: boolval(...)
+  - pattern: is_numeric(...)
+  - pattern: ctype_digit(...)
+  - pattern: number_format(...)
+  - pattern: zeroise(...)
+  - pattern: sanitize_text_field(...)
+  - pattern: sanitize_key(...)
+  - pattern: sanitize_email(...)
+  - pattern: filter_var(...)
+  - pattern: json_encode(...)
+  - pattern: md5(...)
+  - pattern: sha1(...)
+  - pattern: hash(...)
+  - pattern: wp_hash(...)
+  - pattern: preg_quote(...)
+  pattern-sinks:
+  - pattern: include $SINK;
+    focus-metavariable: $SINK
+  - pattern: include_once $SINK;
+    focus-metavariable: $SINK
+  - pattern: require $SINK;
+    focus-metavariable: $SINK
+  - pattern: require_once $SINK;
+    focus-metavariable: $SINK
+  - pattern: fopen(...)
+  - pattern: readfile(...)
+  - pattern: file(...)
+  - pattern: file_get_contents(...)
+  - pattern: highlight_file(...)
+  - pattern: show_source(...)
+  - pattern: parse_ini_file(...)
+  - pattern: readlink(...)
+  - pattern: opendir(...)
+  - pattern: scandir(...)
+  - pattern: glob(...)
+  - pattern: unlink(...)
+  - pattern: locate_template(...)
+  - pattern: load_template(...)
+  - pattern: get_template_part(...)
+  - pattern: virtual(...)
+- id: wisp-wp-rce
+  mode: taint
+  languages:
+  - php
+  severity: ERROR
+  message: 'WordPress rce: request-tainted data reaches a rce sink (WISP vocabulary transplanted into Semgrep taint mode).'
+  metadata:
+    wisp-class: rce
+  pattern-sources:
+  - pattern: $_GET
+  - pattern: $_POST
+  - pattern: $_REQUEST
+  - pattern: $_COOKIE
+  - pattern: $_FILES
+  - pattern: $_SERVER
+  - pattern: $_ENV
+  - pattern: $REQ->get_param(...)
+  - pattern: $REQ->get_params(...)
+  - pattern: $REQ->get_json_params(...)
+  - pattern: $REQ->get_body_params(...)
+  - pattern: $REQ->get_query_params(...)
+  pattern-sanitizers:
+  - pattern: absint(...)
+  - pattern: intval(...)
+  - pattern: floatval(...)
+  - pattern: boolval(...)
+  - pattern: is_numeric(...)
+  - pattern: ctype_digit(...)
+  - pattern: number_format(...)
+  - pattern: zeroise(...)
+  - pattern: sanitize_text_field(...)
+  - pattern: sanitize_key(...)
+  - pattern: sanitize_email(...)
+  - pattern: filter_var(...)
+  - pattern: json_encode(...)
+  - pattern: md5(...)
+  - pattern: sha1(...)
+  - pattern: hash(...)
+  - pattern: wp_hash(...)
+  - pattern: preg_quote(...)
+  pattern-sinks:
+  - pattern: system(...)
+  - pattern: exec(...)
+  - pattern: shell_exec(...)
+  - pattern: passthru(...)
+  - pattern: popen(...)
+  - pattern: proc_open(...)
+  - pattern: pcntl_exec(...)
+  - pattern: eval(...)
+  - pattern: assert(...)
+  - pattern: call_user_func(...)
+  - pattern: call_user_func_array(...)
+  - pattern: create_function(...)
+  - pattern: array_map(...)
+  - pattern: usort(...)
+  - pattern: uasort(...)
+  - pattern: uksort(...)
+  - pattern: register_shutdown_function(...)
+  - pattern: register_tick_function(...)
+- id: wisp-wp-ssrf
+  mode: taint
+  languages:
+  - php
+  severity: WARNING
+  message: 'WordPress ssrf: request-tainted data reaches a ssrf sink (WISP vocabulary transplanted into Semgrep taint mode).'
+  metadata:
+    wisp-class: ssrf
+  pattern-sources:
+  - pattern: $_GET
+  - pattern: $_POST
+  - pattern: $_REQUEST
+  - pattern: $_COOKIE
+  - pattern: $_FILES
+  - pattern: $_SERVER
+  - pattern: $_ENV
+  - pattern: $REQ->get_param(...)
+  - pattern: $REQ->get_params(...)
+  - pattern: $REQ->get_json_params(...)
+  - pattern: $REQ->get_body_params(...)
+  - pattern: $REQ->get_query_params(...)
+  pattern-sanitizers:
+  - pattern: esc_url(...)
+  - pattern: esc_url_raw(...)
+  - pattern: sanitize_url(...)
+  - pattern: rawurlencode(...)
+  - pattern: urlencode(...)
+  - pattern: absint(...)
+  - pattern: intval(...)
+  - pattern: floatval(...)
+  - pattern: boolval(...)
+  - pattern: is_numeric(...)
+  - pattern: ctype_digit(...)
+  - pattern: number_format(...)
+  - pattern: zeroise(...)
+  - pattern: sanitize_text_field(...)
+  - pattern: sanitize_key(...)
+  - pattern: sanitize_email(...)
+  - pattern: filter_var(...)
+  - pattern: json_encode(...)
+  - pattern: md5(...)
+  - pattern: sha1(...)
+  - pattern: hash(...)
+  - pattern: wp_hash(...)
+  - pattern: preg_quote(...)
+  - pattern: wp_http_validate_url(...)
+  pattern-sinks:
+  - pattern: header(...)
+  - pattern: wp_remote_get(...)
+  - pattern: wp_remote_post(...)
+  - pattern: wp_remote_request(...)
+  - pattern: wp_remote_head(...)
+  - pattern: curl_exec(...)
+  - pattern: fsockopen(...)
+  - pattern: stream_socket_client(...)
+  - pattern: get_headers(...)
+  - pattern: getimagesize(...)
+- id: wisp-wp-upload
+  mode: taint
+  languages:
+  - php
+  severity: ERROR
+  message: 'WordPress upload: request-tainted data reaches a upload sink (WISP vocabulary transplanted into Semgrep taint mode).'
+  metadata:
+    wisp-class: upload
+  pattern-sources:
+  - pattern: $_GET
+  - pattern: $_POST
+  - pattern: $_REQUEST
+  - pattern: $_COOKIE
+  - pattern: $_FILES
+  - pattern: $_SERVER
+  - pattern: $_ENV
+  - pattern: $REQ->get_param(...)
+  - pattern: $REQ->get_params(...)
+  - pattern: $REQ->get_json_params(...)
+  - pattern: $REQ->get_body_params(...)
+  - pattern: $REQ->get_query_params(...)
+  pattern-sanitizers:
+  - pattern: basename(...)
+  - pattern: sanitize_file_name(...)
+  - pattern: validate_file(...)
+  - pattern: realpath(...)
+  - pattern: absint(...)
+  - pattern: intval(...)
+  - pattern: floatval(...)
+  - pattern: boolval(...)
+  - pattern: is_numeric(...)
+  - pattern: ctype_digit(...)
+  - pattern: number_format(...)
+  - pattern: zeroise(...)
+  - pattern: sanitize_text_field(...)
+  - pattern: sanitize_key(...)
+  - pattern: sanitize_email(...)
+  - pattern: filter_var(...)
+  - pattern: json_encode(...)
+  - pattern: md5(...)
+  - pattern: sha1(...)
+  - pattern: hash(...)
+  - pattern: wp_hash(...)
+  - pattern: preg_quote(...)
+  pattern-sinks:
+  - pattern: file_put_contents(...)
+  - pattern: move_uploaded_file(...)
+  - pattern: fwrite(...)
+  - pattern: fputs(...)
+  - pattern: copy(...)
+  - pattern: wp_handle_sideload(...)
+  - pattern: media_handle_sideload(...)
+  - pattern: wp_handle_upload(...)
+  - pattern: media_handle_upload(...)
+- id: wisp-wp-deserial
+  mode: taint
+  languages:
+  - php
+  severity: ERROR
+  message: 'WordPress deserial: request-tainted data reaches a deserial sink (WISP vocabulary transplanted into Semgrep taint mode).'
+  metadata:
+    wisp-class: deserial
+  pattern-sources:
+  - pattern: $_GET
+  - pattern: $_POST
+  - pattern: $_REQUEST
+  - pattern: $_COOKIE
+  - pattern: $_FILES
+  - pattern: $_SERVER
+  - pattern: $_ENV
+  - pattern: $REQ->get_param(...)
+  - pattern: $REQ->get_params(...)
+  - pattern: $REQ->get_json_params(...)
+  - pattern: $REQ->get_body_params(...)
+  - pattern: $REQ->get_query_params(...)
+  pattern-sanitizers:
+  - pattern: absint(...)
+  - pattern: intval(...)
+  - pattern: floatval(...)
+  - pattern: boolval(...)
+  - pattern: is_numeric(...)
+  - pattern: ctype_digit(...)
+  - pattern: number_format(...)
+  - pattern: zeroise(...)
+  - pattern: sanitize_text_field(...)
+  - pattern: sanitize_key(...)
+  - pattern: sanitize_email(...)
+  - pattern: filter_var(...)
+  - pattern: json_encode(...)
+  - pattern: md5(...)
+  - pattern: sha1(...)
+  - pattern: hash(...)
+  - pattern: wp_hash(...)
+  - pattern: preg_quote(...)
+  pattern-sinks:
+  - pattern: unserialize(...)
+  - pattern: maybe_unserialize(...)
+  - pattern: yaml_parse(...)
+  - pattern: igbinary_unserialize(...)
+- id: wisp-wp-other
+  mode: taint
+  languages:
+  - php
+  severity: INFO
+  message: 'WordPress other: request-tainted data reaches a other sink (WISP vocabulary transplanted into Semgrep taint mode).'
+  metadata:
+    wisp-class: other
+  pattern-sources:
+  - pattern: $_GET
+  - pattern: $_POST
+  - pattern: $_REQUEST
+  - pattern: $_COOKIE
+  - pattern: $_FILES
+  - pattern: $_SERVER
+  - pattern: $_ENV
+  - pattern: $REQ->get_param(...)
+  - pattern: $REQ->get_params(...)
+  - pattern: $REQ->get_json_params(...)
+  - pattern: $REQ->get_body_params(...)
+  - pattern: $REQ->get_query_params(...)
+  pattern-sanitizers:
+  - pattern: esc_url(...)
+  - pattern: esc_url_raw(...)
+  - pattern: sanitize_url(...)
+  - pattern: rawurlencode(...)
+  - pattern: urlencode(...)
+  - pattern: absint(...)
+  - pattern: intval(...)
+  - pattern: floatval(...)
+  - pattern: boolval(...)
+  - pattern: is_numeric(...)
+  - pattern: ctype_digit(...)
+  - pattern: number_format(...)
+  - pattern: zeroise(...)
+  - pattern: sanitize_text_field(...)
+  - pattern: sanitize_key(...)
+  - pattern: sanitize_email(...)
+  - pattern: filter_var(...)
+  - pattern: json_encode(...)
+  - pattern: md5(...)
+  - pattern: sha1(...)
+  - pattern: hash(...)
+  - pattern: wp_hash(...)
+  - pattern: preg_quote(...)
+  pattern-sinks:
+  - pattern: wp_redirect(...)
+  - pattern: wp_safe_redirect(...)
+  - pattern: setcookie(...)
+  - pattern: setrawcookie(...)
+  - pattern: extract(...)
+  - pattern: parse_str(...)
+  - pattern: mb_parse_str(...)
+  - pattern: import_request_variables(...)
+  - pattern: preg_replace(...)
+  - pattern: create_function(...)
+- id: wisp-wp-csrf
+  languages:
+  - php
+  severity: WARNING
+  message: 'WordPress csrf: state change in a function with no nonce check (best-effort Semgrep transplant of WISP missing-guard).'
+  metadata:
+    wisp-class: csrf
+  patterns:
+  - pattern-either:
+    - pattern: update_option(...)
+    - pattern: add_option(...)
+    - pattern: delete_option(...)
+    - pattern: update_site_option(...)
+    - pattern: update_network_option(...)
+    - pattern: update_post_meta(...)
+    - pattern: add_post_meta(...)
+    - pattern: delete_post_meta(...)
+    - pattern: update_user_meta(...)
+    - pattern: add_user_meta(...)
+    - pattern: delete_user_meta(...)
+    - pattern: update_term_meta(...)
+    - pattern: wp_insert_post(...)
+    - pattern: wp_update_post(...)
+    - pattern: wp_delete_post(...)
+    - pattern: wp_insert_user(...)
+    - pattern: wp_create_user(...)
+    - pattern: wp_update_user(...)
+    - pattern: wp_set_password(...)
+    - pattern: wp_insert_comment(...)
+    - pattern: wp_update_comment(...)
+    - pattern: wp_delete_comment(...)
+    - pattern: wp_set_comment_status(...)
+    - pattern: wp_insert_term(...)
+    - pattern: wp_update_term(...)
+    - pattern: wp_delete_term(...)
+    - pattern: wp_set_object_terms(...)
+    - pattern: wp_set_post_terms(...)
+    - pattern: wp_insert_attachment(...)
+    - pattern: add_role(...)
+    - pattern: remove_role(...)
+    - pattern: set_transient(...)
+    - pattern: set_site_transient(...)
+    - pattern: wp_schedule_event(...)
+    - pattern: rename(...)
+    - pattern: rmdir(...)
+    - pattern: mkdir(...)
+    - pattern: $WPDB->insert(...)
+    - pattern: $WPDB->update(...)
+    - pattern: $WPDB->delete(...)
+    - pattern: $WPDB->replace(...)
+  - pattern-inside: function $F(...) { ... }
+  - pattern-not-inside: function $F(...) { ... wp_verify_nonce(...); ... }
+  - pattern-not-inside: function $F(...) { ... if (!wp_verify_nonce(...)) { ... } ... }
+  - pattern-not-inside: function $F(...) { ... if (!wp_verify_nonce(...)) $S; ... }
+  - pattern-not-inside: function $F(...) { ... check_admin_referer(...); ... }
+  - pattern-not-inside: function $F(...) { ... if (!check_admin_referer(...)) { ... } ... }
+  - pattern-not-inside: function $F(...) { ... if (!check_admin_referer(...)) $S; ... }
+  - pattern-not-inside: function $F(...) { ... check_ajax_referer(...); ... }
+  - pattern-not-inside: function $F(...) { ... if (!check_ajax_referer(...)) { ... } ... }
+  - pattern-not-inside: function $F(...) { ... if (!check_ajax_referer(...)) $S; ... }
+- id: wisp-wp-auth
+  languages:
+  - php
+  severity: WARNING
+  message: 'WordPress auth: state change in a function with no capability check (best-effort Semgrep transplant of WISP missing-guard).'
+  metadata:
+    wisp-class: auth
+  patterns:
+  - pattern-either:
+    - pattern: update_option(...)
+    - pattern: add_option(...)
+    - pattern: delete_option(...)
+    - pattern: update_site_option(...)
+    - pattern: update_network_option(...)
+    - pattern: update_post_meta(...)
+    - pattern: add_post_meta(...)
+    - pattern: delete_post_meta(...)
+    - pattern: update_user_meta(...)
+    - pattern: add_user_meta(...)
+    - pattern: delete_user_meta(...)
+    - pattern: update_term_meta(...)
+    - pattern: wp_insert_post(...)
+    - pattern: wp_update_post(...)
+    - pattern: wp_delete_post(...)
+    - pattern: wp_insert_user(...)
+    - pattern: wp_create_user(...)
+    - pattern: wp_update_user(...)
+    - pattern: wp_set_password(...)
+    - pattern: wp_insert_comment(...)
+    - pattern: wp_update_comment(...)
+    - pattern: wp_delete_comment(...)
+    - pattern: wp_set_comment_status(...)
+    - pattern: wp_insert_term(...)
+    - pattern: wp_update_term(...)
+    - pattern: wp_delete_term(...)
+    - pattern: wp_set_object_terms(...)
+    - pattern: wp_set_post_terms(...)
+    - pattern: wp_insert_attachment(...)
+    - pattern: add_role(...)
+    - pattern: remove_role(...)
+    - pattern: set_transient(...)
+    - pattern: set_site_transient(...)
+    - pattern: wp_schedule_event(...)
+    - pattern: rename(...)
+    - pattern: rmdir(...)
+    - pattern: mkdir(...)
+    - pattern: $WPDB->insert(...)
+    - pattern: $WPDB->update(...)
+    - pattern: $WPDB->delete(...)
+    - pattern: $WPDB->replace(...)
+  - pattern-inside: function $F(...) { ... }
+  - pattern-not-inside: function $F(...) { ... current_user_can(...); ... }
+  - pattern-not-inside: function $F(...) { ... if (!current_user_can(...)) { ... } ... }
+  - pattern-not-inside: function $F(...) { ... if (!current_user_can(...)) $S; ... }
+  - pattern-not-inside: function $F(...) { ... current_user_can_for_blog(...); ... }
+  - pattern-not-inside: function $F(...) { ... if (!current_user_can_for_blog(...)) { ... } ... }
+  - pattern-not-inside: function $F(...) { ... if (!current_user_can_for_blog(...)) $S; ... }
+  - pattern-not-inside: function $F(...) { ... user_can(...); ... }
+  - pattern-not-inside: function $F(...) { ... if (!user_can(...)) { ... } ... }
+  - pattern-not-inside: function $F(...) { ... if (!user_can(...)) $S; ... }
+  - pattern-not-inside: function $F(...) { ... author_can(...); ... }
+  - pattern-not-inside: function $F(...) { ... if (!author_can(...)) { ... } ... }
+  - pattern-not-inside: function $F(...) { ... if (!author_can(...)) $S; ... }
+  - pattern-not-inside: function $F(...) { ... is_super_admin(...); ... }
+  - pattern-not-inside: function $F(...) { ... if (!is_super_admin(...)) { ... } ... }
+  - pattern-not-inside: function $F(...) { ... if (!is_super_admin(...)) $S; ... }
+  - pattern-not-inside: function $F(...) { ... map_meta_cap(...); ... }
+  - pattern-not-inside: function $F(...) { ... if (!map_meta_cap(...)) { ... } ... }
+  - pattern-not-inside: function $F(...) { ... if (!map_meta_cap(...)) $S; ... }
