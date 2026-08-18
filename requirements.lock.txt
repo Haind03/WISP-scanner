@@ -1,0 +1,9 @@
+# Exact versions used to produce every number in the paper (host: PHP 8.1.2,
+# Python 3.11.9, Intel Core Ultra 7 155H). tree-sitter is parser-critical:
+# other versions can change parse trees and therefore findings, so use this
+# lockfile (pip install -r requirements.lock.txt) for exact reproduction and
+# requirements.txt only for casual use.
+tree-sitter==0.25.2
+tree-sitter-php==0.24.1
+PyYAML==6.0.3
+openpyxl==3.1.5

@@ -1,0 +1,98 @@
+rules:
+  - id: wp-sqli-direct-query
+    languages: [php]
+    severity: ERROR
+    message: >
+      Untrusted request data flows into a $wpdb query without prepare().
+      Possible SQL injection (sqli).
+    metadata:
+      class: sqli
+      owasp: A03:2021-Injection
+    mode: taint
+    pattern-sources:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_REQUEST
+      - pattern: $_COOKIE
+    pattern-sanitizers:
+      - pattern: esc_sql(...)
+      - pattern: absint(...)
+      - pattern: intval(...)
+      - pattern: $wpdb->prepare(...)
+    pattern-sinks:
+      - pattern: $wpdb->query(...)
+      - pattern: $wpdb->get_results(...)
+      - pattern: $wpdb->get_row(...)
+      - pattern: $wpdb->get_var(...)
+
+  - id: wp-reflected-xss-echo
+    languages: [php]
+    severity: ERROR
+    message: >
+      Untrusted request data is echoed without escaping. Possible reflected XSS (xss).
+    metadata:
+      class: xss
+      owasp: A03:2021-Injection
+    mode: taint
+    pattern-sources:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_REQUEST
+      - pattern: $_COOKIE
+      - pattern: $_SERVER
+    pattern-sanitizers:
+      - pattern: esc_html(...)
+      - pattern: esc_attr(...)
+      - pattern: esc_url(...)
+      - pattern: sanitize_text_field(...)
+      - pattern: wp_kses(...)
+      - pattern: wp_kses_post(...)
+      - pattern: intval(...)
+      - pattern: absint(...)
+    pattern-sinks:
+      - pattern: echo ...
+      - pattern: print ...
+
+  - id: wp-lfi-include
+    languages: [php]
+    severity: ERROR
+    message: >
+      Untrusted request data flows into a file include. Possible LFI/path traversal (lfi).
+    metadata:
+      class: lfi
+      owasp: A01:2021-Broken-Access-Control
+    mode: taint
+    pattern-sources:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_REQUEST
+    pattern-sanitizers:
+      - pattern: sanitize_file_name(...)
+      - pattern: basename(...)
+    pattern-sinks:
+      - pattern: include $X
+      - pattern: include_once $X
+      - pattern: require $X
+      - pattern: require_once $X
+
+  - id: wp-rce-dangerous-call
+    languages: [php]
+    severity: ERROR
+    message: >
+      Untrusted request data flows into a code/command execution sink (rce).
+    metadata:
+      class: rce
+      owasp: A03:2021-Injection
+    mode: taint
+    pattern-sources:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_REQUEST
+      - pattern: $_COOKIE
+    pattern-sinks:
+      - pattern: eval(...)
+      - pattern: system(...)
+      - pattern: exec(...)
+      - pattern: shell_exec(...)
+      - pattern: passthru(...)
+      - pattern: call_user_func(...)

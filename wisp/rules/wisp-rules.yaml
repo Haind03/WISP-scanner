@@ -1,0 +1,371 @@
+# WISP taint-specification rules — the project's OWN rule format.
+#
+# This file replaces Semgrep / its registry packs. Detection is driven entirely
+# by this declarative spec, executed by our tree-sitter taint engine
+# (pipeline/taint_engine.py via pipeline/rule_spec.py). No third-party scan
+# engine is involved.
+#
+# Stage-4 (rule-mining loop): once a finding is PoC/LLM-confirmed and passes
+# the false-positive regression gate (selftest_engine.py), new vocabulary is
+# appended here. Sections marked [LEARNED] were derived from bounded LLM-review
+# of real findings: the generalizable lessons became declarative rules instead
+# of hard-coded logic.
+#
+# Keep machine-editable: one concept per list item, stable ordering.
+version: 2
+
+# --- taint sources --------------------------------------------------------- #
+# Attacker-controlled request superglobals.
+superglobals:
+  - $_GET
+  - $_POST
+  - $_REQUEST
+  - $_COOKIE
+  - $_FILES
+  - $_SERVER
+  - $_ENV
+  - $HTTP_RAW_POST_DATA
+
+# Functions that read or pass through attacker-controlled data (taint is kept).
+source_funcs:
+  - file_get_contents
+  - stream_get_contents
+  - getenv
+  - wp_unslash
+  - apply_filters
+  - filter_input
+  - filter_input_array
+  - getallheaders
+  - apache_request_headers
+  # [Paper05] WP option/meta can hold attacker-influenced data (second-order sources)
+  - get_option
+  - get_post_meta
+  - get_user_meta
+  - get_term_meta
+  - get_transient
+  - get_site_option
+  - get_comment_meta
+
+# --- sanitizers ------------------------------------------------------------ #
+# Any of these on a flow neutralizes taint (precision lever).
+sanitizers:
+  # WordPress escapers (output context)
+  - esc_html
+  - esc_html__
+  - esc_html_e
+  - esc_attr
+  - esc_attr__
+  - esc_attr_e
+  - esc_url
+  - esc_url_raw
+  - esc_js
+  - esc_textarea
+  - esc_xml
+  - esc_sql
+  - esc_like
+  - tag_escape
+  - wp_kses
+  - wp_kses_post
+  - wp_kses_data
+  - wp_strip_all_tags
+  - antispambot
+  # WordPress sanitizers (input context)
+  - sanitize_text_field
+  - sanitize_textarea_field
+  - sanitize_email
+  - sanitize_key
+  - sanitize_file_name
+  - sanitize_title
+  - sanitize_title_with_dashes
+  - sanitize_user
+  - sanitize_html_class
+  - sanitize_hex_color
+  - sanitize_hex_color_no_hash
+  - sanitize_mime_type
+  - sanitize_option
+  - sanitize_url
+  - sanitize_sql_orderby
+  - wp_parse_id_list
+  - validate_file
+  - wp_validate_boolean
+  # numeric / type coercion
+  - absint
+  - intval
+  - floatval
+  - boolval
+  - is_numeric
+  - ctype_digit
+  - number_format
+  - zeroise
+  # generic PHP escapers
+  - htmlspecialchars
+  - htmlentities
+  - addslashes
+  - mysqli_real_escape_string
+  - mysql_real_escape_string
+  - real_escape_string
+  - filter_var
+  - preg_quote
+  - basename
+  - rawurlencode
+  - urlencode
+  - json_encode
+  # cryptographic digests (one-way -> not injectable downstream)
+  - md5
+  - sha1
+  - hash
+  - wp_hash
+  # nonce check used as a taint sanitizer in legacy callers
+  - wp_verify_nonce
+  - wpdb::prepare
+
+# --- sinks (grouped by vulnerability class) -------------------------------- #
+# `funcs`        : bare function/callable names that are dangerous sinks.
+# `wpdb_methods` : $wpdb-> method calls that execute SQL (prepare excluded).
+# `db_funcs`     : procedural DB query functions.
+sinks:
+  rce:
+    funcs:
+      - system
+      - exec
+      - shell_exec
+      - passthru
+      - popen
+      - proc_open
+      - pcntl_exec
+      - eval
+      - assert
+      - call_user_func
+      - call_user_func_array
+      - create_function
+      # [Paper01/02] callback-via-higher-order RCE sinks
+      - array_map
+      - usort
+      - uasort
+      - uksort
+      - register_shutdown_function
+      - register_tick_function
+  lfi:
+    funcs:
+      - include
+      - include_once
+      - require
+      - require_once
+      - fopen
+      - readfile
+      - file
+      - file_get_contents
+      - highlight_file
+      - show_source
+      - parse_ini_file
+      - readlink
+      - opendir
+      - scandir
+      - glob
+      - unlink
+      # [Paper01] WP-specific LFI sinks commonly missed by generic scanners
+      - locate_template
+      - load_template
+      - get_template_part
+      - virtual
+  upload:
+    funcs:
+      - file_put_contents
+      - move_uploaded_file
+      - fwrite
+      - fputs
+      - copy
+      # [Paper01] WP sideload handlers — upload sink via plugin API
+      - wp_handle_sideload
+      - media_handle_sideload
+      # [Paper01/03] direct WP upload handlers (upload 80% miss class) — dangerous
+      # when type validation is bypassed ($overrides['test_type'] disabled)
+      - wp_handle_upload
+      - media_handle_upload
+  deserial:
+    funcs:
+      - unserialize
+      - maybe_unserialize
+      - yaml_parse
+      - igbinary_unserialize
+  ssrf:
+    funcs:
+      - header
+      - wp_remote_get
+      - wp_remote_post
+      - wp_remote_request
+      - wp_remote_head
+      - curl_exec
+      - fsockopen
+      - stream_socket_client
+      - get_headers
+      - getimagesize
+  other:
+    # open redirect + dynamic var/code sinks that don't fit a tighter class
+    funcs:
+      - wp_redirect
+      - wp_safe_redirect
+      - setcookie
+      - setrawcookie
+      - extract
+      - parse_str
+      - mb_parse_str
+      - import_request_variables
+      - preg_replace
+      - create_function
+  xss:
+    funcs:
+      - echo
+      - print
+      - printf
+      - vprintf
+      - print_r
+  sqli:
+    wpdb_methods:
+      - query
+      - get_results
+      - get_row
+      - get_var
+      - get_col
+      - prepare
+      - get_blog_prefix
+    db_funcs:
+      - mysqli_query
+      - mysql_query
+      - mysqli_multi_query
+      - mysqli_real_query
+      - pg_query
+      - sqlsrv_query
+      - mssql_query
+
+# --- framework-aware missing-guard detector (CSRF / broken access control) - #
+# State-changing operations reachable from a request without a nonce check are
+# CSRF candidates; without a capability check they are broken-access-control
+# (auth) candidates. This is the WordPress-specific analysis generic taint tools
+# miss. Fires when a function reads request data, performs a state change, and
+# the corresponding guard call is absent from the function body.
+state_change:
+  funcs:
+    - update_option
+    - add_option
+    - delete_option
+    - update_site_option
+    - update_network_option
+    - update_post_meta
+    - add_post_meta
+    - delete_post_meta
+    - update_user_meta
+    - add_user_meta
+    - delete_user_meta
+    - update_term_meta
+    - wp_insert_post
+    - wp_update_post
+    - wp_delete_post
+    - wp_insert_user
+    - wp_create_user
+    - wp_update_user
+    - wp_set_password
+    - wp_insert_comment
+    - wp_update_comment
+    - wp_delete_comment
+    - wp_set_comment_status
+    - wp_insert_term
+    - wp_update_term
+    - wp_delete_term
+    - wp_set_object_terms
+    - wp_set_post_terms
+    - wp_insert_attachment
+    - add_role
+    - remove_role
+    - set_transient
+    - set_site_transient
+    - wp_schedule_event
+    - rename
+    - rmdir
+    - mkdir
+  wpdb_methods:
+    - insert
+    - update
+    - delete
+    - replace
+
+guards:
+  nonce:
+    - wp_verify_nonce
+    - check_admin_referer
+    - check_ajax_referer
+  capability:
+    - current_user_can
+    - current_user_can_for_blog
+    - user_can
+    - author_can
+    - is_super_admin
+    - map_meta_cap
+
+# --- [LEARNED] precision vocab from LLM-verify (Stage-4) -------------------- #
+# safe_members: superglobal array members that are SERVER-controlled, not
+# attacker data, so they must never seed taint. Learned from a false LFI on
+# fopen($_FILES['f']['tmp_name']) — tmp_name is the server's random temp path.
+safe_members:
+  $_FILES:
+    - tmp_name
+    - size
+    - error
+  $_SERVER:
+    - REQUEST_TIME
+    - REQUEST_TIME_FLOAT
+    - SERVER_ADDR
+    - SERVER_PORT
+    - SERVER_SOFTWARE
+    - DOCUMENT_ROOT
+    - SCRIPT_FILENAME
+    - GATEWAY_INTERFACE
+
+# predicate_funcs: return a bool/int metadata answer, NOT the tainted string
+# itself, so taint must be dropped. Learned from false flows where an
+# isset()/count() result was treated as carrying request data.
+predicate_funcs:
+  - isset
+  - empty
+  - is_array
+  - is_string
+  - is_bool
+  - is_int
+  - is_null
+  - is_object
+  - array_key_exists
+  - in_array
+  - count
+  - sizeof
+  - strlen
+  - mb_strlen
+  - gettype
+
+# pattern_only_sinks: dangerous ONLY when their pattern (arg 0) is tainted; a
+# tainted subject is harmless. Learned from a false RCE/other on
+# preg_replace('#/+#', '/', $tainted_subject) — the pattern was a constant.
+pattern_only_sinks:
+  - preg_replace
+  - preg_replace_callback
+  - preg_match
+  - preg_match_all
+  - ereg_replace
+  - mb_ereg_replace
+
+
+# --- [LEARNED Stage-4] auto-appended; PoC/LLM-confirmed sanitizers, regression-gated by selftest_engine.py ---
+learned_sanitizers:
+  - acme_harden    # [LEARNED Stage-4] fixture.php (acme_harden)
+
+
+# --- [LEARNED recall-growth] method sinks $obj->name() ---
+learned_method_sinks:
+  insert: sqli    # [recall-growth] 2026-07-06 sample-mined
+  put_contents: upload    # [recall-growth] 2026-07-06 sample-mined
+  loadHTML: xss    # [recall-growth] 2026-07-06 sample-mined
+  loadXML: xss    # [recall-growth] 2026-07-06 sample-mined
+  get_contents: lfi    # [recall-growth] 2026-07-06 sample-mined
+  appendChild: xss    # [recall-growth] 2026-07-06 sample-mined
+  update: sqli    # [recall-growth] 2026-07-06 sample-mined
+  addFile: upload    # [recall-growth] 2026-07-06 sample-mined
+  createTextNode: xss    # [recall-growth] 2026-07-06 sample-mined

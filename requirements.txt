@@ -1,0 +1,10 @@
+# WISP core taint engine — everything needed to SCAN (CPU-only, no network).
+tree-sitter>=0.21
+tree-sitter-php>=0.22
+pyyaml>=6.0
+
+# Evaluation harnesses only (reading the Patchstack label sheets):
+openpyxl>=3.1
+
+# Optional LLM verification stage (wisp/engine/l4_verify.py) and Stage-4 learning
+# loop. Not needed to scan or to reproduce the core taint results.

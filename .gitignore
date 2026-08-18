@@ -1,0 +1,32 @@
+# data / generated artifacts
+out/
+paper/*.pdf
+*.zip
+*.tar.gz
+plugins/
+patchstack_bugbounty/
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+.venv/
+venv/
+
+# env / secrets — never commit a real key
+.env
+
+# logs / temp / editor
+*.log
+*.bak
+*.tmp
+.vscode/
+.idea/
+
+# republishing helpers, not part of the artifact
+AUTHORS-MAP.txt
+build-fresh-history.py
+push-to-new-repo.sh
+texput.log

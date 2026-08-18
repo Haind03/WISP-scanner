@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use WISP or its benchmark, please cite the paper and the dataset."
+title: "WISP: A WordPress-Aware Symbolic Taint Scanner for Plugin Vulnerabilities"
+authors:
+  - family-names: Nguyen
+    given-names: Dinh Hai
+    affiliation: "Posts and Telecommunications Institute of Technology"
+  - family-names: Dinh
+    given-names: Truong Duy
+    affiliation: "Posts and Telecommunications Institute of Technology"
+  - family-names: Nguyen
+    given-names: Dinh Hieu
+    affiliation: "Posts and Telecommunications Institute of Technology"
+year: 2026
+license: MIT
+references:
+  - type: data
+    title: "WISP-1108: A WordPress Plugin Vulnerability Benchmark, with a 325-plugin untouched test set and a 100-CVE Wordfence external-validation set"
+    doi: 10.5281/zenodo.21627535
+    year: 2026
