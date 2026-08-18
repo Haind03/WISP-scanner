@@ -332,6 +332,11 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--target", type=int, default=200)
     ap.add_argument("--sample-only", action="store_true")
+    # A third blind annotator is the cheapest strengthening left: the sample, the packets and the
+    # sealed key already exist, so adding one is a package build rather than a new study. Kept as a
+    # flag so the same draw is reused and the new reader sees exactly what A and B saw.
+    ap.add_argument("--reviewers", default="A,B",
+                    type=lambda x: tuple(t.strip() for t in x.split(",") if t.strip()))
     ap.add_argument("--dest", default=os.path.join(C.ADJ_DIR, "SEND-HUMAN-2026-08-10"))
     a = ap.parse_args()
     if not TARGET_MIN <= a.target <= TARGET_MAX:
@@ -392,7 +397,7 @@ def main():
     if a.sample_only:
         return 0
 
-    for tag in ("A", "B"):
+    for tag in a.reviewers:
         pkg, t1, t2 = build_package(picked, a.dest, tag)
         xlsx = build_workbook(pkg, tag, t1, t2)
         print("reviewer %s: %d tier-1 rows, %d tier-2 rows -> %s"

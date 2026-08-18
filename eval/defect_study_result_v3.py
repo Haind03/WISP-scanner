@@ -72,11 +72,37 @@ def _boot_kappa(units, a_of, b_of, reps=REPS, seed=SEED):
     return [round(float(lo), 4), round(float(hi), 4)]
 
 
+SHIPPED = os.path.join(ROOT, "defect-study", "defect_study_labels.csv")
+
+
+def _units_from_shipped():
+    """Rebuild the analysis units from the shipped anonymised label sheet.
+
+    A reviewer objected that the one number in this paper resting on human judgment could not be
+    recomputed from the bundle, because the sheets lived outside it. They ship now, and this is the
+    path both the bundle and the working tree take when the sheet is present, so the published
+    result is checked by exactly the file a reader holds.
+    """
+    import csv as _csv
+    out = []
+    with open(SHIPPED, encoding="utf-8") as fh:
+        for r in _csv.DictReader(fh):
+            u = {k: r[k] for k in ("packet_id", "record_uid", "slug", "cve", "tool",
+                                   "advisory_class")}
+            for g in ("in_patched_file", "same_callable_as_change", "on_exact_changed_line"):
+                u[g] = str(r[g]).strip().lower() == "true"
+            for who in ("A", "B"):
+                u[who] = {ax: r[f"{who}_{ax}"] for ax in AXES}
+            out.append(u)
+    return out
+
+
 def main():
+    if os.path.isfile(SHIPPED):
+        return _score(_units_from_shipped())
     key = C.read_json(os.path.join(C.TIER2_DIR, "BLINDING_KEY.json"))["payload"]["map"]
     labels = {r: C.read_json(os.path.join(C.TIER2_DIR, f"reviewer_{r}_findings.json"))["payload"]["labels"]
               for r in ("A", "B")}
-    meta = C.read_json(os.path.join(C.TIER1_DIR, "REVIEWER_METADATA_TEMPLATE.json"))["payload"]
 
     smp = C.read_json(SAMPLE)
     smp = smp.get("payload", smp)
@@ -103,6 +129,14 @@ def main():
                       "A": labels["A"][pid], "B": labels["B"][pid]})
     if len(units) != len(want):
         raise SystemExit(f"sample has {len(want)} findings but only {len(units)} joined to a packet")
+    return _score(units)
+
+
+def _score(units):
+    _meta_p = os.path.join(C.TIER1_DIR, "REVIEWER_METADATA_TEMPLATE.json")
+    if not os.path.isfile(_meta_p):
+        _meta_p = os.path.join(ROOT, "defect-study", "ANNOTATOR_METADATA.json")
+    meta = C.read_json(_meta_p)["payload"]
 
     def same_defect(who):
         return lambda u: u[who]["root_cause_relation"] == "SAME_DEFECT"
