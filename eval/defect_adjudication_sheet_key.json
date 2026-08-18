@@ -1,0 +1,835 @@
+{
+ "Dd62c4695": {
+  "tool": "wpt",
+  "slug": "the-post-grid",
+  "cve": "CVE-2026-49054",
+  "advisory_class": "auth",
+  "reported_class": "xss"
+ },
+ "D31117264": {
+  "tool": "wisp",
+  "slug": "cliengo",
+  "cve": "CVE-2025-69388",
+  "advisory_class": "auth",
+  "reported_class": "ssrf"
+ },
+ "D626fad63": {
+  "tool": "wpt",
+  "slug": "quickwebp",
+  "cve": "CVE-2026-42756",
+  "advisory_class": "lfi",
+  "reported_class": "lfi"
+ },
+ "D4ebdf74d": {
+  "tool": "wisp",
+  "slug": "woocustomizer",
+  "cve": "CVE-2026-27046",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "D0aef8417": {
+  "tool": "wisp",
+  "slug": "woocommerce-delivery-notes",
+  "cve": "CVE-2026-24946",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "Dd9a6586a": {
+  "tool": "wpt",
+  "slug": "court-reservation",
+  "cve": "CVE-2026-39675",
+  "advisory_class": "auth",
+  "reported_class": "xss"
+ },
+ "Dd2c0a0e9": {
+  "tool": "wisp",
+  "slug": "modal-dialog",
+  "cve": "CVE-2026-32367",
+  "advisory_class": "rce",
+  "reported_class": "other"
+ },
+ "D7f28fea1": {
+  "tool": "wpt",
+  "slug": "fluent-cart",
+  "cve": "CVE-2025-67971",
+  "advisory_class": "xss",
+  "reported_class": "xss"
+ },
+ "D6ea3e2b1": {
+  "tool": "wpt",
+  "slug": "rsvp",
+  "cve": "CVE-2026-39536",
+  "advisory_class": "other",
+  "reported_class": "sqli"
+ },
+ "De5bec215": {
+  "tool": "wisp",
+  "slug": "powerpack-lite-for-elementor",
+  "cve": "CVE-2026-32430",
+  "advisory_class": "xss",
+  "reported_class": "auth"
+ },
+ "D551157bc": {
+  "tool": "wisp",
+  "slug": "userfeedback-lite",
+  "cve": "CVE-2026-39475",
+  "advisory_class": "sqli",
+  "reported_class": "auth"
+ },
+ "Db22bc838": {
+  "tool": "wpt",
+  "slug": "instantio",
+  "cve": "CVE-2026-39571",
+  "advisory_class": "other",
+  "reported_class": "auth"
+ },
+ "D36290d5f": {
+  "tool": "wisp",
+  "slug": "alttext-ai",
+  "cve": "CVE-2026-25348",
+  "advisory_class": "auth",
+  "reported_class": "deserial"
+ },
+ "Db6f504f8": {
+  "tool": "wpt",
+  "slug": "gutenberg",
+  "cve": "CVE-2025-64354",
+  "advisory_class": "xss",
+  "reported_class": "rce"
+ },
+ "Dd1a10641": {
+  "tool": "wpt",
+  "slug": "capability-manager-enhanced",
+  "cve": "CVE-2026-32394",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "Df9618f55": {
+  "tool": "wisp",
+  "slug": "e2pdf",
+  "cve": "CVE-2026-42681",
+  "advisory_class": "xss",
+  "reported_class": "auth"
+ },
+ "Daf342799": {
+  "tool": "wisp",
+  "slug": "wp-full-stripe-free",
+  "cve": "CVE-2026-42378",
+  "advisory_class": "other",
+  "reported_class": "ssrf"
+ },
+ "D90d1838e": {
+  "tool": "wpt",
+  "slug": "advanced-google-recaptcha",
+  "cve": "CVE-2025-2074",
+  "advisory_class": "sqli",
+  "reported_class": "sqli"
+ },
+ "D81609603": {
+  "tool": "wisp",
+  "slug": "woo-cart-abandonment-recovery",
+  "cve": "CVE-2026-39470",
+  "advisory_class": "auth",
+  "reported_class": "deserial"
+ },
+ "D40cd504c": {
+  "tool": "wisp",
+  "slug": "simple-membership",
+  "cve": "CVE-2026-34886",
+  "advisory_class": "other",
+  "reported_class": "sqli"
+ },
+ "Dc7e2419d": {
+  "tool": "wisp",
+  "slug": "simple-cloudflare-turnstile",
+  "cve": "CVE-2026-40799",
+  "advisory_class": "other",
+  "reported_class": "auth"
+ },
+ "Db333dc0a": {
+  "tool": "wisp",
+  "slug": "cf7-styler",
+  "cve": "CVE-2026-27393",
+  "advisory_class": "auth",
+  "reported_class": "xss"
+ },
+ "D1ac7f402": {
+  "tool": "wisp",
+  "slug": "fluent-cart",
+  "cve": "CVE-2025-67971",
+  "advisory_class": "xss",
+  "reported_class": "rce"
+ },
+ "D820ddb27": {
+  "tool": "wpt",
+  "slug": "w3-total-cache",
+  "cve": "CVE-2025-9501",
+  "advisory_class": "rce",
+  "reported_class": "rce"
+ },
+ "D93455ca1": {
+  "tool": "wpt",
+  "slug": "litespeed-cache",
+  "cve": "CVE-2024-51915",
+  "advisory_class": "xss",
+  "reported_class": "auth"
+ },
+ "D6da0a4db": {
+  "tool": "wisp",
+  "slug": "collectchat",
+  "cve": "CVE-2026-40765",
+  "advisory_class": "other",
+  "reported_class": "auth"
+ },
+ "Dad6e12f7": {
+  "tool": "wisp",
+  "slug": "mycred",
+  "cve": "CVE-2026-27440",
+  "advisory_class": "xss",
+  "reported_class": "csrf"
+ },
+ "D8296d899": {
+  "tool": "wpt",
+  "slug": "geo-mashup",
+  "cve": "CVE-2026-27427",
+  "advisory_class": "xss",
+  "reported_class": "sqli"
+ },
+ "Dcae60a0d": {
+  "tool": "wpt",
+  "slug": "ultimate-addons-for-contact-form-7",
+  "cve": "CVE-2026-32460",
+  "advisory_class": "xss",
+  "reported_class": "auth"
+ },
+ "Df67edcc6": {
+  "tool": "wisp",
+  "slug": "export-wp-page-to-static-html",
+  "cve": "CVE-2026-24574",
+  "advisory_class": "csrf",
+  "reported_class": "auth"
+ },
+ "D26445114": {
+  "tool": "wisp",
+  "slug": "review-schema",
+  "cve": "CVE-2026-25344",
+  "advisory_class": "other",
+  "reported_class": "rce"
+ },
+ "D617e57fd": {
+  "tool": "wpt",
+  "slug": "ultimate-addons-for-gutenberg",
+  "cve": "CVE-2026-42648",
+  "advisory_class": "auth",
+  "reported_class": "xss"
+ },
+ "D322a75de": {
+  "tool": "wisp",
+  "slug": "pojo-accessibility",
+  "cve": "CVE-2026-25386",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "D26e501fd": {
+  "tool": "wisp",
+  "slug": "custom-post-type-ui",
+  "cve": "CVE-2023-1623",
+  "advisory_class": "csrf",
+  "reported_class": "auth"
+ },
+ "Debdee3a6": {
+  "tool": "wpt",
+  "slug": "wp-security-audit-log",
+  "cve": "CVE-2026-45435",
+  "advisory_class": "xss",
+  "reported_class": "deserial"
+ },
+ "Dd64ea0db": {
+  "tool": "wisp",
+  "slug": "cleantalk-spam-protect",
+  "cve": "CVE-2022-3302",
+  "advisory_class": "sqli",
+  "reported_class": "auth"
+ },
+ "D28afae01": {
+  "tool": "wisp",
+  "slug": "seriously-simple-podcasting",
+  "cve": "CVE-2026-39505",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "D4780b04e": {
+  "tool": "wisp",
+  "slug": "wpcomplete",
+  "cve": "CVE-2026-42750",
+  "advisory_class": "xss",
+  "reported_class": "other"
+ },
+ "D3eb54f45": {
+  "tool": "wisp",
+  "slug": "official-mailerlite-sign-up-forms",
+  "cve": "CVE-2026-25420",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "D02a76732": {
+  "tool": "wpt",
+  "slug": "woocommerce-delivery-notes",
+  "cve": "CVE-2026-24946",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "D4c7758bf": {
+  "tool": "wpt",
+  "slug": "geo-mashup",
+  "cve": "CVE-2026-27427",
+  "advisory_class": "xss",
+  "reported_class": "xss"
+ },
+ "Dbc6b994e": {
+  "tool": "wisp",
+  "slug": "user-registration",
+  "cve": "CVE-2026-25425",
+  "advisory_class": "other",
+  "reported_class": "sqli"
+ },
+ "De46d6988": {
+  "tool": "wpt",
+  "slug": "wpcomplete",
+  "cve": "CVE-2026-42750",
+  "advisory_class": "xss",
+  "reported_class": "auth"
+ },
+ "D8c0c9d0a": {
+  "tool": "wpt",
+  "slug": "checkout-upsell-and-order-bumps",
+  "cve": "CVE-2026-25419",
+  "advisory_class": "auth",
+  "reported_class": "sqli"
+ },
+ "D6cae95a5": {
+  "tool": "wisp",
+  "slug": "favicon-rotator",
+  "cve": "CVE-2026-42649",
+  "advisory_class": "other",
+  "reported_class": "upload"
+ },
+ "D2c021592": {
+  "tool": "wpt",
+  "slug": "wp-time-slots-booking-form",
+  "cve": "CVE-2026-32432",
+  "advisory_class": "auth",
+  "reported_class": "deserial"
+ },
+ "D378d5c28": {
+  "tool": "wpt",
+  "slug": "backuply",
+  "cve": "CVE-2024-8669",
+  "advisory_class": "sqli",
+  "reported_class": "deserial"
+ },
+ "D8f82a851": {
+  "tool": "wisp",
+  "slug": "breadcrumb-navxt",
+  "cve": "-",
+  "advisory_class": "other",
+  "reported_class": "auth"
+ },
+ "D1386a8ee": {
+  "tool": "wisp",
+  "slug": "quickwebp",
+  "cve": "CVE-2026-42756",
+  "advisory_class": "lfi",
+  "reported_class": "lfi"
+ },
+ "D38dad8cb": {
+  "tool": "wisp",
+  "slug": "woo-cart-abandonment-recovery",
+  "cve": "CVE-2026-39470",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "D7eb2d403": {
+  "tool": "wisp",
+  "slug": "nelio-content",
+  "cve": "CVE-2026-39521",
+  "advisory_class": "ssrf",
+  "reported_class": "rce"
+ },
+ "D5c0fd977": {
+  "tool": "wpt",
+  "slug": "advanced-google-recaptcha",
+  "cve": "CVE-2025-2074",
+  "advisory_class": "sqli",
+  "reported_class": "sqli"
+ },
+ "D01f9650f": {
+  "tool": "wisp",
+  "slug": "backwpup",
+  "cve": "-",
+  "advisory_class": "rce",
+  "reported_class": "rce"
+ },
+ "De2ce1407": {
+  "tool": "wpt",
+  "slug": "fluent-cart",
+  "cve": "CVE-2025-67971",
+  "advisory_class": "xss",
+  "reported_class": "xss"
+ },
+ "Dbb82322a": {
+  "tool": "wisp",
+  "slug": "visitor-maps-extended-referer-field",
+  "cve": "CVE-2025-69389",
+  "advisory_class": "xss",
+  "reported_class": "auth"
+ },
+ "Dc0a3e547": {
+  "tool": "wisp",
+  "slug": "wpcomplete",
+  "cve": "CVE-2026-42750",
+  "advisory_class": "xss",
+  "reported_class": "xss"
+ },
+ "D7c0f132f": {
+  "tool": "wpt",
+  "slug": "yml-for-yandex-market",
+  "cve": "CVE-2026-32567",
+  "advisory_class": "lfi",
+  "reported_class": "auth"
+ },
+ "Dcc900c32": {
+  "tool": "wisp",
+  "slug": "generateblocks",
+  "cve": "CVE-2021-24751",
+  "advisory_class": "xss",
+  "reported_class": "auth"
+ },
+ "D285beae0": {
+  "tool": "wpt",
+  "slug": "timetics",
+  "cve": "CVE-2026-39432",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "Dbdd242a5": {
+  "tool": "wisp",
+  "slug": "wp-security-audit-log",
+  "cve": "CVE-2026-45435",
+  "advisory_class": "xss",
+  "reported_class": "rce"
+ },
+ "D9c18c9a1": {
+  "tool": "wpt",
+  "slug": "collectchat",
+  "cve": "CVE-2026-40765",
+  "advisory_class": "other",
+  "reported_class": "deserial"
+ },
+ "D322be879": {
+  "tool": "wpt",
+  "slug": "wpcomplete",
+  "cve": "CVE-2026-42750",
+  "advisory_class": "xss",
+  "reported_class": "auth"
+ },
+ "Dbaf3c86c": {
+  "tool": "wpt",
+  "slug": "advanced-coupons-for-woocommerce-free",
+  "cve": "CVE-2026-39508",
+  "advisory_class": "xss",
+  "reported_class": "other"
+ },
+ "D321a22c4": {
+  "tool": "wpt",
+  "slug": "products-file-upload-for-woocommerce",
+  "cve": "CVE-2026-25328",
+  "advisory_class": "lfi",
+  "reported_class": "auth"
+ },
+ "Dacfda64b": {
+  "tool": "wpt",
+  "slug": "modal-dialog",
+  "cve": "CVE-2026-32367",
+  "advisory_class": "rce",
+  "reported_class": "other"
+ },
+ "D5dd75c49": {
+  "tool": "wisp",
+  "slug": "simple-membership",
+  "cve": "CVE-2026-34886",
+  "advisory_class": "other",
+  "reported_class": "deserial"
+ },
+ "D5247c854": {
+  "tool": "wpt",
+  "slug": "capability-manager-enhanced",
+  "cve": "CVE-2026-32394",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "D5a89ded0": {
+  "tool": "wpt",
+  "slug": "woo-cart-abandonment-recovery",
+  "cve": "CVE-2026-39470",
+  "advisory_class": "auth",
+  "reported_class": "deserial"
+ },
+ "D46969626": {
+  "tool": "wpt",
+  "slug": "faustwp",
+  "cve": "CVE-2026-49062",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "D14511b2d": {
+  "tool": "wisp",
+  "slug": "e2pdf",
+  "cve": "CVE-2026-42681",
+  "advisory_class": "xss",
+  "reported_class": "deserial"
+ },
+ "D6c268e70": {
+  "tool": "wisp",
+  "slug": "latepoint",
+  "cve": "CVE-2026-49083",
+  "advisory_class": "other",
+  "reported_class": "auth"
+ },
+ "D56710b9c": {
+  "tool": "wpt",
+  "slug": "advanced-coupons-for-woocommerce-free",
+  "cve": "CVE-2026-39508",
+  "advisory_class": "xss",
+  "reported_class": "sqli"
+ },
+ "D1ac2e7d6": {
+  "tool": "wpt",
+  "slug": "cleantalk-spam-protect",
+  "cve": "CVE-2022-3302",
+  "advisory_class": "sqli",
+  "reported_class": "auth"
+ },
+ "D28c62c7a": {
+  "tool": "wisp",
+  "slug": "latepoint",
+  "cve": "CVE-2026-49083",
+  "advisory_class": "other",
+  "reported_class": "ssrf"
+ },
+ "D0251e9eb": {
+  "tool": "wpt",
+  "slug": "image-optimization",
+  "cve": "CVE-2026-25387",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "Dabe9f6e6": {
+  "tool": "wpt",
+  "slug": "wpcomplete",
+  "cve": "CVE-2026-42750",
+  "advisory_class": "xss",
+  "reported_class": "auth"
+ },
+ "D99beae0b": {
+  "tool": "wpt",
+  "slug": "cf7-styler",
+  "cve": "CVE-2026-27393",
+  "advisory_class": "auth",
+  "reported_class": "xss"
+ },
+ "Dedab5bba": {
+  "tool": "wisp",
+  "slug": "ecab-taxi-booking-manager",
+  "cve": "CVE-2026-28040",
+  "advisory_class": "xss",
+  "reported_class": "rce"
+ },
+ "D79be3bd0": {
+  "tool": "wpt",
+  "slug": "products-file-upload-for-woocommerce",
+  "cve": "CVE-2026-25328",
+  "advisory_class": "lfi",
+  "reported_class": "auth"
+ },
+ "D287ab483": {
+  "tool": "wisp",
+  "slug": "ecab-taxi-booking-manager",
+  "cve": "CVE-2026-28040",
+  "advisory_class": "xss",
+  "reported_class": "rce"
+ },
+ "D24e69679": {
+  "tool": "wpt",
+  "slug": "fluent-cart",
+  "cve": "CVE-2025-67971",
+  "advisory_class": "xss",
+  "reported_class": "xss"
+ },
+ "D9f7491e1": {
+  "tool": "wisp",
+  "slug": "litespeed-cache",
+  "cve": "CVE-2024-51915",
+  "advisory_class": "xss",
+  "reported_class": "xss"
+ },
+ "D0fa43ff6": {
+  "tool": "wpt",
+  "slug": "motors-car-dealership-classified-listings",
+  "cve": "CVE-2026-54814",
+  "advisory_class": "lfi",
+  "reported_class": "auth"
+ },
+ "D7d434a68": {
+  "tool": "wpt",
+  "slug": "cp-contact-form-with-paypal",
+  "cve": "CVE-2026-32433",
+  "advisory_class": "sqli",
+  "reported_class": "sqli"
+ },
+ "D803023fe": {
+  "tool": "wpt",
+  "slug": "ultimate-addons-for-gutenberg",
+  "cve": "CVE-2026-42648",
+  "advisory_class": "auth",
+  "reported_class": "xss"
+ },
+ "D5ebc4add": {
+  "tool": "wisp",
+  "slug": "products-file-upload-for-woocommerce",
+  "cve": "CVE-2026-25328",
+  "advisory_class": "lfi",
+  "reported_class": "auth"
+ },
+ "Db629ea99": {
+  "tool": "wisp",
+  "slug": "ultimate-addons-for-gutenberg",
+  "cve": "CVE-2026-42648",
+  "advisory_class": "auth",
+  "reported_class": "xss"
+ },
+ "Da33e4670": {
+  "tool": "wisp",
+  "slug": "products-file-upload-for-woocommerce",
+  "cve": "CVE-2026-25328",
+  "advisory_class": "lfi",
+  "reported_class": "auth"
+ },
+ "Dc4486f34": {
+  "tool": "wpt",
+  "slug": "b2bking-wholesale-for-woocommerce",
+  "cve": "CVE-2026-27346",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "D6d84df59": {
+  "tool": "wpt",
+  "slug": "yml-for-yandex-market",
+  "cve": "CVE-2026-32567",
+  "advisory_class": "lfi",
+  "reported_class": "lfi"
+ },
+ "D3fd686fc": {
+  "tool": "wpt",
+  "slug": "w3-total-cache",
+  "cve": "CVE-2025-9501",
+  "advisory_class": "rce",
+  "reported_class": "rce"
+ },
+ "Dfbc1e8d3": {
+  "tool": "wpt",
+  "slug": "modal-dialog",
+  "cve": "CVE-2026-32367",
+  "advisory_class": "rce",
+  "reported_class": "auth"
+ },
+ "D05dd6172": {
+  "tool": "wpt",
+  "slug": "simple-cloudflare-turnstile",
+  "cve": "CVE-2026-40799",
+  "advisory_class": "other",
+  "reported_class": "xss"
+ },
+ "De1082951": {
+  "tool": "wpt",
+  "slug": "ultimate-addons-for-gutenberg",
+  "cve": "CVE-2026-42648",
+  "advisory_class": "auth",
+  "reported_class": "xss"
+ },
+ "Dc25e90c5": {
+  "tool": "wpt",
+  "slug": "ecab-taxi-booking-manager",
+  "cve": "CVE-2026-28040",
+  "advisory_class": "xss",
+  "reported_class": "auth"
+ },
+ "D415e24f3": {
+  "tool": "wpt",
+  "slug": "cf7-insightly",
+  "cve": "CVE-2026-32527",
+  "advisory_class": "auth",
+  "reported_class": "sqli"
+ },
+ "Df741fa53": {
+  "tool": "wpt",
+  "slug": "ecab-taxi-booking-manager",
+  "cve": "CVE-2026-28040",
+  "advisory_class": "xss",
+  "reported_class": "xss"
+ },
+ "D45c733dd": {
+  "tool": "wisp",
+  "slug": "ultimate-addons-for-gutenberg",
+  "cve": "CVE-2026-42648",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "Dc2ee8c34": {
+  "tool": "wisp",
+  "slug": "quickwebp",
+  "cve": "CVE-2026-42756",
+  "advisory_class": "lfi",
+  "reported_class": "lfi"
+ },
+ "D6fd88033": {
+  "tool": "wisp",
+  "slug": "checkout-upsell-and-order-bumps",
+  "cve": "CVE-2026-25419",
+  "advisory_class": "auth",
+  "reported_class": "sqli"
+ },
+ "D9bc45804": {
+  "tool": "wisp",
+  "slug": "ecab-taxi-booking-manager",
+  "cve": "CVE-2026-28040",
+  "advisory_class": "xss",
+  "reported_class": "rce"
+ },
+ "Df7572e93": {
+  "tool": "wisp",
+  "slug": "fluent-cart",
+  "cve": "CVE-2025-67971",
+  "advisory_class": "xss",
+  "reported_class": "rce"
+ },
+ "D79785957": {
+  "tool": "wpt",
+  "slug": "visitor-maps-extended-referer-field",
+  "cve": "CVE-2025-69389",
+  "advisory_class": "xss",
+  "reported_class": "auth"
+ },
+ "D84044b3e": {
+  "tool": "wisp",
+  "slug": "wp-security-audit-log",
+  "cve": "CVE-2026-45435",
+  "advisory_class": "xss",
+  "reported_class": "rce"
+ },
+ "Ddff3cd17": {
+  "tool": "wpt",
+  "slug": "geo-mashup",
+  "cve": "CVE-2026-48967",
+  "advisory_class": "other",
+  "reported_class": "sqli"
+ },
+ "De84eba63": {
+  "tool": "wisp",
+  "slug": "js-support-ticket",
+  "cve": "CVE-2026-48887",
+  "advisory_class": "other",
+  "reported_class": "rce"
+ },
+ "D458cb178": {
+  "tool": "wpt",
+  "slug": "products-file-upload-for-woocommerce",
+  "cve": "CVE-2026-25328",
+  "advisory_class": "lfi",
+  "reported_class": "auth"
+ },
+ "D88085394": {
+  "tool": "wpt",
+  "slug": "simply-schedule-appointments",
+  "cve": "CVE-2026-39694",
+  "advisory_class": "auth",
+  "reported_class": "auth"
+ },
+ "D6edee56c": {
+  "tool": "wisp",
+  "slug": "simply-schedule-appointments",
+  "cve": "CVE-2026-39694",
+  "advisory_class": "auth",
+  "reported_class": "sqli"
+ },
+ "D1f82e9a8": {
+  "tool": "wisp",
+  "slug": "geo-mashup",
+  "cve": "CVE-2026-27427",
+  "advisory_class": "xss",
+  "reported_class": "xss"
+ },
+ "D3ee8b20d": {
+  "tool": "wisp",
+  "slug": "wpforms-lite",
+  "cve": "CVE-2026-40764",
+  "advisory_class": "csrf",
+  "reported_class": "xss"
+ },
+ "D62a1085f": {
+  "tool": "wpt",
+  "slug": "generateblocks",
+  "cve": "CVE-2026-48877",
+  "advisory_class": "other",
+  "reported_class": "xss"
+ },
+ "D0e812c95": {
+  "tool": "wisp",
+  "slug": "js-support-ticket",
+  "cve": "CVE-2026-48887",
+  "advisory_class": "other",
+  "reported_class": "rce"
+ },
+ "D9be9a681": {
+  "tool": "wisp",
+  "slug": "user-registration",
+  "cve": "CVE-2026-25425",
+  "advisory_class": "other",
+  "reported_class": "rce"
+ },
+ "D62380efc": {
+  "tool": "wpt",
+  "slug": "court-reservation",
+  "cve": "CVE-2026-39675",
+  "advisory_class": "auth",
+  "reported_class": "xss"
+ },
+ "D53e812e2": {
+  "tool": "wpt",
+  "slug": "quickwebp",
+  "cve": "CVE-2026-42756",
+  "advisory_class": "lfi",
+  "reported_class": "auth"
+ },
+ "D07b0f597": {
+  "tool": "wisp",
+  "slug": "blog-filter",
+  "cve": "CVE-2026-39517",
+  "advisory_class": "xss",
+  "reported_class": "rce"
+ },
+ "D5388bcf6": {
+  "tool": "wpt",
+  "slug": "essential-addons-for-elementor-lite",
+  "cve": "CVE-2024-3018",
+  "advisory_class": "deserial",
+  "reported_class": "auth"
+ },
+ "Da5392198": {
+  "tool": "wisp",
+  "slug": "geo-mashup",
+  "cve": "CVE-2026-27427",
+  "advisory_class": "xss",
+  "reported_class": "rce"
+ }
+}

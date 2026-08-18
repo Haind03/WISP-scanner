@@ -1,0 +1,605 @@
+{
+ "schema_version": "adjv3.1",
+ "protocol_version": "adjudication-v3",
+ "artifact_kind": "defect_study_sample",
+ "content_hash": "7fd7bfedd19d42147401e4b315635bb58251df2c9861bde8c5c8d100ce9ad4b1",
+ "payload": {
+  "diagnostics": {
+   "note": "the protocol stratifies on class, patch shape and plugin size, not on tool. The per-tool counts below are a consequence of that design, reported here so an imbalance is seen before labelling rather than after.",
+   "per_class": {
+    "auth": 53,
+    "csrf": 9,
+    "deserial": 3,
+    "lfi": 13,
+    "other": 46,
+    "rce": 8,
+    "sqli": 20,
+    "ssrf": 4,
+    "upload": 5,
+    "xss": 39
+   },
+   "per_shape": {
+    "code-replacement": 80,
+    "deletion": 2,
+    "guard-insertion": 61,
+    "refactor-heavy": 57
+   },
+   "per_size": {
+    "large": 66,
+    "medium": 76,
+    "small": 58
+   },
+   "per_tool": {
+    "progpilot": 11,
+    "semgrep": 56,
+    "wisp": 83,
+    "wpt": 50
+   }
+  },
+  "population": {
+   "n_findings": 701,
+   "n_records": 98,
+   "source": "revision-cns-v2/data/FINDING_POPULATION_V3.jsonl",
+   "topk": 3
+  },
+  "protocol": "revision-cns-v2/bundle-src/DEFECT-LEVEL-STUDY-PROTOCOL.md",
+  "python_version": "3.11.9",
+  "sample": {
+   "finding_uids": [
+    "0263107a-06d3-50f6-92a8-d52b3522ce56",
+    "02956072-8986-5e31-9673-5309ab3706ae",
+    "0373cbda-4d3c-599c-9af3-4d0502b1f8c3",
+    "039b8f9e-9a95-5c0d-90d9-7190091ec17c",
+    "05c34b78-c18f-5810-aeb8-84996f52230a",
+    "06dc5d30-a791-5f81-bdbb-46b6a27b3280",
+    "0a095271-f94a-544e-84a0-c1ae4b1dd622",
+    "0a2fbfda-26bb-5cff-9f8c-49e60ede07a9",
+    "0d0cbf86-9651-5eed-9469-4e063d658df1",
+    "0dee45c5-fbcb-53a1-a78d-cb582f6b423e",
+    "0e5e605f-2b4e-5529-a624-7ff55070be68",
+    "0f22e8f5-9d41-5126-b921-6178715502bf",
+    "0f3e8ae7-3927-5d5b-90db-0bda8b2b30be",
+    "12b44a14-a79f-5cab-a862-095486ca6bf8",
+    "12ed44b5-d2bf-56da-b5e8-133f2939e77e",
+    "13dd2cea-781a-54b3-aa98-ebbbd6baaaf4",
+    "14d4c72b-5ad8-52b7-a0cd-d9086e892fad",
+    "1571a7bd-9e3f-5132-936d-3f8f18b4a478",
+    "1648f088-e9a7-5ee1-abac-20989469676c",
+    "17252bf3-e9b9-5663-ad17-21ff723da144",
+    "19412ab0-5553-5fa1-9d43-f8303bfc934d",
+    "1991a5e7-d815-5dfe-8f4e-769832190d57",
+    "1d1940e1-ce81-5a37-a214-dcab79d0afaf",
+    "1d9a7709-fdda-568a-bdc4-bb80ebe622d7",
+    "1e1aa5c6-44a6-55e8-ac19-aa88e01f1eb6",
+    "1eb9325d-d043-50a9-8589-7991a93bfd81",
+    "21cf7b6b-0713-5b4f-bf87-3b00e1f4c475",
+    "2438f31e-1216-58c0-9e6b-72d7b2631077",
+    "261c6794-6792-5630-9882-aca9f99fbecf",
+    "272af31f-8558-5bd6-8576-5831cdc759f2",
+    "286d7d7d-ffa6-5c6d-959b-4a9ad5b989f7",
+    "287a5dd4-da72-590d-84b1-c8208247190e",
+    "29164d1e-e89b-5998-9400-7735aa2fd07a",
+    "29627f4c-6734-5f48-96ed-634544760eea",
+    "2b0d7617-8428-5df8-8a56-2574a17c6f87",
+    "2b5ebe23-896a-535e-bc07-3fa845780481",
+    "2b92fb86-7490-599c-ac64-c6b96845cffd",
+    "2daf30e0-041b-584c-ba3a-db7d8965e73d",
+    "2e0900b2-b6a0-557b-934b-7b70f57f1b98",
+    "35c9776a-6287-540a-bbe3-8390b7c6d986",
+    "3a048da7-6882-579d-95cf-891165e3a1f4",
+    "3a8e6e1f-a937-5fe6-986d-f4ebcaab21a7",
+    "3b593d88-f8a3-5055-867e-2011fc036936",
+    "3b88e37f-736b-58ed-a5f3-2789b6c8250f",
+    "3bb1ac41-354f-5e08-a3dc-6d9be0bdca0b",
+    "3cb443d7-f23b-5fc1-848c-f3ca5ff90282",
+    "3d310c3b-90b9-58f5-a82a-be3aa64cad49",
+    "3ed479a9-959f-5ebf-a1c0-1828be3d5946",
+    "4184f74e-9fd9-5dc6-9fb6-cc2c604c95b1",
+    "41e46856-508b-56dd-8718-36b8ede79f18",
+    "4622ca37-f2cb-524c-898d-ffbaa99d0439",
+    "464fe068-db73-5a81-b1a0-ef804fba2bae",
+    "47426b36-6a99-5f34-8af3-49ca3d711b63",
+    "49ab9791-44e6-5aa0-a107-e89091ff91f5",
+    "49ce760b-0bfd-510a-9797-d5ece9836e72",
+    "4c029ac4-6c47-55dc-acb5-c0c1bdcd9ef0",
+    "4c305af6-76df-5816-8304-32fb3348b455",
+    "4e5e0f69-ff68-54ac-96fa-f2e96de44aac",
+    "4ef1a683-ab4a-531a-915b-10dd4413b04c",
+    "4f270bc1-f2f8-58d8-a5ed-db58e0c8b17d",
+    "5060f8ec-02a9-581f-8e5c-95a0064d475b",
+    "53af0714-a151-507d-9f0f-6f170149e004",
+    "5b2e18dc-3f72-53e5-b2ab-b727fdf122e6",
+    "5b67d791-4abf-5be1-af2f-80b9bbe70867",
+    "5bd0487f-223a-5057-a338-3721423f6491",
+    "5c9a48b4-0a8c-58d7-954b-939535b14c67",
+    "5cebf811-6265-5fa0-a0d2-d2e8b9acefe7",
+    "6082d8f9-c262-5085-ac90-eb028c33997b",
+    "61a86502-fa7a-5406-b9cc-b0bc6621b130",
+    "61ed488b-2c3c-51b2-b52e-43a76e5d5f26",
+    "628d239a-9042-571d-8601-363b1553e0ee",
+    "62a38f92-b2b2-500b-a5b3-b4d22a0d972b",
+    "631d5580-6eae-55d3-94f1-543969b587fe",
+    "635e19b4-ec4c-5ee5-b9b4-c8ab9272a2c9",
+    "64a35b83-3426-5f18-ad17-a7ed0b44b353",
+    "6765f603-10a8-59f1-a6be-1306582ae669",
+    "67c155b7-7649-5f2e-be7a-634508e06da7",
+    "67c4e8d1-c294-51d5-a29c-f158bc6e0803",
+    "6800026a-14c5-5f26-b2c4-c3b1daa427c9",
+    "697693d8-9efd-57d0-a42f-e987b87203f4",
+    "699a88aa-6e2c-59ba-83ba-79cac2691aee",
+    "6a8d954f-5908-5749-8fd6-9a27a29e2b78",
+    "6af668a8-da26-57b2-9c18-112dcc4f0dae",
+    "6d1e839b-a220-542e-8fff-13752ac1ea56",
+    "6d8b727b-3b49-58c6-a18c-9812d19f2658",
+    "710e6b16-cea7-51d6-87ff-7eda8f63da5a",
+    "7314f0cc-6c8a-5b15-9333-5d85e9d1c9f0",
+    "73d78ec3-e8e3-5ef8-945d-77ea7876112c",
+    "747b2f34-8ede-565a-a98d-d1319143d552",
+    "74c6b807-8a56-52e2-88d4-1bb3dade8243",
+    "75462119-fef2-518d-9a43-35fa11409344",
+    "76ae7b67-04d7-5d0d-9618-86b4821f017a",
+    "77100e04-ee5a-5bb7-bba4-3a3a5f8a9dba",
+    "77190b56-c019-5cf4-9d4c-95c19b407b37",
+    "77541434-7abb-5316-825a-02db5350ab66",
+    "7867b611-7a9f-505a-a893-67f88f9a2ea0",
+    "78ec176e-9ca2-5743-823a-c2168839fd91",
+    "796feba2-56bc-5a46-86c5-2144082b45c9",
+    "7a23e54a-f84d-572e-a5b5-936018786cc0",
+    "7b56435a-10aa-553e-a266-15440539e88d",
+    "7bbe9030-25d7-5b6c-8453-27d612341f0f",
+    "7c15ab86-4905-5738-9297-e1c50f0f1144",
+    "7f79db4f-3925-58d7-a25a-1141a3b915fb",
+    "7fd84191-fd40-50b4-8e97-6a144aded7e3",
+    "80347407-4d44-534a-9fde-7562cfc95b18",
+    "81cc0400-1a50-51b2-a402-69024d2a9a3b",
+    "82c4c8d2-be45-5c23-bd3a-fad5c6fbc596",
+    "8491a02b-00d8-52cc-aa9e-f09baccb8f2d",
+    "85907f65-4ab9-57e2-bd34-3119133cabe7",
+    "87735ce5-fb44-523d-81de-819b7d1bcf43",
+    "89414812-e098-5b34-b6ab-210e5101e06f",
+    "8b081e1b-746d-534b-b3a7-4ba02745b1ba",
+    "8b21581b-3cf7-5da4-af25-2cb241e43fdb",
+    "8bc84c36-2a1d-592b-a530-a58088c18e59",
+    "8c909156-0f6f-57b6-9ee4-79411b9fc7e1",
+    "8ecdb0d3-8135-55cf-b623-7c9fa563be73",
+    "8f418f1e-8384-5eac-aa88-c6a5a0953d2c",
+    "908b9675-f7fb-5803-838a-385fb9cecccc",
+    "92ad2478-d198-5dab-a0df-2becab27fa44",
+    "930e92f4-9dd2-5008-9f7c-a826f883bedb",
+    "9395fe89-23d9-50e6-bdee-ce1bb3d725c8",
+    "9516c73d-481b-5e9f-bc85-5c0406580167",
+    "96e52820-c03a-5fc7-912a-3a9ab6bedc43",
+    "96e8ea1f-9a6e-5842-9428-f506a378f650",
+    "99c61805-a5ec-5efe-94de-f73e5bace8f2",
+    "9a26df2f-2ddd-5b43-8bd6-8bb8dc41aae1",
+    "9a2e6e18-532c-5349-9d43-043cf25d7713",
+    "9a84fdad-a364-54a2-828c-20e54010162b",
+    "9e3f7ef8-9c4c-556e-8b45-f6dbbfc0ea59",
+    "9face989-6b4f-5991-b3f7-fdd58ddd107b",
+    "a11d8a76-d306-5388-a561-4035a4b98cee",
+    "a2445be9-b886-5f84-86b8-3bf47806f4c4",
+    "a29b406a-9f63-5ad0-92be-ded7653ccd7f",
+    "a430aec0-eecf-591c-b3cd-ef16ace040d8",
+    "a50c8da3-78c3-54cf-ad5b-12d600f89b01",
+    "a5d2a8a4-3fb3-549c-9961-df36b6d24113",
+    "a6406b38-320a-53a5-954e-25894d5c39d9",
+    "a66ac6e5-7911-59bb-8e67-3b1737dc3fa3",
+    "a6a780fa-88b4-5d1b-b281-fbb763a46b74",
+    "a6f85b92-fb1b-5c35-b1ff-b02f185f9209",
+    "a84642b0-e155-5bf7-abf8-82f75c8b2e6d",
+    "a8601b36-e4bd-5718-8fd9-3690cf70325d",
+    "aaf4cdc1-f857-5bae-88b3-b945ec9f53d9",
+    "ada34adb-9bb8-5fe2-a114-c8fcfb86ca06",
+    "ae883691-28a9-5542-a65b-0d96a72089c9",
+    "ae9a801d-1814-50a1-adc7-6cd852488d2a",
+    "aeaa79ea-ff18-58eb-ba71-417d5b94e46f",
+    "af41fc4d-7f9b-51ff-a64e-7111adb28bd4",
+    "af8fd2b4-bae1-5e21-90e8-1dff808b1923",
+    "b0d9f820-96f1-59de-afd1-5d6bbb1f284a",
+    "b11d6856-1166-5de6-9344-9229267917d3",
+    "b2c18070-0a0c-5c81-9d8d-782c0b508739",
+    "b5ff4504-a8ba-53f5-a33a-30f62df0a83a",
+    "b6dde4c9-8653-54e3-9623-46f0cce54551",
+    "beee5f7f-230a-5ec7-884b-204dfd197651",
+    "bf27c159-255e-55eb-a771-993687107eb7",
+    "c220a91b-33ce-5542-8050-220aa9eb8702",
+    "c23f1d1a-6811-50bd-9115-a6e7cbc1a09d",
+    "c3362868-871c-5989-8b0d-6399df79eb54",
+    "c4c8bd1d-320c-50f3-8676-dd30c76c0803",
+    "c75ce5de-621c-54c9-904f-e78c51f07a3b",
+    "c789d3ba-e288-566d-9c6b-69a1447b5767",
+    "c96a2d42-6e9a-5ce9-934e-e0bb07f86983",
+    "cb355349-429b-5ce5-a18e-5a1db806c3db",
+    "cb8c56a9-b6a5-5e27-8540-eb66e44cba96",
+    "cb92d224-6f84-5dd2-a7ea-c81ca449f9c1",
+    "cbf2c82c-92c5-53c2-ad64-4ebaf7dba47a",
+    "cd40a529-e63c-58f5-8d8e-fd5125afa56b",
+    "cd51397a-785d-57bc-9fdb-339920d887af",
+    "cd746b7f-5c11-5195-ac6c-8f064e3aca7a",
+    "d48f3486-d630-554a-a631-64f8c1d7fae3",
+    "d4dc473e-c9ec-5b0b-b3c5-775347389b50",
+    "d642f87c-c57c-5ae7-9885-901498dcfae0",
+    "d6743e70-7243-5035-81c2-eb5873d2ae83",
+    "d6855b72-0a78-5267-923d-fb94ff33dc05",
+    "da8db3f7-e507-5341-a9e8-b1a2b8c4def4",
+    "dbe492d6-3a14-56ca-9532-154d067509da",
+    "dea8b2b9-5504-5765-9f8a-a343c0e8aaca",
+    "def7542f-e1cc-5feb-b414-32e4b63d9651",
+    "dff2cb85-2f1f-5194-b71d-6458b28bda94",
+    "e1ae092c-a7e8-504f-a39c-d04f8a752779",
+    "e32eac8c-7fb3-5bf1-b8aa-bcd9985bb5a4",
+    "e514d940-a627-5b2c-8651-e56accc5ba03",
+    "e5525494-969c-5a6e-86a5-82f4b4f0ba08",
+    "e5f7734b-207d-5bcb-bc51-efb05649a6e8",
+    "e9dca877-6f0d-5cb3-bc22-afe2c4f78e40",
+    "ed237b8b-a6c2-52a5-8c3e-a69a21240b9b",
+    "ed7d0b74-a876-5229-96fe-65ade0cb919b",
+    "f0204ec7-59b3-548c-a7ae-f93ada4a271c",
+    "f11556da-175e-5fb8-a3c4-cbe8a0d317ae",
+    "f17ae25e-8613-5cf4-be31-9db868920585",
+    "f1820461-7a35-5051-9e80-14ed53265c95",
+    "f3691bfa-c629-5f53-a550-b9945f3cc2a9",
+    "f44555f8-3370-54d2-9200-0774170c7ef8",
+    "f5c7ab34-6ecf-56ca-a39f-307a89fc0d85",
+    "f639fa96-a13e-5d88-948c-668ce0fbd86e",
+    "fb67ef19-0262-596b-8327-e0e38843d833",
+    "fc986184-5761-5933-b180-0c4abb74ce33",
+    "fcaa8a93-dca7-5687-8c7c-6439a803711c",
+    "fcd8f780-b367-5237-a9b6-e39642a023cd"
+   ],
+   "n_findings": 200,
+   "n_records": 88,
+   "records": [
+    "advanced-coupons-for-woocommerce-free|CVE-2026-39508",
+    "advanced-google-recaptcha|CVE-2025-2074",
+    "advanced-iframe|CVE-2026-25453",
+    "alttext-ai|CVE-2026-25348",
+    "amazonsimpleadmin|CVE-2026-42759",
+    "automatorwp|CVE-2026-42775",
+    "b2bking-wholesale-for-woocommerce|CVE-2026-27346",
+    "backup-backup|CVE-2026-39480",
+    "backuply|CVE-2024-8669",
+    "backwpup|-",
+    "bdthemes-element-pack-lite|CVE-2026-40745",
+    "breadcrumb-navxt|-",
+    "brizy|CVE-2026-32408",
+    "capability-manager-enhanced|CVE-2026-32394",
+    "cf7-insightly|CVE-2026-32527",
+    "cf7-styler|CVE-2026-27393",
+    "checkout-upsell-and-order-bumps|CVE-2026-25419",
+    "cleantalk-spam-protect|CVE-2022-3302",
+    "cliengo|CVE-2025-69388",
+    "coblocks|CVE-2024-4260",
+    "collapsing-categories|CVE-2026-32366",
+    "collectchat|CVE-2026-40765",
+    "court-reservation|CVE-2026-39675",
+    "cp-contact-form-with-paypal|CVE-2026-32433",
+    "custom-post-type-ui|CVE-2023-1623",
+    "duplicate-post|-",
+    "e2pdf|CVE-2026-42681",
+    "easy-table-of-contents|CVE-2026-32343",
+    "ecab-taxi-booking-manager|CVE-2026-28040",
+    "elementor|CVE-2026-32445",
+    "embed-pdf-viewer|CVE-2026-32349",
+    "essential-addons-for-elementor-lite|CVE-2024-3018",
+    "export-wp-page-to-static-html|CVE-2026-24574",
+    "faustwp|CVE-2026-49062",
+    "favicon-rotator|CVE-2026-42649",
+    "filr-protection|CVE-2026-28133",
+    "fluent-cart|CVE-2025-67971",
+    "generateblocks|CVE-2021-24751",
+    "generateblocks|CVE-2026-48877",
+    "geo-mashup|CVE-2026-27427",
+    "geo-mashup|CVE-2026-48967",
+    "groundhogg|CVE-2026-40727",
+    "gutenberg|CVE-2025-64354",
+    "icon-list-block|CVE-2026-32359",
+    "image-optimization|CVE-2026-25387",
+    "instantio|CVE-2026-39571",
+    "latepoint|CVE-2026-49083",
+    "litespeed-cache|CVE-2024-51915",
+    "microsoft-clarity|CVE-2024-0590",
+    "modal-dialog|CVE-2026-32367",
+    "motors-car-dealership-classified-listings|CVE-2026-54814",
+    "mw-wp-form|CVE-2023-6316",
+    "mycred|CVE-2026-27440",
+    "nelio-content|CVE-2026-39521",
+    "new-user-approve|CVE-2025-69063",
+    "official-mailerlite-sign-up-forms|CVE-2026-25420",
+    "post-smtp|CVE-2026-48838",
+    "powerpack-lite-for-elementor|CVE-2026-32430",
+    "products-file-upload-for-woocommerce|CVE-2026-25328",
+    "quickwebp|CVE-2026-42756",
+    "review-schema|CVE-2026-25344",
+    "rsvp|CVE-2026-39536",
+    "seriously-simple-podcasting|CVE-2026-39505",
+    "simple-cloudflare-turnstile|CVE-2026-40799",
+    "simply-schedule-appointments|CVE-2026-39694",
+    "site-mailer|CVE-2025-1319",
+    "squirrly-seo|CVE-2026-52714",
+    "the-post-grid|CVE-2026-49054",
+    "themesflat-addons-for-elementor|CVE-2026-39500",
+    "timetics|CVE-2026-39432",
+    "ultimate-addons-for-contact-form-7|CVE-2026-32460",
+    "ultimate-addons-for-gutenberg|CVE-2026-42648",
+    "user-registration|CVE-2026-25425",
+    "userfeedback-lite|CVE-2026-39475",
+    "visitor-maps-extended-referer-field|CVE-2025-69389",
+    "w3-total-cache|CVE-2025-9501",
+    "woo-cart-abandonment-recovery|CVE-2026-39470",
+    "woocommerce-delivery-notes|CVE-2026-24946",
+    "woocommerce-pos|CVE-2026-52711",
+    "woocustomizer|CVE-2026-27046",
+    "wp-full-stripe-free|CVE-2026-42378",
+    "wp-google-map-plugin|CVE-2026-39492",
+    "wp-job-portal|CVE-2026-48880",
+    "wp-security-audit-log|CVE-2026-45435",
+    "wp-time-slots-booking-form|CVE-2026-32432",
+    "wpcomplete|CVE-2026-42750",
+    "wpforms-lite|CVE-2026-40764",
+    "yml-for-yandex-market|CVE-2026-32567"
+   ]
+  },
+  "schema_version": "defect-study-sample-v3",
+  "script": "eval/defect_study_v3.py",
+  "seed": 20260810,
+  "strata": {
+   "auth|code-replacement|large": {
+    "allocated": 2,
+    "inclusion_probability": 0.333333,
+    "population": 6
+   },
+   "auth|code-replacement|medium": {
+    "allocated": 7,
+    "inclusion_probability": 0.25,
+    "population": 28
+   },
+   "auth|code-replacement|small": {
+    "allocated": 4,
+    "inclusion_probability": 0.285714,
+    "population": 14
+   },
+   "auth|deletion|large": {
+    "allocated": 2,
+    "inclusion_probability": 0.333333,
+    "population": 6
+   },
+   "auth|guard-insertion|large": {
+    "allocated": 7,
+    "inclusion_probability": 0.269231,
+    "population": 26
+   },
+   "auth|guard-insertion|medium": {
+    "allocated": 8,
+    "inclusion_probability": 0.25,
+    "population": 32
+   },
+   "auth|guard-insertion|small": {
+    "allocated": 10,
+    "inclusion_probability": 0.25641,
+    "population": 39
+   },
+   "auth|refactor-heavy|large": {
+    "allocated": 2,
+    "inclusion_probability": 0.4,
+    "population": 5
+   },
+   "auth|refactor-heavy|medium": {
+    "allocated": 11,
+    "inclusion_probability": 0.255814,
+    "population": 43
+   },
+   "csrf|code-replacement|large": {
+    "allocated": 2,
+    "inclusion_probability": 0.333333,
+    "population": 6
+   },
+   "csrf|code-replacement|small": {
+    "allocated": 2,
+    "inclusion_probability": 0.333333,
+    "population": 6
+   },
+   "csrf|guard-insertion|small": {
+    "allocated": 2,
+    "inclusion_probability": 0.5,
+    "population": 4
+   },
+   "csrf|refactor-heavy|large": {
+    "allocated": 3,
+    "inclusion_probability": 0.333333,
+    "population": 9
+   },
+   "deserial|guard-insertion|medium": {
+    "allocated": 3,
+    "inclusion_probability": 0.375,
+    "population": 8
+   },
+   "lfi|code-replacement|large": {
+    "allocated": 3,
+    "inclusion_probability": 0.333333,
+    "population": 9
+   },
+   "lfi|code-replacement|small": {
+    "allocated": 4,
+    "inclusion_probability": 0.333333,
+    "population": 12
+   },
+   "lfi|guard-insertion|large": {
+    "allocated": 3,
+    "inclusion_probability": 0.333333,
+    "population": 9
+   },
+   "lfi|refactor-heavy|large": {
+    "allocated": 3,
+    "inclusion_probability": 0.333333,
+    "population": 9
+   },
+   "other|code-replacement|large": {
+    "allocated": 7,
+    "inclusion_probability": 0.259259,
+    "population": 27
+   },
+   "other|code-replacement|medium": {
+    "allocated": 2,
+    "inclusion_probability": 0.333333,
+    "population": 6
+   },
+   "other|code-replacement|small": {
+    "allocated": 7,
+    "inclusion_probability": 0.259259,
+    "population": 27
+   },
+   "other|guard-insertion|large": {
+    "allocated": 4,
+    "inclusion_probability": 0.333333,
+    "population": 12
+   },
+   "other|guard-insertion|medium": {
+    "allocated": 6,
+    "inclusion_probability": 0.285714,
+    "population": 21
+   },
+   "other|guard-insertion|small": {
+    "allocated": 5,
+    "inclusion_probability": 0.263158,
+    "population": 19
+   },
+   "other|refactor-heavy|large": {
+    "allocated": 11,
+    "inclusion_probability": 0.261905,
+    "population": 42
+   },
+   "other|refactor-heavy|medium": {
+    "allocated": 4,
+    "inclusion_probability": 0.333333,
+    "population": 12
+   },
+   "rce|code-replacement|small": {
+    "allocated": 3,
+    "inclusion_probability": 0.375,
+    "population": 8
+   },
+   "rce|refactor-heavy|large": {
+    "allocated": 2,
+    "inclusion_probability": 0.333333,
+    "population": 6
+   },
+   "rce|refactor-heavy|medium": {
+    "allocated": 3,
+    "inclusion_probability": 0.375,
+    "population": 8
+   },
+   "sqli|code-replacement|medium": {
+    "allocated": 3,
+    "inclusion_probability": 0.333333,
+    "population": 9
+   },
+   "sqli|code-replacement|small": {
+    "allocated": 8,
+    "inclusion_probability": 0.25,
+    "population": 32
+   },
+   "sqli|guard-insertion|small": {
+    "allocated": 3,
+    "inclusion_probability": 0.333333,
+    "population": 9
+   },
+   "sqli|refactor-heavy|large": {
+    "allocated": 3,
+    "inclusion_probability": 0.333333,
+    "population": 9
+   },
+   "sqli|refactor-heavy|medium": {
+    "allocated": 3,
+    "inclusion_probability": 0.375,
+    "population": 8
+   },
+   "ssrf|code-replacement|medium": {
+    "allocated": 1,
+    "inclusion_probability": 0.333333,
+    "population": 3
+   },
+   "ssrf|code-replacement|small": {
+    "allocated": 1,
+    "inclusion_probability": 1.0,
+    "population": 1
+   },
+   "ssrf|refactor-heavy|medium": {
+    "allocated": 2,
+    "inclusion_probability": 0.5,
+    "population": 4
+   },
+   "upload|code-replacement|medium": {
+    "allocated": 3,
+    "inclusion_probability": 0.333333,
+    "population": 9
+   },
+   "upload|guard-insertion|medium": {
+    "allocated": 2,
+    "inclusion_probability": 0.285714,
+    "population": 7
+   },
+   "xss|code-replacement|large": {
+    "allocated": 6,
+    "inclusion_probability": 0.285714,
+    "population": 21
+   },
+   "xss|code-replacement|medium": {
+    "allocated": 8,
+    "inclusion_probability": 0.242424,
+    "population": 33
+   },
+   "xss|code-replacement|small": {
+    "allocated": 7,
+    "inclusion_probability": 0.241379,
+    "population": 29
+   },
+   "xss|guard-insertion|large": {
+    "allocated": 3,
+    "inclusion_probability": 0.25,
+    "population": 12
+   },
+   "xss|guard-insertion|medium": {
+    "allocated": 3,
+    "inclusion_probability": 0.333333,
+    "population": 9
+   },
+   "xss|guard-insertion|small": {
+    "allocated": 2,
+    "inclusion_probability": 0.333333,
+    "population": 6
+   },
+   "xss|refactor-heavy|large": {
+    "allocated": 3,
+    "inclusion_probability": 0.25,
+    "population": 12
+   },
+   "xss|refactor-heavy|medium": {
+    "allocated": 7,
+    "inclusion_probability": 0.241379,
+    "population": 29
+   }
+  },
+  "stratification": {
+   "absence_note": "a shape the population does not contain cannot be given a floor. This field exists so the gap is on the record rather than inferred from a table that simply has no such row.",
+   "axes": [
+    "advisory_class",
+    "patch_shape",
+    "plugin_size"
+   ],
+   "floor_per_stratum": 1,
+   "n_strata": 47,
+   "patch_shape_rule": "refactor-heavy if >= 20 changed PHP files, else rename if any PHP file was renamed, else deletion if any was deleted, else guard-insertion if any changed PHP file only gained lines, else code-replacement",
+   "patch_shapes_absent_from_this_population": [
+    "rename"
+   ],
+   "plugin_size_cuts": [
+    64,
+    207
+   ],
+   "plugin_size_rule": "PHP files in the vulnerable archive, tertiles of the sampled slugs"
+  },
+  "target": 200,
+  "timestamp_utc": "2026-08-17T08:59:46Z"
+ }
+}

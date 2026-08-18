@@ -1,0 +1,29 @@
+{
+  "n": 119,
+  "agreement": 0.9328,
+  "kappa": 0.8433,
+  "both_same_defect": 4,
+  "both_sd_rate": 0.0336,
+  "A_counts": {
+    "UR": 88,
+    "SC": 14,
+    "SD": 8,
+    "UN": 9
+  },
+  "B_counts": {
+    "UR": 88,
+    "SC": 14,
+    "SD": 8,
+    "UN": 9
+  },
+  "per_tool_both_sd": {
+    "wpt": {
+      "n": 60,
+      "both_sd": 4
+    },
+    "wisp": {
+      "n": 59,
+      "both_sd": 0
+    }
+  }
+}

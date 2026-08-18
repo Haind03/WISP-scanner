@@ -1,0 +1,35 @@
+{
+ "schema_version": "adjv3.1",
+ "protocol_version": "adjudication-v3",
+ "artifact_kind": "reviewer_metadata",
+ "content_hash": "9cb13bbea09a65093ec65c66406e52052e2a7013437ed3b9f4bb3ea85de9bfb5",
+ "payload": {
+  "reviewer_A": {
+   "reviewer_pseudonym": "A",
+   "expertise_php_wordpress_security": "PHP/WordPress security research, source code auditing, and vulnerability analysis.",
+   "years_experience": "3",
+   "start_date": "2026-08-17",
+   "end_date": "2026-08-17",
+   "knows_research_objective": "yes",
+   "is_paper_author": "no",
+   "conflict_of_interest": "none",
+   "protocol_version": "adjudication-v3"
+  },
+  "reviewer_B": {
+   "reviewer_pseudonym": "B",
+   "expertise_php_wordpress_security": "Experience in PHP and WordPress security analysis, including vulnerability assessment and review of common web security issues.",
+   "years_experience": "3",
+   "start_date": "2026-08-17",
+   "end_date": "2026-08-17",
+   "knows_research_objective": "no",
+   "is_paper_author": "no",
+   "conflict_of_interest": "no",
+   "protocol_version": "adjudication-v3"
+  },
+  "declaration_provenance": {
+   "collected": "2026-08-18, relayed by the corresponding author from each annotator",
+   "note": "Annotator A first answered is_paper_author=yes on the original form and corrected it to no when re-asked on an unambiguous form. The original wording did not distinguish being named in the manuscript's author list from contributing labels to the study. The manuscript's author list is Dinh Hai Nguyen, Truong Duy Dinh, Dinh Hieu Nguyen and neither annotator is on it. Both answers are recorded here rather than only the second.",
+   "first_pass_reviewer_A_is_paper_author": "yes (superseded, ambiguous question)"
+  }
+ }
+}

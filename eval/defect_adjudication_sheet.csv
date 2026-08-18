@@ -1,0 +1,1385 @@
+finding_id,slug,advisory_class,reported_class,file,line,finding_slice,vendor_patch_hunk,reviewer_A,reviewer_B,notes
+Dd62c4695,the-post-grid,auth,xss,app/Helpers/Fns.php,4346," 4342: 		if ( ! $html ) {
+ 4343: 			return '';
+ 4344: 		}
+ 4345: 		if ( $allHtml ) {
+ 4346: 			echo stripslashes_deep( $html ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+ 4347: 		} else {
+ 4348: 			echo wp_kses_post( stripslashes_deep( $html ) );
+ 4349: 		}
+ 4350: 	}"," 4705: 		if ( self::tpg_option( 'tpg_icon_font' ) === 'flaticon' ) {
+ 4708: 			return 'flaticon-' . $flaticon . ' ' . $default_class;",UR,UR,
+D31117264,cliengo,auth,ssrf,admin/class-cliengo-form.php,162,"  158:     }
+  159: 
+  160:     $api_host = Cliengo_Form::PROD_ENV ? 'https://api.cliengo.com' : 'https://api.stagecliengo.com';
+  161:     $body = array('username' => $_POST['username'], 'password' => $_POST['password']);
+  162:     $api_response = wp_remote_request(""$api_host/1.0/wordpress/login"", array(
+  163:         'method' => 'POST',
+  164:         'headers' => array(
+  165:             'content-type' => 'application/json',
+  166:         ),","   49:    * Initialize the class and set its properties.
+   63:    * Fetches and returns all session variables
+   66:     $account = get_option( 'cliengo_session' );
+   82:     // Check user permissions
+   87:     // Check nonce
+   88:     if ( ! isset( $_POST['update_chatbot_token_nonce'] ) || ! wp_verify_nonce( $_POST['update_chatbot_token_nonce'], 'update_chatbot_token_action' ) ) {",UR,UR,
+D626fad63,quickwebp,lfi,lfi,admin/class-image-optimizer.php,422,"  418: 			'original_name'	=> $data['original_name'],
+  419: 			'size'			=> $data['size'],
+  420: 			'type'			=> $this->type_from_mime_type( $data['type'] ),
+  421: 			'mime_type'		=> $data['type'],
+  422: 			'image'			=> 'data:'.$data['new_type'].';base64,' . base64_encode( file_get_contents( $data['tmp_name'] ) ),
+  423: 			'name'			=> $data['name'],
+  424: 			'new_size'		=> $data['new_size'],
+  425: 			'new_type'		=> $this->type_from_mime_type( $data['new_type'] ),
+  426: 			'new_mime_type'	=> $data['new_type']","  541: 	 * Optimize a local file
+  600: 		$attachment_id	= isset( $_POST['attachment_id'] ) ? sanitize_text_field( $_POST['attachment_id'] ) : false;
+  606: 		$already_optimized = get_post_meta( $attachment_id, 'quickwebp_already_optimized', true );
+  609: 		}
+  610: 
+  611: 		// check the mime type",SC,SC,
+D4ebdf74d,woocustomizer,auth,auth,includes/inc/woocommerce.php,1009," 1005:         }
+ 1006:         // Save wcz_var_price_suffix
+ 1007:         if ( isset( $_POST['wcz_suffix_field'][$variation_id] ) ) {
+ 1008:             $suffix_field = sanitize_text_field( $_POST['wcz_suffix_field'][$variation_id] );
+ 1009:             update_post_meta( $variation_id, 'wcz_var_price_suffix', $suffix_field );
+ 1010:         }
+ 1011:     }
+ 1012: }
+ 1013: ","  757:     // Get $product ID from ajax
+  758:     $product_id = $_POST['product_id'];
+  760:     $product_limit = 4;",SC,SC,
+D0aef8417,woocommerce-delivery-notes,auth,auth,includes/class-woocommerce-delivery-notes.php,559,"  555: 				$plugin_short_name = $_POST['plugin_short_name']; //phpcs:ignore
+  556: 			}
+  557: 			if ( get_option( $plugin_short_name . '_allow_tracking' ) ) {
+  558: 				delete_option( $plugin_short_name . '_allow_tracking' );
+  559: 				delete_option( 'ts_tracker_last_send' );
+  560: 			}
+  561: 			$url = admin_url( 'admin.php?page=wc-settings&tab=wcdn-settings&setting=wcdn_general' );
+  562: 
+  563: 			wp_send_json(","   39: 		public static $plugin_version = '5.8.0';
+  366: 			// Set default template type for invoice, receipt, and delivery-note if not set.",SD,SC,
+Dd9a6586a,court-reservation,auth,xss,public/partials/courtres-public-table-full-view.php,289,"  285: 										'data-cell' => array(),
+  286: 									),
+  287: 									'br' => array(),
+  288: 								);
+  289: 								echo wp_kses( $this->getTD_multi( $court_ispis_2, $day, $j, $klasa, 0, 30, date_i18n( 'Y-m-d', strtotime( '+' . $day . ' day', $nowTZTS ) ) ), $allowed_html );
+  290: 								// echo $this->getTD_multi( $court_ispis_2, $day, $j, 0, 30, date_i18n(""Y-m-d"", strtotime('+'.$day.' day', $nowTZTS)), $klasa );
+  291: 							}
+  292: 					}
+  293: 					?>","    2: // print_r($_GET); die;
+  241: 						$t0 = date( $timeFormat, strtotime( $j_ . ':00' ) );
+  243: 						$t1 = date( $timeFormat, strtotime( $j_ . ':00 + 30 min' ) );
+  245: 						$t1 = date( $timeFormat, strtotime( $j_ . ':00 + 1 hour' ) );
+  301: 							$t0     = date( $timeFormat, strtotime( $j_ . ':00 + 30 min' ) );
+  302: 							$t1     = date( $timeFormat, strtotime( $j_ . ':00 + 1 hour' ) );",UR,UR,
+Dd2c0a0e9,modal-dialog,rce,other,modal-dialog-admin.php,370,"  366: 
+  367: 		update_option( 'MD_General', $options );
+  368: 
+  369: 		//lets redirect the post request into get request (you may add additional params at the url, if you need to show save results
+  370: 		wp_redirect( $this->remove_querystring_var( $_POST['_wp_http_referer'], 'message' ) . ""&message=1"" );
+  371: 	}
+  372: 
+  373: 	//executed if the post arrives initiated by pressing the submit button of form
+  374: 	function on_save_changes_configurations() {","  422: 				'excludeurlstrings',
+  423: 				'codecondition'
+  701: 				</td>
+  702: 			</tr>
+  703: 			<tr>
+  704: 				<td>PHP Condition string ( E.g. in_category(3) || is_archive(3) )</td>",UR,UR,
+D7f28fea1,fluent-cart,xss,xss,app/Services/Renderer/ProductCardRender.php,73,"   69:         if (empty($this->product->post_excerpt)) {
+   70:             return;
+   71:         }
+   72: 
+   73:         echo sprintf(
+   74:             '<p %1$s class=""fct-product-card-excerpt"">
+   75:                    %2$s
+   76:             </p>',
+   77:             $atts, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped","  132:         ?>
+  148:     }",SC,SD,
+D6ea3e2b1,rsvp,other,sqli,includes/rsvp_frontend.inc.php,904,"  900: 	global $wpdb;
+  901: 
+  902: 	if ( ( get_option( OPTION_NOTIFY_ON_RSVP ) == 'Y' ) && ( get_option( OPTION_NOTIFY_EMAIL ) != '' ) ) {
+  903: 		$sql      = 'SELECT firstName, lastName, rsvpStatus, note, kidsMeal, veggieMeal, email, passcode FROM ' . ATTENDEES_TABLE . ' WHERE id= ' . $attendee_id;
+  904: 		$attendee = $wpdb->get_row( $sql );
+  905: 		if ( $attendee !== null ) {
+  906: 			$body = __( 'Hello', 'rsvp' ) . "", \r\n\r\n"";
+  907: 
+  908: 			$body .= sprintf(","  230: 		<input type=""submit"" value=""' . __( 'Yes', 'rsvp' ) . ""\"" onclick=\""document.getElementById('rsvpStep').value='editattendee';\"" />
+  277: 
+  663: 						<p class=\""rsvpParagraph\"" style=\""text-align:left;\"">\r\n
+ 1087: 		// update their information and what not....
+ 1285: 		// Try to find the user.
+ 1316: 		$sql      = 'SELECT id, firstName, lastName, rsvpStatus FROM ' . ATTENDEES_TABLE . ' WHERE id = %d';",UR,UR,
+De5bec215,powerpack-lite-for-elementor,xss,auth,includes/admin/feedback/class-pp-tracking.php,174,"  170: 				case 'review_already_did':
+  171: 					update_option( 'pp_review_already_did', 'yes' );
+  172: 					break;
+  173: 				case 'do_not_upgrade':
+  174: 					update_option( 'pp_do_not_upgrade_to_pro', 'yes' );
+  175: 					break;
+  176: 			}
+  177: 
+  178: 			wp_safe_redirect( esc_url_raw( remove_query_arg( [ 'pp_admin_action', '_nonce' ] ) ) );","   73: 		//add_action( 'init', array( $this, 'schedule_send' ) );
+   74: 		//add_action( 'init', array( $this, 'create_recurring_schedule' ) );
+   75: 		//add_filter( 'cron_schedules', array( $this, 'cron_add_weekly' ) );
+   76: 		//add_action( 'pp_admin_after_settings_saved', array( $this, 'check_for_settings_optin' ), 10, 2 );
+   77: 		//add_action( 'admin_init', array( $this, 'act_on_tracking_decision' ) );
+  148: 					'submitting' => esc_html__( 'Submitting...', 'powerpack' ),",UR,UR,
+D551157bc,userfeedback-lite,sqli,auth,lite/includes/admin/class-userfeedback-connect.php,182,"  178: 				$over_time = get_option( 'userfeedback_over_time', array() );
+  179: 
+  180: 				if ( empty( $over_time['installed_pro'] ) ) {
+  181: 					$over_time['installed_pro'] = time();
+  182: 					update_option( 'userfeedback_over_time', $over_time );
+  183: 				}
+  184: 
+  185: 				wp_send_json_success( esc_html__( 'Plugin installed & activated.', 'userfeedback-lite' ) );
+  186: 			} else {",    2: ,UR,UR,
+Db22bc838,instantio,other,auth,includes/controller/class-setup-wizard.php,718,"  714:                 $options['ins-toggler'] = 'tog-1';
+  715:                 $options['cart-fly']['cart-fly-icon'] = 1;
+  716:             }
+  717:             
+  718: 			update_option( 'wiopt', $options );
+  719: 			$response              = [
+  720: 				'success'      => true,
+  721: 				'redirect_url' => esc_url( admin_url( 'admin.php?page=ins_tf_settings' ) )
+  722: 			];",,UR,UR,
+D36290d5f,alttext-ai,auth,deserial,includes/class-atai-attachment.php,1558," 1554:     $attachment_id = absint( $_REQUEST['attachment_id'] );
+ 1555:     $keywords = is_array($_REQUEST['keywords']) ? array_map('sanitize_text_field', $_REQUEST['keywords']) : [];
+ 1556: 
+ 1557:     // Generate ALT text
+ 1558:     $response = $this->generate_alt( $attachment_id, null, array( 'keywords' => $keywords ) );
+ 1559: 
+ 1560:     if ( $response === 'insufficient_credits' ) {
+ 1561:       wp_send_json( array(
+ 1562:         'status' => 'error',","   36:   /**
+  128:     $gpt_prompt = get_option('atai_gpt_prompt');
+  133:     $model_name = get_option('atai_model_name');
+  152:         if ( ! count( $api_options['keywords'] ) && ( get_option( 'atai_keywords_title' ) === 'yes' ) ) {
+  189:     if ( 'yes' === get_option( 'atai_force_lang' ) ) {
+  190:       $forced_lang = get_option( 'atai_lang' );",UR,UR,
+Db6f504f8,gutenberg,xss,rce,build/block-library/blocks/post-navigation-link.php,116,"  112: 
+  113: 	if ( ! empty( $attributes['taxonomy'] ) ) {
+  114: 		$content = $get_link_function( $format, $link, true, '', $attributes['taxonomy'] );
+  115: 	} else {
+  116: 		$content = $get_link_function( $format, $link );
+  117: 	}
+  118: 
+  119: 	return sprintf(
+  120: 		'<div %1$s>%2$s</div>',",,UR,UR,
+Dd1a10641,capability-manager-enhanced,auth,auth,includes/features/restrict-profile-features.php,53,"   49:                 ];
+   50:                 $role_profile_features_elements[$new_element_key] = $new_element_data;
+   51:             }
+   52:             $profile_features_elements[$profile_feature_role] = $role_profile_features_elements;
+   53:             update_option('capsman_profile_features_elements', $profile_features_elements, false);
+   54:             update_option('capsman_profile_features_updated', $profile_element_updated, false);
+   55:             delete_option('capsman_profile_features_elements_testing_role');
+   56:             $cookie_name = defined('PPC_TEST_USER_COOKIE_NAME') ? PPC_TEST_USER_COOKIE_NAME : 'ppc_test_user_tester_' . COOKIEHASH;
+   57:             if (isset($_COOKIE[$cookie_name]) && !empty($_COOKIE[$cookie_name])) {","   15:         //implement profile features restriction
+   33:         
+   37:             $response['status']  = 'success';
+   39:             $profile_feature_role = get_option(""capsman_profile_features_elements_testing_role"", 'subscriber');
+   56:             $cookie_name = defined('PPC_TEST_USER_COOKIE_NAME') ? PPC_TEST_USER_COOKIE_NAME : 'ppc_test_user_tester_' . COOKIEHASH;
+   65:                     ], ",SD,SD,
+Df9618f55,e2pdf,xss,csrf,classes/model/e2pdf-loader.php,936,"  932:         }
+  933: 
+  934:         $this->helper->set('license', new Model_E2pdf_License());
+  935:         if ($this->helper->get('license')->get('error') === 'Site Url Not Found. Please try to ""Reactivate"" plugin.') {
+  936:             update_option('e2pdf_version', '1.00.00');
+  937:             $this->action_plugins_loaded();
+  938:             $this->helper->set('license', new Model_E2pdf_License());
+  939:         }
+  940:     }","    4:  * File: /model/e2pdf-loader.php
+    5:  *
+    6:  * @package  E2Pdf
+    7:  * @license  GPLv3
+    8:  * @link     https://e2pdf.com
+   16:     private $e2pdf_admin_pages = [",UR,UR,
+Daf342799,wp-full-stripe-free,other,ssrf,includes/wpfs-customer.php,3374," 3370: 		}
+ 3371: 
+ 3372: 		if ( ! empty( $pricing ) && ! $bindingResult->hasErrors() ) {
+ 3373: 			if ( ! empty( $_POST['stripePaymentIntentId'] ) ) {
+ 3374: 				$this->updatePaymentIntentAmount( $_POST['stripePaymentIntentId'], $pricing, $pricingData->stripePriceId );
+ 3375: 			}
+ 3376: 			$return = [
+ 3377: 				'success' => true,
+ 3378: 				'productPricing' => $pricing", 3712: 				! $this->paymentIntentSucceeded( $paymentIntent ),UR,UR,
+D90d1838e,advanced-google-recaptcha,sqli,sqli,libs/ajax.php,423,"  419:         // build query
+  420:         $wpdb->sQuery = ""SELECT SQL_CALC_FOUND_ROWS "" . str_replace("" , "", "" "", implode("", "", $aColumns)) .
+  421:             "" FROM "" . $wpdb->wpcatcha_login_fails . "" $sWhere $sOrder $sLimit"";
+  422: 
+  423:         $rResult = $wpdb->get_results($wpdb->sQuery); // phpcs:ignore
+  424: 
+  425:         // data set length after filtering
+  426:         $wpdb->sQuery = ""SELECT FOUND_ROWS()"";
+  427:         $iFilteredTotal = $wpdb->get_var($wpdb->sQuery); // phpcs:ignore","   21:         set_time_limit(300);
+  237:     static function get_locks_logs()
+  238:     {
+  239:         // phpcs:ignore db call warnings as we are using a custom table 
+  240:         
+  243: ",SD,SC,
+D81609603,woo-cart-abandonment-recovery,auth,deserial,modules/cart-abandonment/classes/class-cartflows-ca-tracking.php,899,"  895: 						if ( $billing_email ) {
+  896: 							$order_data = $this->get_captured_data_by_email( $billing_email );
+  897: 
+  898: 							if ( ! is_null( $order_data ) ) {
+  899: 								$existing_cart_contents = maybe_unserialize( $order_data->cart_contents );
+  900: 								$order_cart_contents    = maybe_unserialize( $checkout_details->cart_contents );
+  901: 								$existing_cart_products = array_keys( (array) $existing_cart_contents );
+  902: 								$order_cart_products    = array_keys( (array) $order_cart_contents );
+  903: 								if ( $this->check_if_similar_cart( $existing_cart_products, $order_cart_products ) ) {","   81: 		define( 'CARTFLOWS_ZAPIER_ACTION_AFTER_TIME', 1800 );
+  357: 			wc_print_notice( __( 'This checkout page is generated by Cart Abandonment Recovery for WooCommerce plugin from test mail.', 'woo-cart-abandonment-recovery' ), 'notice' );
+  785: 
+  806: 			$products     = WC()->cart->get_cart();
+  807: 			$current_time = current_time( WCF_CA_DATETIME_FORMAT );
+  808: 			$other_fields = [",UR,UR,
+D40cd504c,simple-membership,other,sqli,classes/class.swpm-members.php,408,"  404: 			foreach ( $members as $record_id ) {
+  405: 				if ( ! is_numeric( $record_id ) ) {
+  406: 					wp_die( 'Error! ID must be numeric.' );
+  407: 				}
+  408: 				self::delete_user_by_id( $record_id );
+  409: 			}
+  410: 			echo '<div id=""message"" class=""updated fade""><p>Selected records deleted successfully!</p></div>';
+  411: 			return;
+  412: 		} elseif ( 'bulk_active' === $current_action ) {","   21: 			'member_id'           => __('ID' , 'simple-membership'),
+   22: 			'user_name'           => __('Username' , 'simple-membership'),
+   23: 			'first_name'          => __('First Name' , 'simple-membership'),
+   24: 			'last_name'           => __('Last Name' , 'simple-membership'),
+   25: 			'email'               => __('Email' , 'simple-membership'),
+   26: 			'alias'               => __('Membership Level' , 'simple-membership'),",UR,UR,
+Dc7e2419d,simple-cloudflare-turnstile,other,csrf,inc/turnstile.php,310,"  306: 		if(count($cfturnstile_log) > 50) {
+  307: 			array_shift($cfturnstile_log);
+  308: 		}
+  309: 		// Update log
+  310: 		update_option('cfturnstile_log', $cfturnstile_log);
+  311: 	}
+  312: }
+  313: 
+  314: /**","  251: 		foreach ($response as $key => $val) {
+  252: 			if ($key == 'error-codes') {
+  253: 				foreach ($val as $key => $error_val) {
+  255: 					if($error_val == 'invalid-input-secret') {
+  256: 						update_option('cfturnstile_tested', 'no'); // Disable if invalid secret",UR,UR,
+Db333dc0a,cf7-styler,auth,xss,freemius/includes/class-freemius.php,25137,"25133:             $this->_isAutoInstall = true;
+25134: 
+25135:             // Try to install and activate.
+25136:             $updater = FS_Plugin_Updater::instance( $this );
+25137:             $result  = $updater->install_and_activate_plugin( $plugin_id );
+25138: 
+25139:             if ( is_array( $result ) && ! empty( $result['message'] ) ) {
+25140:                 self::shoot_ajax_failure( array(
+25141:                     'message' => $result['message'],",,UR,UR,
+D1ac7f402,fluent-cart,xss,rce,app/Modules/Tax/TaxModule.php,569,"  565: 
+  566:         // if there is any excluded category in the cart, then don't apply VAT reverse charge
+  567:         $excludedCategories = Arr::get($this->taxSettings, 'eu_vat_settings.vat_reverse_excluded_categories', []);
+  568:         $productIds = array_column($cart->cart_data, 'post_id');
+  569:         $productTerms = $this->getTermsByProductIds($productIds);
+  570: 
+  571:         $isExcluded = false;
+  572:         foreach ($productTerms as $productId => $terms) {
+  573:             if (array_intersect($terms, $excludedCategories)) {","   65:             // Show breakdown by tax rate if available
+   67:                 foreach ($taxLines as $taxLine) {
+   68:                     $rateLabel = Arr::get($taxLine, 'label', 'Tax');
+   69:                     $rateTaxAmount = (int)Arr::get($taxLine, 'tax_amount', 0);
+   70:                     $isCompound = Arr::get($taxLine, 'is_compound', false);
+   71:                     $taxableBase = (int)Arr::get($taxLine, 'taxable_amount', 0);",UR,UR,
+D820ddb27,w3-total-cache,rce,rce,SetupGuide_Plugin_Admin.php,443,"  439: 				'wincache',
+  440: 			);
+  441: 
+  442: 			if ( in_array( $engine, $allowed_engines, true ) ) {
+  443: 				if ( empty( $engine ) || 'file' === $engine || Util_Installed::$engine() ) {
+  444: 					if ( $old_enabled !== $enable ) {
+  445: 						$config->set( 'dbcache.enabled', $enable );
+  446: 						$is_updating = true;
+  447: 					}","  780: 					'exclude'            => $config->get_array( 'lazyload.exclude' ),",SC,SC,
+D93455ca1,litespeed-cache,xss,auth,src/metabox.cls.php,140,"  136: 			}
+  137: 		}
+  138: 
+  139: 		if ( $val ) {
+  140: 			update_post_meta( $post_id, $name, $val );
+  141: 		}
+  142: 		else {
+  143: 			delete_post_meta( $post_id, $name );
+  144: 		}","   12: defined( 'WPINC' ) || exit;
+   14: class Metabox extends Root {
+   25: 	public function __construct() {
+   28: 			'litespeed_no_cache' => __( 'Disable Cache', 'litespeed-cache' ),
+   29: 			'litespeed_no_image_lazy' => __( 'Disable Image Lazyload', 'litespeed-cache' ),
+   30: 			'litespeed_no_vpi' => __( 'Disable VPI', 'litespeed-cache' ),",UR,UR,
+D6da0a4db,collectchat,other,csrf,collect.php,188,"  184:         function collectchat_ignore_notice(){
+  185:             if(isset($_GET['collectchat-ignore-notice']) && $_GET['collectchat-ignore-notice'] == ""0""){
+  186:                 $settings = get_option('collectchat-plugin-settings');
+  187:                 $settings['ignore_rating'] = ""yes"";
+  188:                 update_option('collectchat-plugin-settings', $settings, ""no"");
+  189:             }
+  190:         }
+  191: 
+  192:         function collectchat_html_sanitize($input) {","    4:  * Version: 2.4.9
+  170:                         echo '<div class=""notice notice-success"">';",UR,UR,
+Dad6e12f7,mycred,xss,csrf,addons/cash-creds/modules/cashcred-module-core.php,583,"  579: 		        'comment_status' => 'open'
+  580: 		    ) );
+  581: 
+  582: 		    if ( $post_id !== null && ! is_wp_error( $post_id ) ) {
+  583: 		        wp_update_post( array( 'ID' => $post_id, 'post_title' => $post_id ) );
+  584: 
+  585: 		        $remote_addr = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+  586: 
+  587: 		        // Store locked values",,UR,UR,
+D8296d899,geo-mashup,other,sqli,geo-mashup-db.php,1367," 1363: 			$select_string .= ' WHERE ' . implode( ' AND ', $wheres );
+ 1364: 		}
+ 1365: 		$select_string .= ' ORDER BY ' . esc_sql( $names );
+ 1366: 
+ 1367: 		return $wpdb->get_results( $select_string );
+ 1368: 	}
+ 1369: 
+ 1370: 	/**
+ 1371: 	 * Get the location of a post.",,UR,UR,
+Dcae60a0d,ultimate-addons-for-contact-form-7,xss,auth,admin/tf-options/classes/UACF7_Settings.php,1122," 1118: 											$extension      = strtolower( pathinfo( $sanitized_name, PATHINFO_EXTENSION ) );
+ 1119: 								
+ 1120: 											// Validate file extension and MIME type
+ 1121: 											if ( in_array( $extension, $allowed_extensions, true ) && $type === $allowed_mime_types[ $extension ] ) {
+ 1122: 												move_uploaded_file( $tmp_name, $tf_itinerary_fonts . '/' . $sanitized_name );
+ 1123: 											}
+ 1124: 										}
+ 1125: 									}
+ 1126: 								}","  391: 						<?php echo $this->uacf7_get_sidebar_collab_plugin_list(); ?>
+  392: 
+  586: 		}
+  587: 
+  588: 		public function uacf7_get_sidebar_collab_plugin_list() {
+  589: 			$plugins = [",UR,UR,
+Df67edcc6,export-wp-page-to-static-html,csrf,auth,admin/includes/AjaxRequests/increament-pdf-count.php,38,"   34:         } else {
+   35:             $data['count'] += 1;
+   36:         }
+   37:     
+   38:         set_transient($key, $data, 24 * HOUR_IN_SECONDS);
+   39:         wp_send_json_success();
+   40:     }
+   41: 
+   42: ",,UR,UR,
+D26445114,review-schema,other,rce,app/Controllers/Ajax/Review.php,960,"  956: 
+  957: 		// add pros & cons
+  958: 		$rt_pros_cons = [];
+  959: 		if (isset($_POST['rt_pros']) && ('' !== $_POST['rt_pros'])) {
+  960: 			$rt_pros_cons['pros'] = array_map('sanitize_text_field', array_filter($_POST['rt_pros']));
+  961: 		}
+  962: 		if (isset($_POST['rt_cons']) && ('' !== $_POST['rt_cons'])) {
+  963: 			$rt_pros_cons['cons'] = array_map('sanitize_text_field', array_filter($_POST['rt_cons']));
+  964: 		}","   10: 		add_action('wp_ajax_rtrs_review_edit_form', [$this, 'rtrs_review_edit_form']);
+   11: 		add_action('wp_ajax_nopriv_rtrs_review_edit_form', [$this, 'rtrs_review_edit_form']);
+   13: 		add_action('wp_ajax_rtrs_self_video_popup', [$this, 'rtrs_self_video_popup']);
+   14: 		add_action('wp_ajax_nopriv_rtrs_self_video_popup', [$this, 'rtrs_self_video_popup']);
+   16: 		add_action('wp_ajax_rtrs_review_edit', [$this, 'rtrs_review_edit']);
+   18: 		add_action('wp_ajax_rtrs_review_filter', [$this, 'rtrs_review_filter']);",UR,UR,
+D617e57fd,ultimate-addons-for-gutenberg,auth,xss,blocks-config/post-timeline/class-uagb-post-timeline.php,1008," 1004: 
+ 1005: 			$target = ( isset( $attributes['linkTarget'] ) && ( true === $attributes['linkTarget'] ) ) ? '_blank' : '_self';
+ 1006: 			do_action( ""uagb_single_post_before_featured_image_{$attributes['post_type']}"", get_the_ID(), $attributes );
+ 1007: 			?>
+ 1008: 				<a class='uagb-timeline__image' href=""<?php echo esc_url( apply_filters( ""uagb_single_post_link_{$attributes['post_type']}"", get_the_permalink(), get_the_ID(), $attributes ) ); ?>"" target=""<?php echo esc_attr( $target ); ?>"" rel=""noopener noreferrer""><?php echo wp_get_attachment_image( get_post_thumbnail_id(), $attributes['imageSize'] ); ?>
+ 1009: 				</a>
+ 1010: 			<?php
+ 1011: 			do_action( ""uagb_single_post_after_featured_image_{$attributes['post_type']}"", get_the_ID(), $attributes );
+ 1012: 		}","   66: 
+   67: 			$inherit_from_theme = 'enabled' === ( 'deleted' !== UAGB_Admin_Helper::get_admin_settings_option( 'uag_btn_inherit_from_theme_fallback', 'deleted' ) ? 'disabled' : UAGB_Admin_Helper::get_admin_settings_option( 'uag_btn_inherit_from_theme', 'disabled' ) );
+  371: 						'dateFontSizeType'           => array(
+  372: 							'type' => 'string',
+  373: 						),
+  374: 						'dateFontSize'               => array(",UR,UR,
+D322a75de,pojo-accessibility,auth,auth,vendor/elementor/wp-one-package/src/Admin/Controllers/Settings.php,82,"   78: 				$setting_name = Utils::camel_to_snake( $key );
+   79: 				if ( ! isset( Fields::get_settings()[ $setting_name ] ) ) {
+   80: 					continue;
+   81: 				}
+   82: 				update_option( Fields::SETTING_PREFIX . $setting_name, $value );
+   83: 			}
+   84: 
+   85: 			$data = Fields::instance()->get_plugin_settings();
+   86: ",,UN,UN,
+D26e501fd,custom-post-type-ui,csrf,auth,inc/post-types.php,2162," 2158: 	 */
+ 2159: 	do_action( 'cptui_after_update_post_type', $data );
+ 2160: 
+ 2161: 	// Used to help flush rewrite rules on init.
+ 2162: 	set_transient( 'cptui_flush_rewrite_rules', 'true', 5 * 60 );
+ 2163: 
+ 2164: 	if ( isset( $success ) && 'new' === $data['cpt_type_status'] ) {
+ 2165: 		return 'add_success';
+ 2166: 	}", 1226: 							$selected           = isset( $current ) ? disp_boolean( $current['can_export'] ) : '';,UR,UR,
+Debdee3a6,wp-security-audit-log,xss,deserial,classes/Entities/class-occurrences-entity.php,486,"  482: 
+  483: 				$result = $meta['value'];
+  484: 			}
+  485: 
+  486: 			$result = maybe_unserialize( $result );
+  487: 			if ( 'CurrentUserRoles' === $name && is_string( $result ) ) {
+  488: 				$result = preg_replace( '/[\[\]""]/', '', $result );
+  489: 				$result = explode( ',', $result );
+  490: 			}","   83: 			'username'    => 'varchar(60)',
+  134: 			. ' ADD username VARCHAR(60) NULL,'
+  185: 					`username` varchar(60) DEFAULT NULL,
+  410: 					$value = \print_r( (array) $value, \true ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
+  503: 		 * @param \wpdb $connection - \wpdb connection to be used for name extraction.
+  508: 		 * @since 5.5.0 - Added connection parameter.",UR,UR,
+Dd64ea0db,cleantalk-spam-protect,sqli,auth,inc/cleantalk-common.php,260,"  256:     // Add a connection report
+  257:     apbct_add_connection_report($ct, $ct_request, $ct_result);
+  258: 
+  259:     if ( $ct->server_change ) {
+  260:         update_option(
+  261:             'cleantalk_server',
+  262:             array(
+  263:                 'ct_work_url'       => $ct->work_url,
+  264:                 'ct_server_ttl'     => $ct->server_ttl,",,UR,UR,
+D28afae01,seriously-simple-podcasting,auth,auth,php/classes/rest/class-rest-api-controller.php,333,"  329: 		$episode_data_array = array_map( 'str_getcsv', file( $_FILES['ssp_podcast_file']['tmp_name'] ) );
+  330: 		foreach ( $episode_data_array as $episode_data ) {
+  331: 			// add check to make sure url being added is valid first
+  332: 			update_post_meta( $episode_data[0], 'podmotor_episode_id', $episode_data[1] );
+  333: 			update_post_meta( $episode_data[0], 'audio_file', $episode_data[2] );
+  334: 		}
+  335: 		ssp_email_podcasts_imported();
+  336: 
+  337: 		$response['updated'] = 'true';",,UN,UN,
+D4780b04e,wpcomplete,xss,other,admin/class-wpcomplete-admin.php,2502," 2498: 
+ 2499:     if ( wp_get_referer() ) {
+ 2500:       wp_safe_redirect( wp_get_referer() );
+ 2501:     } else {
+ 2502:       wp_safe_redirect( admin_url(""users.php?page=wpcomplete-users&user_id="" . $_REQUEST['user_id']) );
+ 2503:     }
+ 2504:   }
+ 2505: 
+ 2506: }"," 1387:                 $button_name = ($button === ''.$post_id) ? 'Default Button' : ""Button '$button_id'"";
+ 1388:                 $completion .= ('<a href=""edit.php?page=wpcomplete-buttons&post_id=' . $post_id . '&button=' . $button . '"">' . ""$button_name: $completed_users/$avail_users Users ("" . round(100 * ($completed_users / $avail_users), 1) . '%)</a><br>');
+ 1403:               $completion = '<a href=""edit.php?page=wpcomplete-posts&post_id=' . $post_id . '"">' . (""$completed_users/$avail_users Users ("" . round(100 * ($completed_users / $avail_users), 1) . '%)')  . '</a>';
+ 1408:           echo '<div id=""completable-' . $post_id . '"">' . $completion . '</div>';
+ 1410:           echo '<div id=""completable-' . $post_id . '"">—</div>';",UR,UR,
+D3eb54f45,official-mailerlite-sign-up-forms,auth,csrf,src/Modules/Form.php,313,"  309:                 'code' => 0,
+  310:             ];
+  311:         }
+  312: 
+  313:         $wpdb->insert( $wpdb->base_prefix . 'mailerlite_forms', [
+  314:             'name' => $form_name,
+  315:             'time' => date( 'Y-m-d h:i:s' ),
+  316:             'type' => $form_type,
+  317:             'data' => serialize( $form_data ),","    8: use MailerLiteForms\Views\CustomForm;
+  279:                 $form_name          = $_POST['form_name'];
+  282: 
+  285:                     $group_data = [];
+  286:                     $group_data['id'] = $group[0];
+  287:                     $group_data['name'] = $group[1];",UR,UR,
+D02a76732,woocommerce-delivery-notes,auth,auth,includes/class-woocommerce-delivery-notes.php,387,"  383: 					array( 'test_form' => false )
+  384: 				);
+  385: 				if ( ! isset( $upload['error'] ) ) {
+  386: 					$attachment_id = wp_insert_attachment(
+  387: 						array(
+  388: 							'guid'           => $upload['url'],
+  389: 							'post_mime_type' => $upload['type'],
+  390: 							'post_title'     => basename( $upload['file'] ),
+  391: 							'post_content'   => '',","   39: 		public static $plugin_version = '5.8.0';
+  366: 			// Set default template type for invoice, receipt, and delivery-note if not set.",SD,SD,
+D4c7758bf,geo-mashup,xss,xss,edit-form.php,183,"  179: 
+  180: 	<?php echo empty( $location->id ) ? $search_html . $map_html . $location_table_html : $location_table_html . $map_html . $search_html; ?>
+  181: 
+  182: 	<input id=""geo_mashup_ui_manager"" name=""geo_mashup_ui_manager"" type=""hidden"" value=""<?php echo $ui_manager; ?>"" />
+  183: 	<input id=""geo_mashup_object_id"" name=""geo_mashup_object_id"" type=""hidden"" value=""<?php echo $object_id; ?>"" />
+  184: 	<input id=""geo_mashup_no_js"" name=""geo_mashup_no_js"" type=""hidden"" value=""true"" />
+  185: 	<input id=""geo_mashup_location_id"" name=""geo_mashup_location_id"" type=""hidden"" value=""<?php echo esc_attr( $location->id ); ?>"" />
+  186: 	<input id=""geo_mashup_location"" name=""geo_mashup_location"" type=""hidden"" value=""<?php echo esc_attr( $coordinate_string ); ?>"" />
+  187: 	<input id=""geo_mashup_geoname"" name=""geo_mashup_geoname"" type=""hidden"" value=""<?php echo esc_attr( $location->geoname ); ?>"" />",,UN,UN,
+Dbc6b994e,user-registration,other,sqli,modules/membership/includes/AJAX.php,2774," 2770: 		}
+ 2771: 		$memberships           = implode( ',', $memberships );
+ 2772: 		$membership_repository = new MembershipRepository();
+ 2773: 
+ 2774: 		$memberships = $membership_repository->get_multiple_membership_by_ID( $memberships, false );
+ 2775: 
+ 2776: 		$upgrade_paths = $membership_upgrade_service->fetch_upgrade_paths( $memberships, 'manual' );
+ 2777: 
+ 2778: 		if ( ! empty( $upgrade_paths ) ) {","   32: use WPEverest\URMembership\Admin\Services\UpgradeMembershipService;
+   33: use WPEverest\URMembership\Local_Currency\Admin\CoreFunctions;
+   88: 			'validate_payment_currency'    => false,
+  232: 		if ( ur_check_module_activation( 'team' ) ) {
+  233: 			$data['team_id'] = ! empty( $response['team_id'] ) ? $response['team_id'] : 0;
+  234: 		}",UR,UR,
+De46d6988,wpcomplete,xss,auth,public/class-wpcomplete-public.php,2643," 2639:     }
+ 2640: 
+ 2641:     if (defined('DOING_AJAX') && DOING_AJAX) {
+ 2642:       $updates_to_sendback['wpc-reset'] = ($saved) ? 'success' : 'failed';
+ 2643:       echo json_encode( $updates_to_sendback, JSON_UNESCAPED_UNICODE );
+ 2644:       die();
+ 2645:     } else {
+ 2646:       // TODO: how do we handle multiple buttons?
+ 2647:       // redirect back to referral page","  785:     
+  786:     $unique_button_id = $_REQUEST['button'];
+  787:     list($post_id, $button_id) = $this->extract_button_info($unique_button_id);
+  792:     if ( isset( $button_id ) && ( !isset( $posts[$post_id]['buttons'] ) || !in_array( $unique_button_id, $posts[$post_id]['buttons'] ) ) ) {
+ 1037:     $unique_button_id = $_REQUEST['button'];
+ 1038:     list($post_id, $button_id) = $this->extract_button_info($unique_button_id);",UR,UR,
+D8c0c9d0a,checkout-upsell-and-order-bumps,auth,sqli,app/Models/Model.php,98,"   94:      * @return array
+   95:      */
+   96:     public static function getRow($where, $where_format = null, $columns = null)
+   97:     {
+   98:         return self::db()->get_row(self::prepareSelectQuery($where, $where_format, $columns), static::OUTPUT_TYPE);
+   99:     }
+  100: 
+  101:     /**
+  102:      * Get Row by ID","  242:                 $order_by = $args['order_by'];
+  247:                 $query .= "" ORDER BY `$order_by` $sort"";
+  251:                 $limit = $args['limit'];
+  252:                 $query .= "" LIMIT $limit"";
+  256:                 $offset = $args['offset'];
+  257:                 $query .= "" OFFSET $offset"";",UR,UR,
+D6cae95a5,favicon-rotator,other,upload,includes/class.media.php,302,"  298: 		}
+  299: 		
+  300: 		//Handle HTML upload
+  301: 		if ( isset($_POST['html-upload']) && !empty($_FILES) ) {
+  302: 			$id = media_handle_upload('async-upload', $_REQUEST['post_id']);
+  303: 			//Clear uploaded files
+  304: 			unset($_FILES);
+  305: 			if ( is_wp_error($id) ) {
+  306: 				$errors['upload_error'] = $id;","    2: require_once 'class.base.php';
+  116: 		if ( !!$p && $p->width && $p->height ) {
+  146: 			$types = esc_js($filetypes) . '"",file_types_description: ""' . esc_js(__($p->file_desc));
+  157: 			if ( !!$p && isset($p->file_mime) && is_array($p->file_mime) )
+  171: 		$p = parse_url($url);
+  266: 			$args->id = esc_attr( $this->util->array_key_first( $_POST[ $this->var_setmedia ] ) );",UR,UR,
+D2c021592,wp-time-slots-booking-form,auth,deserial,cp-main-class.inc.php,288,"  284:         .($searchfor?'posted_data like \'%'.esc_sql($searchfor).'%\' AND ':'')
+  285:         .""time<=%s ORDER BY time DESC LIMIT 0,1000"", date(""Y-m-d"",strtotime($to."" +1 day"" ))) );
+  286:         foreach($rows as $item)
+  287:         {
+  288:             $data = unserialize($item->posted_data);
+  289:             if (!$paidonly || $data['paid'])
+  290:             {
+  291:                 foreach($data[""apps""] as $app)
+  292:                     if ($app[""date""] >= $from && $app[""date""] <= $to && ($status == '-1' || $status == $app[""cancelled""]) )","  737:         if ($this->get_param(""cal"") || $this->get_param(""cal"") == '0' || $this->get_param(""pwizard"") == '1')
+  738:         {
+  739:             $this->item = $this->get_param(""cal"");
+  740:             if (isset($_GET[""edit""]) && $_GET[""edit""] == '1')
+  741:                 @include_once dirname( __FILE__ ) . '/cp_admin_int_edition.inc.php';
+  742:             else if ($this->get_param(""schedule"") == '1')",UR,UR,
+D378d5c28,backuply,sqli,deserial,functions.php,1598," 1594: 		
+ 1595: 		// NOTE : Any changes in this pattern will need to be handled in callback function as well
+ 1596: 		$str = preg_replace_callback('/s:(\d+):""(.*?)"";(?=([:]|(?<=;)\}(?!\.)|a:|s:|S:|b:|d:|i:|o:|O:|C:|r:|R:|N;))/s', 'backuply_fix_serialize_callback', $str);
+ 1597: 		
+ 1598: 		$var = @unserialize($str);
+ 1599: 	
+ 1600: 	}
+ 1601: 	
+ 1602: 	//If it is still empty false","  221: 		if(urldecode($key) == $config['RESTORE_KEY']) {
+  278: 	$write['RESTORE_KEY'] = backuply_csrf_get_token();
+ 1474: 
+ 1475: 
+ 1480: 	
+ 1486: 	$cnt_qry = ""SELECT count('"".$field_prefix.""_id') as count_"".$field_prefix."" FROM `"".$wpdb->prefix.$table . ""`;"";",UR,UR,
+D8f82a851,breadcrumb-navxt,other,auth,includes/class.mtekk_adminkit_message.php,76,"   72: 		{
+   73: 			check_ajax_referer($this->uid . '_dismiss', 'nonce');
+   74: 			$this->dismissed = true;
+   75: 			//If the message was dismissed, update the transient for 30 days
+   76: 			$result = set_transient($this->uid, $this->dismissed, 2592000);
+   77: 		}
+   78: 	}
+   79: 	/**
+   80: 	 * Function that prints out the message if not already dismissed",,UR,UR,
+D1386a8ee,quickwebp,lfi,lfi,admin/class-image-optimizer.php,409,"  405: 		$image->save( $image_file['tmp_name'], $quality, 'webp' );
+  406: 
+  407: 		$image_file['new_size'] = $image->filesize();
+  408: 		$image_file['new_type'] = $image->mime();
+  409: 		$this->return_ajax_data( $image_file );
+  410: 	}
+  411: 
+  412: 	/**
+  413: 	 * Return ajax data","  541: 	 * Optimize a local file
+  600: 		$attachment_id	= isset( $_POST['attachment_id'] ) ? sanitize_text_field( $_POST['attachment_id'] ) : false;
+  606: 		$already_optimized = get_post_meta( $attachment_id, 'quickwebp_already_optimized', true );
+  609: 		}
+  610: 
+  611: 		// check the mime type",SC,SC,
+D38dad8cb,woo-cart-abandonment-recovery,auth,auth,lib/nps-survey/classes/nps-survey-script.php,483,"  479: 		if ( $nps_form_status['dismiss_count'] >= 2 ) {
+  480: 			$nps_form_status['dismiss_permanently'] = true;
+  481: 		}
+  482: 
+  483: 		update_option( self::get_nps_id( strval( $request['plugin_slug'] ) ), $nps_form_status );
+  484: 
+  485: 		wp_send_json_success(
+  486: 			array(
+  487: 				'status' => true,",,UN,UN,
+D7eb2d403,nelio-content,ssrf,rce,includes/rest/class-nelio-content-post-rest-controller.php,896,"  892: 		}
+  893: 
+  894: 		$post_helper = Nelio_Content_Post_Helper::instance();
+  895: 		$post_helper->update_post_references( $post_id, $references, array() );
+  896: 		$post_helper->update_series( $post_id, $series );
+  897: 
+  898: 		$this->trigger_save_post_action( $post_id, false );
+  899: 
+  900: 		$post = get_post( $post_id );",,UR,UR,
+D5c0fd977,advanced-google-recaptcha,sqli,sqli,libs/ajax.php,298,"  294: 
+  295:         // build query
+  296:         $wpdb->sQuery = ""SELECT SQL_CALC_FOUND_ROWS "" . str_replace("" , "", "" "", implode("", "", $aColumns)) . "" FROM "" . $wpdb->wpcatcha_accesslocks . "" $sWhere $sOrder $sLimit"";
+  297: 
+  298:         $rResult = $wpdb->get_results($wpdb->sQuery); // phpcs:ignore
+  299: 
+  300:         // data set length after filtering
+  301:         $wpdb->sQuery = ""SELECT FOUND_ROWS()"";
+  302:         $iFilteredTotal = $wpdb->get_var($wpdb->sQuery); // phpcs:ignore","   21:         set_time_limit(300);
+  237:     static function get_locks_logs()
+  238:     {
+  239:         // phpcs:ignore db call warnings as we are using a custom table 
+  240:         
+  243: ",SD,SD,
+D01f9650f,backwpup,rce,rce,app/options-save.php,290,"  286: 		$jobs=get_option('backwpup_jobs');
+  287: 		$jobid=$_GET['jobid'];
+  288: 		try {
+  289: 			$s3 = new AmazonS3($jobs[$jobid]['awsAccessKey'], $jobs[$jobid]['awsSecretKey']);
+  290: 			$s3file=$s3->get_object($jobs[$jobid]['awsBucket'], $_GET['file']);
+  291: 		} catch (Exception $e) {
+  292: 			die($e->getMessage());
+  293: 		} 
+  294: 		if ($s3file->status==200) {","  454: function backwpup_save_job() { //Save Job settings
+  610: 		update_option('backwpup_dropboxrequest',array('jobid'=>$jobid,'oAuthRequestToken' => $response['oauth_token'],'oAuthRequestTokenSecret' => $response['oauth_token_secret']));
+  612: 		$response = $dropbox->oAuthAuthorize($response['oauth_token'], plugins_url('dropbox-auth.php',__FILE__).'?wpabs='.trailingslashit(ABSPATH));
+  614: 	if ($_POST['dropboxauth']==__('Delete!', 'backwpup')) {
+  619: 	",SC,SC,
+De2ce1407,fluent-cart,xss,xss,app/Services/Renderer/ProductCardRender.php,92,"   88: 
+   89:         if ($link) {
+   90:             // Render as link
+   91:             $targetAttr = $target === '_blank' ? 'target=""_blank"" rel=""noopener noreferrer""' : '';
+   92:             echo sprintf(
+   93:                     '<h3 class=""fct-product-card-title"">
+   94:                         <a %1$s data-fluent-cart-product-link 
+   95:                            data-product-id=""%2$s"" 
+   96:                            href=""%3$s"" ","  132:         ?>
+  148:     }",SC,SD,
+Dbb82322a,visitor-maps-extended-referer-field,xss,auth,visitor-maps-extended-referer.php,428,"  424:     //wp_die($_REQUEST['vmerf_update_settings']);
+  425:     $updated = false;
+  426:     if(isset($_REQUEST['vmerf_update_settings'])):   
+  427:        $vmerf_settings = array('preserve_data' => $_REQUEST['vmerf_preserve_data']);
+  428:        update_option(""vmerf_settings"", $vmerf_settings);
+  429:        $output .= '<div class=""updated below-h2"" style=""padding: 10px 4px; margin:10px 0px;"">Settings successfully updated!</div>' . ""\n"";
+  430:     $updated = true;
+  431:     endif;
+  432:     $vmerf_settings = get_option(""vmerf_settings"");","    6:  * @copyright 2011-2014
+   14: Version: 1.2.6
+   18: define(""VMERF_VERSION"", ""1.2.6"");
+  117: # Cond start
+  309:     
+  310:     $vmerf_htbackup = get_option(""vmerf_htbackup"", false);",UR,UR,
+Dc0a3e547,wpcomplete,xss,xss,includes/plugin-update-checker-3.1.php,813,"  809:         $message = __('A new version of this plugin is available.', 'plugin-update-checker');
+  810:       } else {
+  811:         $message = sprintf(__('Unknown update checker status ""%s""', 'plugin-update-checker'), htmlentities($status));
+  812:       }
+  813:       printf(
+  814:         '<div class=""updated notice is-dismissible""><p>%s</p></div>',
+  815:         apply_filters('puc_manual_check_message-' . $this->slug, $message, $status)
+  816:       );
+  817:     }",,UN,UN,
+D7c0f132f,yml-for-yandex-market,lfi,auth,function.php,382,"  378: 		try {
+  379: 			// Проверяем существование каталога
+  380: 			if ( $wp_filesystem->exists( $path ) ) {
+  381: 				// Удаляем каталог рекурсивно
+  382: 				$result = $wp_filesystem->delete( $path, true );
+  383: 
+  384: 				if ( false === $result ) {
+  385: 					throw new Exception(
+  386: 						__( 'Error when deleting a folder', 'yml-for-yandex-market' )","  269: 		$new_url = common_option_get(
+  322: 			$wooc_currencies = common_option_get(",UR,UR,
+Dcc900c32,generateblocks,xss,csrf,plugin.php,59,"   55:  */
+   56: function generateblocks_do_activate( $network_wide = false ) {
+   57: 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only used to do a redirect. False positive.
+   58: 	if ( ! $network_wide && ! isset( $_GET['activate-multi'] ) ) {
+   59: 		update_option( 'generateblocks_do_activation_redirect', true );
+   60: 	}
+   61: }
+   62: register_activation_hook( __FILE__, 'generateblocks_do_activate' );","    8:  * Version: 1.3.5
+   22: define( 'GENERATEBLOCKS_VERSION', '1.3.5' );
+   38: ",UR,UR,
+D285beae0,timetics,auth,auth,utils/global-helper.php,112,"  108:      * @return void
+  109:      */
+  110:     function timetics_update_google_auth( $user_id = 0, $data = [] ) {
+  111:         if ( ! empty( $data['code'] ) ) {
+  112:             update_user_meta( $user_id, 'timetics_google_auth_code', $data['code'] );
+  113:         }
+  114: 
+  115:         if ( ! empty( $data['refresh_token'] ) ) {
+  116:             update_user_meta( $user_id, 'timetics_google_refresh_token', $data['refresh_token'] );",,UN,UN,
+Dbdd242a5,wp-security-audit-log,xss,rce,classes/Views/AuditLog.php,299,"  295: 			self::$page_args['order']    = isset( $_REQUEST['order'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) : false;
+  296: 
+  297: 			// Search arguments.
+  298: 			self::$page_args['search_term']    = ( isset( $_REQUEST['s'] ) && ! empty( $_REQUEST['s'] ) ) ? trim( sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) ) : false;
+  299: 			self::$page_args['search_filters'] = ( isset( $_REQUEST['filters'] ) && is_array( $_REQUEST['filters'] ) ) ? array_map( 'sanitize_text_field', wp_unslash( $_REQUEST['filters'] ) ) : false;
+  300: 
+  301: 		}
+  302: 
+  303: 		return self::$page_args;","   14: use WSAL\Helpers\View_Manager;
+   15: use WSAL\Controllers\Constants;
+   19: use WSAL\ListAdminEvents\List_Events;
+   35: 	 * Listing view object (Instance of \WSAL\ListAdminEvents\List_Events).
+   37: 	 * @var \WSAL\ListAdminEvents\List_Events
+   99: 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'add_plugin_install_script' ) );",UR,UR,
+D9c18c9a1,collectchat,other,deserial,deactivation-feedback/feedback-form.php,386,"  382: 		);
+  383: 
+  384: 		if ( ! is_wp_error( $raw_response ) && 200 == wp_remote_retrieve_response_code( $raw_response ) ) {
+  385: 			if ( ! $is_anonymous ) {
+  386: 				$response = maybe_unserialize( wp_remote_retrieve_body( $raw_response ) );
+  387: 			}
+  388: 			echo 'done';
+  389: 		} else {
+  390: 			echo $response->get_error_code() . ': ' . $response->get_error_message();",,UR,UR,
+D322be879,wpcomplete,xss,auth,admin/class-wpcomplete-admin.php,1060," 1056:         if ( !empty( $redirect_to ) ) {
+ 1057:           $post_meta['redirect'] = $redirect;
+ 1058:         }
+ 1059: 
+ 1060:         update_post_meta( $post_id, 'wpcomplete', json_encode( $post_meta, JSON_UNESCAPED_UNICODE ) );
+ 1061: 
+ 1062:       } else {
+ 1063: 
+ 1064:         // If the value exists, delete it."," 1387:                 $button_name = ($button === ''.$post_id) ? 'Default Button' : ""Button '$button_id'"";
+ 1388:                 $completion .= ('<a href=""edit.php?page=wpcomplete-buttons&post_id=' . $post_id . '&button=' . $button . '"">' . ""$button_name: $completed_users/$avail_users Users ("" . round(100 * ($completed_users / $avail_users), 1) . '%)</a><br>');
+ 1403:               $completion = '<a href=""edit.php?page=wpcomplete-posts&post_id=' . $post_id . '"">' . (""$completed_users/$avail_users Users ("" . round(100 * ($completed_users / $avail_users), 1) . '%)')  . '</a>';
+ 1408:           echo '<div id=""completable-' . $post_id . '"">' . $completion . '</div>';
+ 1410:           echo '<div id=""completable-' . $post_id . '"">—</div>';",UR,UR,
+Dbaf3c86c,advanced-coupons-for-woocommerce-free,xss,other,Models/URL_Coupons.php,239,"  235:         if ( strpos( $redirect_url, home_url() ) === false ) {
+  236:             wc_clear_notices();
+  237:         }
+  238: 
+  239:         wp_redirect( $redirect_url ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+  240:         exit();
+  241:     }
+  242: 
+  243:     /**",,UR,UR,
+D321a22c4,products-file-upload-for-woocommerce,lfi,auth,frontend/index.php,363,"  359: 				wp_send_json( array(""status""=>""not"",""text""=>esc_html__( 'This file exceeds the maximum allowed size.', 'products-file-upload-for-woocommerce') ) );
+  360: 				die();
+  361: 			}
+  362:             if ( is_dir( $uploads_dir ) && is_writable( $uploads_dir ) ) {
+  363: 				$move_new_file = @ move_uploaded_file( $file['tmp_name'], $new_file );
+  364: 				if ( false !== $move_new_file ) {
+  365: 					// Set correct file permissions.
+  366: 					$perms = 0644;
+  367: 					@ chmod( $new_file, $perms );","    2: if ( ! defined( 'ABSPATH' ) ) {
+    3: 	exit; // Exit if accessed directly
+    5: class Superaddons_Products_Uploads_Frontend {
+    6:     function __construct(){
+    7:         add_action( ""wp_enqueue_scripts"",array($this,""add_lib""));
+    8:         add_action( ""woocommerce_before_add_to_cart_button"",array($this,""add_upload""));",UR,UR,
+Dacfda64b,modal-dialog,rce,other,modal-dialog-admin.php,476,"  472: 
+  473: 		update_option( $configname, $options );
+  474: 
+  475: 		//lets redirect the post request into get request (you may add additional params at the url, if you need to show save results
+  476: 		wp_redirect( $this->remove_querystring_var( $_POST['_wp_http_referer'], 'message' ) . ""&message=1&config="" . $configid );
+  477: 	}
+  478: 
+  479: 	function general_config_meta_box( $data ) {
+  480: 		$genoptions = $data['genoptions'];","  422: 				'excludeurlstrings',
+  423: 				'codecondition'
+  701: 				</td>
+  702: 			</tr>
+  703: 			<tr>
+  704: 				<td>PHP Condition string ( E.g. in_category(3) || is_archive(3) )</td>",UR,UR,
+D5dd75c49,simple-membership,other,deserial,ipn/swpm-stripe-sca-checkout-session-create.php,59,"   55: 			$payment_amount   = round( $payment_amount, 2 ); //round the amount to 2 decimal place.
+   56: 
+   57: 			$payment_amount = apply_filters( 'swpm_payment_amount_filter', $payment_amount, $button_id );
+   58: 
+   59: 			$zero_cents = unserialize( SIMPLE_WP_MEMBERSHIP_STRIPE_ZERO_CENTS );
+   60: 			if ( in_array( $payment_currency, $zero_cents ) ) {
+   61: 				//this is zero-cents currency, amount shouldn't be multiplied by 100
+   62: 				$price_in_cents = $payment_amount;
+   63: 			} else {",,UR,UR,
+D5247c854,capability-manager-enhanced,auth,auth,includes/admin-notices/admin-notices.php,267,"  263:                         $admin_notice_data['blacklist_notices'][] = $notice_id;
+  264:                     }
+  265:                 }
+  266: 
+  267:                 update_option('cme_admin_notice_data', $admin_notice_data);
+  268: 
+  269:                 $response['message'] = esc_html__('Admin notice status updated successfully.', 'capability-manager-enhanced');
+  270:                 $response['status']  = 'success';
+  271:             }",,UN,UN,
+D5a89ded0,woo-cart-abandonment-recovery,auth,deserial,modules/cart-abandonment/classes/class-cartflows-ca-tracking.php,312,"  308: 					if ( isset( $token_data['wcf_coupon_code'] ) && ! $woocommerce->cart->applied_coupons ) {
+  309: 						$woocommerce->cart->add_discount( $token_data['wcf_coupon_code'] );
+  310: 					}
+  311: 				}
+  312: 				$other_fields = maybe_unserialize( $result->other_fields );
+  313: 
+  314: 				$parts = explode( ',', $other_fields['wcf_location'] );
+  315: 				if ( count( $parts ) > 1 ) {
+  316: 					$country = $parts[0];","   81: 		define( 'CARTFLOWS_ZAPIER_ACTION_AFTER_TIME', 1800 );
+  357: 			wc_print_notice( __( 'This checkout page is generated by Cart Abandonment Recovery for WooCommerce plugin from test mail.', 'woo-cart-abandonment-recovery' ), 'notice' );
+  785: 
+  806: 			$products     = WC()->cart->get_cart();
+  807: 			$current_time = current_time( WCF_CA_DATETIME_FORMAT );
+  808: 			$other_fields = [",UR,UR,
+D46969626,faustwp,auth,auth,includes/blocks/functions.php,138,"  134:  * @param string $destination The destination directory for unzipping.
+  135:  * @return WP_Error|bool True on success, WP_Error on failure.
+  136:  */
+  137: function unzip_uploaded_file( $target_file, $destination ) {
+  138: 	$unzip_result = unzip_file( $target_file, $destination );
+  139: 	if ( is_wp_error( $unzip_result ) ) {
+  140: 		return $unzip_result;
+  141: 	}
+  142: 	return true;",   56: 		return $unzip_result;,SC,SC,
+D14511b2d,e2pdf,xss,deserial,classes/helper/e2pdf-convert.php,152,"  148:         if (is_array($value)) {
+  149:             return $value;
+  150:         }
+  151:         if (version_compare(PHP_VERSION, '7.0.0', '<')) {
+  152:             return @unserialize($value);
+  153:         } else {
+  154:             return @unserialize($value, ['allowed_classes' => false]);
+  155:         }
+  156:     }","   25:         $color = [
+   26:             0x00, 0x00, 0x00,
+   27:         ];
+   30:             $color = [
+   33:                 hexdec(substr($hex, 2, 1)),
+   34:             ];",UR,UR,
+D6c268e70,latepoint,other,auth,latepoint.php,1271," 1267: 				if ( ! isset( $_GET['activate-multi'] ) ) {
+ 1268: 					wp_redirect( OsRouterHelper::build_link( OsRouterHelper::build_route_name( 'wizard', 'setup' ) ) );
+ 1269: 				}
+ 1270: 			} elseif ( get_option( 'latepoint_show_version_5_modal', false ) ) {
+ 1271: 				delete_option( 'latepoint_show_version_5_modal' );
+ 1272: 				if ( ! isset( $_GET['activate-multi'] ) ) {
+ 1273: 					wp_redirect( OsRouterHelper::build_link( OsRouterHelper::build_route_name( 'settings', 'version_5_intro' ) ) );
+ 1274: 				}
+ 1275: 			}","    5:  * Version: 5.5.1
+   32: 		public $version    = '5.5.1';
+   49: 		}
+  113: 
+  114: 			if ( ! defined( 'LATEPOINT_VERSION' ) ) {
+  115: 				define( 'LATEPOINT_VERSION', $this->version );",UR,UR,
+D56710b9c,advanced-coupons-for-woocommerce-free,xss,sqli,Models/Store_Credits/Queries.php,179,"  175: 
+  176:         // run the query.
+  177:         // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+  178:         $results = $wpdb->get_results(
+  179:             ""{$query}{$sort_query}
+  180:              {$limit_query}
+  181:             "",
+  182:             ARRAY_A
+  183:         );",,UR,UR,
+D1ac2e7d6,cleantalk-spam-protect,sqli,auth,cleantalk.php,1828," 1824:                     } else {
+ 1825:                         $installer = new CleantalkUpgrader(new CleantalkUpgraderSkinDeprecated());
+ 1826:                     }
+ 1827: 
+ 1828:                     $installer->install($result->download_link);
+ 1829: 
+ 1830:                     if ( $installer->apbct_result === 'OK' ) {
+ 1831:                         die('OK');
+ 1832:                     } else {",    7:   Version: 5.185,UR,UR,
+D28c62c7a,latepoint,other,ssrf,lib/kit/nps-survey/classes/nps-survey-script.php,442,"  438: 			'headers' => self::get_api_headers(),
+  439: 			'timeout' => 60,
+  440: 		);
+  441: 
+  442: 		$response = wp_safe_remote_post( $api_endpoint, $request_args );
+  443: 
+  444: 		if ( is_wp_error( $response ) ) {
+  445: 			// There was an error in the request.
+  446: 			wp_send_json_error(",,UR,UR,
+D0251e9eb,image-optimization,auth,auth,modules/oauth/classes/data.php,98,"   94: 		$data['last_update'] = time();
+   95: 		$data['version'] = 1;
+   96: 
+   97: 		update_option( self::OPTION_OWNER_USER_ID, get_current_user_id() );
+   98: 		return update_option( self::CONNECT_DATA_OPTION_NAME, $data );
+   99: 	}
+  100: 
+  101: 	/**
+  102: 	 * get_access_token","   15: 
+   46: 
+   72: 		if ( $connect_data === null || $force ) {",SD,SD,
+Dabe9f6e6,wpcomplete,xss,auth,admin/class-wpcomplete-admin.php,917,"  913:         }
+  914:       }
+  915:       if ( $post_meta['buttons'] != $buttons ) {
+  916:         $post_meta['buttons'] = $buttons;
+  917:         update_post_meta( ''.$post->ID, 'wpcomplete', json_encode( $post_meta, JSON_UNESCAPED_UNICODE ) );
+  918:       }
+  919: 
+  920:     } else if ($post->post_status == 'auto-draft') {
+  921:       $completable = (get_option( $this->plugin_name . '_auto_enable', 'false' )) === 'true';"," 1387:                 $button_name = ($button === ''.$post_id) ? 'Default Button' : ""Button '$button_id'"";
+ 1388:                 $completion .= ('<a href=""edit.php?page=wpcomplete-buttons&post_id=' . $post_id . '&button=' . $button . '"">' . ""$button_name: $completed_users/$avail_users Users ("" . round(100 * ($completed_users / $avail_users), 1) . '%)</a><br>');
+ 1403:               $completion = '<a href=""edit.php?page=wpcomplete-posts&post_id=' . $post_id . '"">' . (""$completed_users/$avail_users Users ("" . round(100 * ($completed_users / $avail_users), 1) . '%)')  . '</a>';
+ 1408:           echo '<div id=""completable-' . $post_id . '"">' . $completion . '</div>';
+ 1410:           echo '<div id=""completable-' . $post_id . '"">—</div>';",UR,UR,
+D99beae0b,cf7-styler,auth,xss,includes/lib/Cf7_Template.php,44,"   40: 
+   41:         <div style=""margin-bottom:10px;"">
+   42:             <div style=""display: inline-block;vertical-align: top;margin-right: 10px;"">
+   43:                 <label for=""cf7cstmzr_<?php echo $element ?>_shadow_blur-radius""><?php _e('Blur radius', 'cf7-styler') ?></label>
+   44:                 <input id=""cf7cstmzr_<?php echo $element ?>_shadow_blur-radius"" name=""cf7cstmzr_<?php echo $element ?>_shadow_blur-radius"" class=""cf7cstmzr-number cf7cstmzr-form-control cf7cstmzr-text-field"" min=""0"" type=""number"" value=""<?php echo $style_scheme[$element . '_border_shadow_blur_radius']; ?>"">
+   45:             </div>
+   46: 
+   47:             <div style=""display: inline-block;vertical-align: top;margin-right: 10px;"">
+   48:                 <label for=""cf7cstmzr_<?php echo $element ?>_shadow_spread-radius""><?php _e('Spread radius', 'cf7-styler') ?></label>","   10:             <h4 class=""cf7cstmzr-settings-item-header""><?php echo $title; ?></h4>
+   27:         <label><?php _e('Shadow', 'cf7-styler') ?></label>
+   31:                 <label for=""cf7cstmzr_<?php echo $element ?>_shadow_horizontal-length""><?php _e('Horizontal Length', 'cf7-styler') ?></label>
+   32:                 <input id=""cf7cstmzr_<?php echo $element ?>_shadow_horizontal-length"" name=""cf7cstmzr_<?php echo $element ?>_shadow_horizontal-length"" class=""cf7cstmzr-number cf7cstmzr-form-control cf7cstmzr-text-field"" min=""-200"" max=""200"" type=""number"" value=""<?php echo $style_scheme[$element . '_border_shadow_horizontal_length']; ?>"">
+   36:                 <label for=""cf7cstmzr_<?php echo $element ?>_shadow_vertical-length""><?php _e('Vertical Length', 'cf7-styler') ?></label>
+   37:                 <input id=""cf7cstmzr_<?php echo $element ?>_shadow_vertical-length"" name=""cf7cstmzr_<?php echo $element ?>_shadow_vertical-length"" class=""cf7cstmzr-number cf7cstmzr-form-control cf7cstmzr-text-field"" min=""-200"" max=""200"" type=""number"" value=""<?php echo $style_scheme[$element . '_border_shadow_vertical_length']; ?>"">",UR,UR,
+Dedab5bba,ecab-taxi-booking-manager,xss,rce,Admin/settings/MPTBM_Extra_Service.php,239,"  235: 				}
+  236: 			}
+  237: 			public function ex_service_data( $post_id ) {
+  238: 				$new_extra_service         = array();
+  239: 				$extra_icon                =  isset($_POST['service_icon']) ? array_map('sanitize_text_field',$_POST['service_icon']) : [];
+  240: 				$extra_names               =  isset($_POST['service_name']) ? array_map('sanitize_text_field',$_POST['service_name']) : [];
+  241: 				$extra_price               =  isset($_POST['service_price']) ? array_map('sanitize_text_field',$_POST['service_price']) : [];
+  242: 				$extra_qty_type            =  isset($_POST['service_qty_type']) ? array_map('sanitize_text_field',$_POST['service_qty_type']) : [];
+  243: 				$extra_service_description =  isset($_POST['extra_service_description']) ? array_map('sanitize_textarea_field',$_POST['extra_service_description']) : [];","  112: 						<input type=""number"" pattern=""[0-9]*"" step=""0.01"" class=""small mp_price_validation"" name=""service_price[]"" placeholder=""<?php esc_attr_e( 'EX: 10', 'ecab-taxi-booking-manager' ); ?>"" value=""<?php echo esc_attr( $service_price ); ?>""/>",UR,UR,
+D79be3bd0,products-file-upload-for-woocommerce,lfi,auth,backend/index.php,108,"  104:                 foreach( $_POST['superaddons_products_uploads'] as $key => $value ){
+  105:                     $datas[sanitize_text_field($key)] = sanitize_text_field($value);
+  106:                 }
+  107:             }
+  108:             update_option(""superaddons_products_uploads"",$datas);
+  109:         }
+  110: }
+  111: }
+  112: new Superaddon_Settings_Tab_Products_Upload;","    5: class Superaddon_Settings_Tab_Products_Upload {
+   10:     }
+   14:     }
+   44: 					</td>
+  110: }
+  111: }",UR,UR,
+D287ab483,ecab-taxi-booking-manager,xss,rce,Admin/MPTBM_Wc_Checkout_Fields.php,240,"  236: 				
+  237: 				// Add options if type is select
+  238: 				if ($type == 'select' && isset($_POST['option_value']) && isset($_POST['option_text'])) {
+  239: 					$array_option_text = array_map('sanitize_text_field', $_POST['option_text']);
+  240: 					$array_option_value = array_map('sanitize_text_field', $_POST['option_value']);
+  241: 					
+  242: 					if (is_array($array_option_value)) {
+  243: 						$select_options = array();
+  244: 						foreach ($array_option_value as $index => $value) {",,UR,UR,
+D24e69679,fluent-cart,xss,xss,app/Services/Renderer/ProductCardRender.php,109,"  105:                     esc_html($titleText)
+  106:             );
+  107:         } else {
+  108:             // Render as plain text (no link)
+  109:             echo sprintf(
+  110:                 '<h3 class=""fct-product-card-title"" %1$s>%2$s</h3>',
+  111:                 $atts, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+  112:                 esc_html($titleText)
+  113:             );","  132:         ?>
+  148:     }",SC,SD,
+D9f7491e1,litespeed-cache,xss,xss,src/esi.cls.php,417,"  413: 				$output .= self::_build_inline($url, $inline_param);
+  414: 			}
+  415: 		}
+  416: 
+  417: 		echo $output;
+  418: 	}
+  419: 
+  420: 	/**
+  421: 	 * Build a whole inline segment","   16: defined('WPINC') || exit;
+   65: 		// Init ESI in `after_setup_theme` hook after detected if LITESPEED_DISABLE_ALL is ON or not
+  105: 		 * To use it, just change the origianl shortcode as below:
+  280: 			$_SERVER['REQUEST_URI'] = trailingslashit($_SERVER['ESI_REFERER']);
+  357: 			remove_action('wp_footer', 'wp_admin_bar_render', 1000);
+  435: 		return ""<esi:inline name='$url' cache-control='"" . $control . ""' cache-tag='"" . $tag . ""'>"" . $inline_param['val'] . ""</esi:inline>"";",SC,SD,
+D0fa43ff6,motors-car-dealership-classified-listings,lfi,auth,includes/actions.php,569,"  565: 		if ( isset( $_POST['author_description'] ) ) {
+  566: 			$new_user_data['description'] = sanitize_textarea_field( $_POST['author_description'] );
+  567: 		}
+  568: 
+  569: 		$user_error = wp_update_user( $new_user_data );
+  570: 		if ( is_wp_error( $user_error ) ) {
+  571: 			$got_error_validation = true;
+  572: 			$error_msg            = $user_error->get_error_message();
+  573: 		}",,UR,UR,
+D7d434a68,cp-contact-form-with-paypal,sqli,sqli,cp_contactformpp_functions.php,349,"  345:         wp_enqueue_script( ""jquery"" );
+  346:         wp_enqueue_script( ""jquery-ui-core"" );
+  347:         wp_enqueue_script( ""jquery-ui-datepicker"" );
+  348:     }  
+  349:     $codes = $wpdb->get_results( 'SELECT * FROM '.CP_CONTACTFORMPP_DISCOUNT_CODES_TABLE_NAME.' WHERE `form_id`='.$id);
+  350: 
+  351:     $button_label = cp_contactformpp_get_option('vs_text_submitbtn', 'Submit',$id);
+  352:     $button_label = ($button_label==''?'Submit':$button_label);
+  353:     ?>","  313:     if ($id != '')
+  314:         $myrows = $wpdb->get_results( ""SELECT * FROM "".$wpdb->prefix.CP_CONTACTFORMPP_FORMS_TABLE."" WHERE id="".$id );
+  442:     else if (isset($_GET[""cal""]) && $_GET[""cal""] != '')
+  454:         if (isset($_GET[""page""]) &&$_GET[""page""] == 'cp_contact_form_addons')
+ 1506:     global $wpdb, $cp_contactformpp_option_buffered_item, $cp_contactformpp_option_buffered_id;
+ 1511:        $myrows = $wpdb->get_results( ""SELECT * FROM "".$wpdb->prefix.CP_CONTACTFORMPP_FORMS_TABLE."" WHERE id="".$id );",SD,SC,
+D803023fe,ultimate-addons-for-gutenberg,auth,xss,blocks-config/cf7-styler/class-uagb-cf7-styler.php,942,"  938: 			if ( $form && 0 !== $form && -1 !== $form ) {
+  939: 				?>
+  940: 				<div class = ""<?php echo esc_attr( implode( ' ', $main_classes ) ); ?>"">
+  941: 					<div class = ""<?php echo esc_attr( implode( ' ', $classes ) ); ?>"">
+  942: 					<?php echo do_shortcode( '[contact-form-7 id=""' . $form . '""]' ); ?>
+  943: 					</div>
+  944: 				</div>
+  945: 				<?php
+  946: 			}","   66: 			$enable_legacy_blocks = UAGB_Admin_Helper::get_admin_settings_option( 'uag_enable_legacy_blocks' );
+   68: 			if ( 'yes' === $enable_legacy_blocks ) {",UR,UR,
+D5ebc4add,products-file-upload-for-woocommerce,lfi,auth,yeekit/document.php,60,"   56:         }
+   57:         function dismiss_noty(){
+   58:             check_ajax_referer( 'yeekit_addons_nonce', 'nonce' );
+   59:             $id = sanitize_text_field($_POST[""id""]);
+   60:             update_user_meta(get_current_user_id(), 'yeeaddons_dismissed_' . $id, true);
+   61:             wp_send_json_success();
+   62:         }
+   63:         function add_js(){
+   64:             wp_enqueue_script('yeekit_list_addons', plugins_url('yeekit.js', __FILE__),array(""jquery""),""1.0.0"");","    2: if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+    4: if(!class_exists('Yeekit_Document_Addons')) { 
+    5:     class Yeekit_Document_Addons {
+    7:         function __construct(){
+    8:             add_action('admin_menu', array($this,""add_menu""),9999);
+    9:             add_action('admin_enqueue_scripts', array($this,'add_js'));",UR,UR,
+Db629ea99,ultimate-addons-for-gutenberg,auth,xss,blocks-config/post/class-uagb-post.php,1318," 1314: 					wp_send_json_error( 'Invalid JSON data received.' );
+ 1315: 				}
+ 1316: 
+ 1317: 				$attr['paged'] = isset( $_POST['page_number'] ) ? absint( $_POST['page_number'] ) : 1;
+ 1318: 				$html          = $this->post_grid_callback( $attr );
+ 1319: 				wp_send_json_success( $html );
+ 1320: 
+ 1321: 			}
+ 1322: ","  191: 							'isLeftToRightLayout'         => array(
+  192: 								'type'    => 'boolean',
+  193: 								'default' => false,
+  194: 							),
+  195: 							'wrapperTopPadding'           => array(
+  196: 								'type'    => 'number',",UR,UR,
+Da33e4670,products-file-upload-for-woocommerce,lfi,auth,backend/index.php,108,"  104:                 foreach( $_POST['superaddons_products_uploads'] as $key => $value ){
+  105:                     $datas[sanitize_text_field($key)] = sanitize_text_field($value);
+  106:                 }
+  107:             }
+  108:             update_option(""superaddons_products_uploads"",$datas);
+  109:         }
+  110: }
+  111: }
+  112: new Superaddon_Settings_Tab_Products_Upload;","    5: class Superaddon_Settings_Tab_Products_Upload {
+   10:     }
+   14:     }
+   44: 					</td>
+  110: }
+  111: }",UR,UR,
+Dc4486f34,b2bking-wholesale-for-woocommerce,auth,auth,public/class-b2bking-public.php,622,"  618: 					update_user_meta( $user_id, 'b2bking_customergroup', sanitize_text_field($group_id));
+  619: 
+  620: 					if (apply_filters('b2bking_use_wp_roles', false)){
+  621: 						$user_obj = new WP_User($user_id);
+  622: 						$user_obj->add_role('b2bking_role_'.$group_id);
+  623: 
+  624: 						if (apply_filters('b2bking_use_wp_roles_only_b2b', false)){
+  625: 							$user_obj->set_role('b2bking_role_'.$group_id);
+  626: 						}",,UN,UN,
+D6d84df59,yml-for-yandex-market,lfi,lfi,includes/feeds/class-y4ym-get-unit.php,284,"  280: 			$this->get_feed_id(),
+  281: 			$this->get_product()->get_id()
+  282: 		);
+  283: 		if ( file_exists( $tmp_file_path ) ) {
+  284: 			$file_content = file_get_contents( $tmp_file_path );
+  285: 		} else {
+  286: 			$file_content = false;
+  287: 		}
+  288: 		if ( false === $file_content ) {","    8:  * @version    5.2.0 (03-02-2026)
+  258: 		$ignore_cache = common_option_get(",SD,SC,
+D3fd686fc,w3-total-cache,rce,rce,SetupGuide_Plugin_Admin.php,590,"  586: 				'wincache',
+  587: 			);
+  588: 
+  589: 			if ( in_array( $engine, $allowed_engines, true ) ) {
+  590: 				if ( empty( $engine ) || 'file' === $engine || Util_Installed::$engine() ) {
+  591: 					if ( $old_enabled !== $enable ) {
+  592: 						$config->set( 'objectcache.enabled', $enable );
+  593: 						$is_updating = true;
+  594: 					}","  780: 					'exclude'            => $config->get_array( 'lazyload.exclude' ),",SC,SC,
+Dfbc1e8d3,modal-dialog,rce,auth,modal-dialog-admin.php,982,"  978: 	}
+  979: 
+  980: 	function md_editsave_post_field( $post_id ) {
+  981: 		if ( isset( $_POST['dialogid'] ) ) {
+  982: 			update_post_meta( $post_id, ""modal-dialog-id"", $_POST['dialogid'] );
+  983: 		}
+  984: 	}
+  985: 
+  986: 	function dialog_config_faq_meta_box() {","  422: 				'excludeurlstrings',
+  423: 				'codecondition'
+  701: 				</td>
+  702: 			</tr>
+  703: 			<tr>
+  704: 				<td>PHP Condition string ( E.g. in_category(3) || is_archive(3) )</td>",UR,UR,
+D05dd6172,simple-cloudflare-turnstile,other,xss,inc/integrations/forms/contact-form-7.php,13,"    9: function cfturnstile_cf7_shortcode() {
+   10: 	ob_start();
+   11: 	$id = wp_rand();
+   12: 	echo '<div class=""cf7-cf-turnstile"" style=""margin-top: 0px; margin-bottom: -15px;"">';
+   13: 	echo cfturnstile_field_show('.wpcf7-submit', 'turnstileCF7Callback', 'contact-form-7', '-cf7-' . $id);
+   14: 	?>
+   15: 	<script>document.addEventListener(""DOMContentLoaded"",function(){document.querySelectorAll('.wpcf7-form').forEach(function(e){e.addEventListener('submit',function(){if(document.getElementById('cf-turnstile-cf7-<?php echo esc_js( $id ); ?>')){setTimeout(function(){turnstile.reset('#cf-turnstile-cf7-<?php echo esc_js( $id ); ?>');},1000)}})})});</script>
+   16: 	<?php
+   17: 	$disable_script = ""function turnstileCF7Callback() {",,UR,UR,
+De1082951,ultimate-addons-for-gutenberg,auth,xss,blocks-config/google-map/class-uagb-google-map.php,197,"  193: 					class=""uagb-google-map__iframe""
+  194: 					title=""<?php _e( 'Google Map for ', 'ultimate-addons-for-gutenberg' ) . $address; ?>""
+  195: 					src=""<?php echo esc_url_raw( $updated_url ); ?>""
+  196: 					width=""640""
+  197: 					height=""<?php echo floatval( $height ); ?>""
+  198: 					loading=""lazy""
+  199: 				></embed>
+  200: 			</div>
+  201: 			<?php","   62: 						'block_id'            => array(
+   65: 						'address'             => array(
+   69: 						'height'              => array(
+   73: 						'heightTablet'        => array(
+   77: 						'heightMobile'        => array(
+   81: 						'zoom'                => array(",UR,UR,
+Dc25e90c5,ecab-taxi-booking-manager,xss,auth,inc/MPTBM_Rest_Api.php,924,"  920:             $featured_image_id = absint($request->get_param('featured_image_id'));
+  921:             $categories = $request->get_param('categories') ? array_map('absint', (array) $request->get_param('categories')) : array();
+  922:             
+  923:             // Create the taxi post
+  924:             $taxi_id = wp_insert_post(array(
+  925:                 'post_type' => MPTBM_Function::get_cpt(),
+  926:                 'post_title' => $title,
+  927:                 'post_content' => $description,
+  928:                 'post_status' => 'publish',"," 1358:             global $wpdb;
+ 1359:             $table_name = $wpdb->prefix . 'posts';
+ 1360:             $meta_table = $wpdb->prefix . 'postmeta';
+ 1362:             // Build WHERE conditions
+ 1363:             $where_conditions = array(""p.post_type = 'shop_order'"");
+ 1364:             ",UR,UR,
+D415e24f3,cf7-insightly,auth,sqli,includes/data.php,449,"  445:   }
+  446:   $table_name = $this->get_crm_table_name();
+  447:   // update
+  448: //  $wpdb->show_errors();
+  449:   return $wpdb->update($table_name,$arr, array('id' => $id));
+  450:   }
+  451:   
+  452:   /**
+  453:   * fields sorting order",,UR,UR,
+Df741fa53,ecab-taxi-booking-manager,xss,xss,inc/MPTBM_Rest_Api.php,400,"  396:             
+  397:             $key_data = $this->validate_api_key($api_key);
+  398:             
+  399:             if ($key_data) {
+  400:                 return new WP_REST_Response(array(
+  401:                     'success' => true,
+  402:                     'valid' => true,
+  403:                     'data' => array(
+  404:                         'user_id' => $key_data['user_id'],"," 1358:             global $wpdb;
+ 1359:             $table_name = $wpdb->prefix . 'posts';
+ 1360:             $meta_table = $wpdb->prefix . 'postmeta';
+ 1362:             // Build WHERE conditions
+ 1363:             $where_conditions = array(""p.post_type = 'shop_order'"");
+ 1364:             ",SC,SC,
+D45c733dd,ultimate-addons-for-gutenberg,auth,auth,classes/class-uagb-init-blocks.php,1450," 1446: 		if ( empty( $_POST['confirmation'] ) || 'yes' !== sanitize_text_field( $_POST['confirmation'] ) ) {
+ 1447: 			wp_send_json_error( array( 'message' => __( 'Invalid request', 'ultimate-addons-for-gutenberg' ) ) );
+ 1448: 		}
+ 1449: 
+ 1450: 		update_option( 'spectra_svg_confirmation', 'yes' );
+ 1451: 		wp_send_json_success();
+ 1452: 	}
+ 1453: 
+ 1454: 	/**","   89: 		add_filter( 'srfm_enable_redirect_activation', '__return_false' );
+   90: 
+   91: 		add_filter( 'admin_body_class', array( $this, 'add_wp_compat_body_class' ) );
+   92: 
+   93: 		add_action( 'wp_ajax_uagb_sureforms', array( $this, 'sureforms_plugin_activator' ) );
+   94: 		add_action( 'wp_ajax_uagb_surecart', array( $this, 'surecart_plugin_activator' ) );",SC,SC,
+Dc2ee8c34,quickwebp,lfi,lfi,admin/class-image-optimizer.php,389,"  385: 		if ( $settings['quickwebp_settings_conversion'] != '1' ) {
+  386: 			
+  387: 			$image_file['new_size'] = $image_file['size'];
+  388: 			$image_file['new_type'] = $image_file['type'];
+  389: 			$this->return_ajax_data( $image_file );
+  390: 		}
+  391: 
+  392: 		$extension_to_use = $this->image_extension_loaded( $settings );
+  393: 		if ( ! $extension_to_use ) {","  541: 	 * Optimize a local file
+  600: 		$attachment_id	= isset( $_POST['attachment_id'] ) ? sanitize_text_field( $_POST['attachment_id'] ) : false;
+  606: 		$already_optimized = get_post_meta( $attachment_id, 'quickwebp_already_optimized', true );
+  609: 		}
+  610: 
+  611: 		// check the mime type",SC,SC,
+D6fd88033,checkout-upsell-and-order-bumps,auth,sqli,app/Models/Stats.php,692,"  688:         } else {
+  689:             return;
+  690:         }
+  691: 
+  692:         self::insert([
+  693:             'campaign_id' => $data['campaign_id'],
+  694:             'campaign_type' => $campaign_type,
+  695:             'offer_id' => $offer_id,
+  696:             'order_id' => $order->get_id(),",,UR,UR,
+D9bc45804,ecab-taxi-booking-manager,xss,rce,Admin/MPTBM_Wc_Checkout_Fields.php,239,"  235: 				);
+  236: 				
+  237: 				// Add options if type is select
+  238: 				if ($type == 'select' && isset($_POST['option_value']) && isset($_POST['option_text'])) {
+  239: 					$array_option_text = array_map('sanitize_text_field', $_POST['option_text']);
+  240: 					$array_option_value = array_map('sanitize_text_field', $_POST['option_value']);
+  241: 					
+  242: 					if (is_array($array_option_value)) {
+  243: 						$select_options = array();",,UR,UR,
+Df7572e93,fluent-cart,xss,rce,app/Hooks/Cart/WebCheckoutHandler.php,890,"  886:         $changes = Arr::get($fillData, 'hook_changes', []);
+  887:         unset($fillData['hook_changes']);
+  888: 
+  889: 
+  890:         $cart->fill($fillData);
+  891:         $cart->save();
+  892:         $fragments = [];
+  893: 
+  894: ","   10: use FluentCart\Api\StoreSettings;
+   17: use FluentCart\App\Models\Cart;
+   18: use FluentCart\App\Models\CustomerAddresses;
+  207:                 ]
+  243:                     'type'     => 'replace'",UR,UR,
+D79785957,visitor-maps-extended-referer-field,xss,auth,visitor-maps-extended-referer.php,380,"  376:     $vmerf_auto_update = trim($_POST['vmerf_auto_update']);
+  377:     $vmerf_auto_update_time = (trim($_POST['vmerf_auto_update_time']) == '') ? 5 : trim($_POST['vmerf_auto_update_time']);
+  378:     settype($vmerf_auto_update_time, ""integer""); 
+  379:     $vmerf_auto_update_time = ($vmerf_auto_update_time < 1) ? 1 : $vmerf_auto_update_time; 
+  380:     update_option(""vmerf_auto_update"", $vmerf_auto_update);
+  381:     update_option(""vmerf_auto_update_time"", $vmerf_auto_update_time);
+  382:     $vmerf_output = ""vmerf_message += 'Auto-Update settings successfully updated.';\n"";
+  383:     return $vmerf_output;  
+  384: }","    6:  * @copyright 2011-2014
+   14: Version: 1.2.6
+   18: define(""VMERF_VERSION"", ""1.2.6"");
+  117: # Cond start
+  309:     
+  310:     $vmerf_htbackup = get_option(""vmerf_htbackup"", false);",UR,UR,
+D84044b3e,wp-security-audit-log,xss,rce,classes/Writers/class-csv-writer.php,240,"  236: 							);
+  237: 						}
+  238: 					}
+  239: 
+  240: 					$current_row = self::sanitize_csv_row( $current_row );
+  241: 
+  242: 					fputcsv( $output, $current_row, $csv_export_separator, $enclosure, '\\' );
+  243: 				}
+  244: 			}","   11:  */
+   22: use WSAL\Controllers\Alert_Manager;
+   73: 			if ( \class_exists( '\WSAL\Extensions\Views\Reports' ) ) {
+   76: 		}
+   77: 
+   78: 		/**",UR,UR,
+Ddff3cd17,geo-mashup,other,sqli,geo-mashup-db.php,1791," 1787: 		}
+ 1788: 		
+ 1789: 		$query_string = ""SELECT $field_string FROM $table_string $where $groupby $having $sort $limit"";
+ 1790: 
+ 1791: 		$wpdb->query( $query_string );
+ 1792: 		
+ 1793: 		return $wpdb->last_result;
+ 1794: 	}
+ 1795: ",,UR,UR,
+De84eba63,js-support-ticket,other,rce,modules/configuration/model.php,120,"  116:         // handle editor text for new ticket message after sanitizing all data
+  117:         if (isset($jsst_data['new_ticket_message'])) {
+  118:             $jsst_data['new_ticket_message'] = JSSTincluder::getJSModel('jssupportticket')->getSanitizedEditorData(wp_unslash($_POST['new_ticket_message'] ?? ''));
+  119:             $jsst_data['new_ticket_message'] = JSSTincluder::getJSModel('jssupportticket')->jsstremovetags($jsst_data['new_ticket_message']);
+  120:             $jsst_data['new_ticket_message'] = JSSTincluder::getJSmodel('jssupportticket')->stripslashesFull($jsst_data['new_ticket_message']);
+  121:         }
+  122:         // handle editor text for visitor message after sanitizing all data
+  123:         if (isset($jsst_data['visitor_message'])) {
+  124:             $jsst_data['visitor_message'] = JSSTincluder::getJSModel('jssupportticket')->getSanitizedEditorData(wp_unslash($_POST['visitor_message'] ?? ''));","    9:         $jsst_query = ""SELECT configname,configvalue,addon
+   11:         $jsst_data = jssupportticket::$_db->get_results($jsst_query);
+   16:         foreach ($jsst_data AS $jsst_config) {
+   17:             if($jsst_config->addon == '' ||  in_array($jsst_config->addon, jssupportticket::$_active_addons)){
+   18:                 jssupportticket::$jsst_data[0][$jsst_config->configname] = $jsst_config->configvalue;
+   22:         jssupportticket::$jsst_data[1] = JSSTincluder::getJSModel('email')->getAllEmailsForCombobox();",UR,UR,
+D458cb178,products-file-upload-for-woocommerce,lfi,auth,frontend/index.php,220,"  216: 			$names = explode(""/"",$name);
+  217: 			$path = $this->get_upload_dir();
+  218: 			$path_main = $path . '/'.end($names);
+  219: 			if ( @is_readable( $path_main ) && @is_file( $path_main ) ) { 
+  220: 				@unlink($path_main);
+  221: 				wp_send_json( array(""status""=>""ok"" ) );
+  222: 			}else{
+  223: 				wp_send_json( array(""status""=>""error"" ) );
+  224: 			}","    2: if ( ! defined( 'ABSPATH' ) ) {
+    3: 	exit; // Exit if accessed directly
+    5: class Superaddons_Products_Uploads_Frontend {
+    6:     function __construct(){
+    7:         add_action( ""wp_enqueue_scripts"",array($this,""add_lib""));
+    8:         add_action( ""woocommerce_before_add_to_cart_button"",array($this,""add_upload""));",UR,UR,
+D88085394,simply-schedule-appointments,auth,auth,includes/lib/td-health-check/assets/mu-plugin/health-check-troubleshooting-mode.php,497,"  493: 			$old_allowed_plugins = $this->allowed_plugins;
+  494: 
+  495: 			$this->allowed_plugins[ $_GET['health-check-troubleshoot-enable-plugin'] ] = $_GET['health-check-troubleshoot-enable-plugin'];
+  496: 
+  497: 			update_option( 'health-check-allowed-plugins', $this->allowed_plugins );
+  498: 
+  499: 			if ( ! $this->test_site_state() ) {
+  500: 				$this->allowed_plugins = $old_allowed_plugins;
+  501: 				update_option( 'health-check-allowed-plugins', $old_allowed_plugins );",,UN,UN,
+D6edee56c,simply-schedule-appointments,auth,sqli,includes/class-support-status-api.php,551,"  547: 		if ( json_last_error() !== JSON_ERROR_NONE ) {
+  548: 			return new WP_REST_Response( __( 'Invalid data format.'), 500 );
+  549: 		}
+  550: 
+  551: 		$import = $this->plugin->support_status->import_data( $decoded );
+  552: 
+  553: 		// if any error happens while trying to import appointment type data, return.
+  554: 		if ( is_wp_error( $import ) ) {
+  555: 			return new WP_REST_Response( $import->get_error_messages(), 500 );","  559: 		return new WP_REST_Response( __( 'Data successfully imported!' ), 200 );",UR,UR,
+D1f82e9a8,geo-mashup,other,xss,vendor/freemius/wordpress-sdk/includes/class-freemius.php,26254,"26250: 
+26251:             $user_api = $this->get_api_user_scope_by_user( Freemius::_get_user_by_email( $current_wp_user->user_email ) );
+26252: 
+26253:             foreach ( $modules as $module ) {
+26254:                 $user_api->call( ""?plugin_id={$module->id}"", 'put', array(
+26255:                     'is_marketing_allowed' => ( true == fs_request_get_bool( 'is_marketing_allowed' ) )
+26256:                 ) );
+26257:             }
+26258: ",,UR,UR,
+D3ee8b20d,wpforms-lite,csrf,xss,includes/class-process.php,243,"  239: 		 */
+  240: 		$this->form_data = (array) apply_filters( 'wpforms_process_before_form_data', wpforms_decode( $form->post_content ), $entry );
+  241: 
+  242: 		if ( ! empty( $this->form_data['settings']['ajax_submit'] ) && ! $this->is_valid_ajax_submit_action() ) {
+  243: 			wpforms_log(
+  244: 				'Attempt to submit corrupted post data.',
+  245: 				wp_unslash( $_POST ),
+  246: 				[
+  247: 					'type'    => [ 'error', 'entry' ],",,UR,UR,
+D62a1085f,generateblocks,other,xss,includes/pattern-library/class-pattern-library-rest.php,148,"  144: 		$libraries = GenerateBlocks_Libraries::get_instance();
+  145: 		$data = $libraries->get_all( rest_sanitize_boolean( $is_enabled ) );
+  146: 		$data = array_values( $data ); // Fix indexes.
+  147: 
+  148: 		return new WP_REST_Response(
+  149: 			array(
+  150: 				'error'  => false,
+  151: 				'data' => $data,
+  152: 			),",,UR,UR,
+D0e812c95,js-support-ticket,other,rce,modules/gdpr/model.php,80,"   76:     	}
+   77:     	$jsst_data = jssupportticket::JSST_sanitizeData($jsst_data); // JSST_sanitizeData() function uses wordpress santize functions
+   78:     	$jsst_data['message'] = JSSTincluder::getJSModel('jssupportticket')->getSanitizedEditorData($_POST['message']);
+   79:     	$jsst_row = JSSTincluder::getJSTable('erasedatarequests');
+   80:     	$jsst_data = JSSTincluder::getJSmodel('jssupportticket')->stripslashesFull($jsst_data);// remove slashes with quotes.
+   81:     	$jsst_error = 0;
+   82:     	if (!$jsst_row->bind($jsst_data)) {
+   83:             $jsst_error = 1;
+   84:     	}","    9: 		$jsst_query = ""SELECT * FROM `"" . jssupportticket::$_db->prefix . ""js_ticket_fieldsordering` WHERE fieldfor = 3 ORDER BY ordering "";
+   10: 		jssupportticket::$jsst_data[0] = jssupportticket::$_db->get_results($jsst_query);
+   17: 		$jsst_query = ""SELECT * FROM `"" . jssupportticket::$_db->prefix . ""js_ticket_erasedatarequests`"";
+   18: 		jssupportticket::$jsst_data[0] = jssupportticket::$_db->get_results($jsst_query);
+   23:         $jsst_email = jssupportticket::$_search['gdpr']['email'];
+   24:         $jsst_email = jssupportticket::parseSpaces($jsst_email);",UR,UR,
+D9be9a681,user-registration,other,rce,modules/membership/includes/AJAX.php,1655," 1651: 		}
+ 1652: 		$data = $_POST['membership_groups_data'];
+ 1653: 
+ 1654: 		$membership_group_service = new MembershipGroupService();
+ 1655: 		$create_groups            = $membership_group_service->create_membership_groups( $data );
+ 1656: 
+ 1657: 		if ( ! $create_groups['status'] ) {
+ 1658: 			wp_send_json_error(
+ 1659: 				array(","   32: use WPEverest\URMembership\Admin\Services\UpgradeMembershipService;
+   33: use WPEverest\URMembership\Local_Currency\Admin\CoreFunctions;
+   88: 			'validate_payment_currency'    => false,
+  232: 		if ( ur_check_module_activation( 'team' ) ) {
+  233: 			$data['team_id'] = ! empty( $response['team_id'] ) ? $response['team_id'] : 0;
+  234: 		}",UR,UR,
+D62380efc,court-reservation,auth,xss,public/class-courtres-public.php,1880," 1876: 			)
+ 1877: 
+ 1878: 		);
+ 1879: 
+ 1880: 		echo wp_kses( $html, $allowed_html );
+ 1881: 		wp_die();
+ 1882: 	}
+ 1883: 
+ 1884:     function is_court_payable($courtID,$table_settings)","    2: 
+   95: 		$table_courts = $this->getTable( 'courts' );
+   97: 		$court = $wpdb->get_row( ""SELECT * FROM $table_courts WHERE id = $courtID"" );
+   99: 		if (isset($court)) 
+  100: 		{ 
+  102: 			$court_payable = $wpdb->get_row( ""SELECT * FROM $table_settings WHERE option_name = '$court_option' ORDER BY `option_id` DESC LIMIT 1"" );",UR,UR,
+D53e812e2,quickwebp,lfi,auth,admin/components/checkbox.php,10,"    6: 
+    7: if( isset( $key_option, $_POST[ $key_option ] ) ) {
+    8: 
+    9:     $value = is_array($_POST[ $key_option ]) ? array_map( 'sanitize_text_field', $_POST[ $key_option ] ) : array();
+   10:     update_option( $key_option, $value );
+   11:     
+   12: }
+   13: if(isset($data['options']) && is_array($data['options'])) {
+   14:     ?>",,UR,UR,
+D07b0f597,blog-filter,xss,rce,templates/blog-filter-ajax-get.php,33,"   29:     $user_atts['blog_filtering'] = sanitize_key($user_atts['blog_filtering']);
+   30: }
+   31: if (isset($user_atts['selected_terms'])) {
+   32:     // Sanitize as comma-separated integers
+   33:     $user_atts['selected_terms'] = implode(',', array_map('intval', array_filter(explode(',', $user_atts['selected_terms']))));
+   34: }
+   35: 
+   36: $defaults = bfg_get_shortcode_defaults();
+   37: ","    2: 
+   22: $user_atts = isset($_POST['bfg_query_vars']) ? (array) $_POST['bfg_query_vars'] : array();
+   56: $displayed_posts     = isset($_POST['displayed_posts']) ? array_map('intval', $_POST['displayed_posts']) : array();
+   61:     $raw_filter = $_POST['targetFilter'];
+   73: $unique_id = isset($_POST['unique_id']) ? intval($_POST['unique_id']) : rand(1, 1000);",UR,UR,
+D5388bcf6,essential-addons-for-elementor-lite,deserial,auth,includes/Classes/WPDeveloper_Notice.php,777,"  773:         // Remove the upsale from notice_will_show field in options DB.
+  774:         unset( $options_data[ $this->plugin_name ]['notice_will_show'][ $notice ] );
+  775:         $this->update_options_data( $options_data[ $this->plugin_name ] );
+  776:         // Set users meta, not to show again current_version notice.
+  777:         update_user_meta( get_current_user_id(), self::ADMIN_UPDATE_NOTICE_KEY, $user_notices);
+  778:     }
+  779: 
+  780:     public function notice_dissmiss(){
+  781:         if( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ), 'wpdeveloper_notice_dissmiss' ) ) {",,UR,UR,
+Da5392198,geo-mashup,other,rce,geo-mashup.php,762,"  758: 	 */
+  759: 	public static function ajax_kml_attachments() {
+  760: 		$urls = array(array());
+  761: 		if ( !empty( $_REQUEST['post_ids'] ) ) {
+  762: 			$post_ids = array_map( 'intval', explode( ',', $_REQUEST['post_ids'] ) );
+  763: 			foreach( $post_ids as $post_id ) {
+  764: 				$urls[] = self::get_kml_attachment_urls( $post_id );
+  765: 			}
+  766: 		}",,UR,UR,
