@@ -49,6 +49,50 @@ def _parse_newcommands(path):
     return defs
 
 
+def check_preprints_are_not_load_bearing(main_text, fails):
+    """The paper claims preprints are cited only in Related Work and the Introduction.
+
+    That is a new claim as of 2026-08-18 and it is exactly the kind that goes false quietly: one
+    citation added to a Results paragraph next year makes the sentence a lie and nothing would
+    notice. 17 of the 30 references are 2026 preprints, a reviewer flagged the share as high for
+    this venue, and the answer we gave is that none of them carries a measurement. So the claim is
+    checked rather than asserted.
+    """
+    bib = os.path.join(LATEX, "references.bib")
+    if not os.path.isfile(bib):
+        return
+    body = open(bib, encoding="utf-8").read()
+    pre = set()
+    for m in re.finditer(r"@\w+\{([^,]+),(.*?)\n\}", body, re.S):
+        if re.search(r"arxiv|eprint|preprint", m.group(2), re.I):
+            pre.add(m.group(1).strip())
+    if not pre:
+        return
+    allowed = ("Introduction", "Related Work")
+    secs = [(mm.start(), mm.group(1)) for mm in re.finditer(r"\\section\*?\{([^}]*)\}", main_text)]
+
+    def sec_of(pos):
+        cur = "(front matter)"
+        for p_, n in secs:
+            if p_ < pos:
+                cur = n
+            else:
+                break
+        return cur
+
+    bad = []
+    for m in re.finditer(r"\\cite[a-z]*\{([^}]*)\}", main_text):
+        for k in (x.strip() for x in m.group(1).split(",")):
+            if k in pre:
+                sec = sec_of(m.start())
+                if not any(a in sec for a in allowed):
+                    bad.append(f"{k} cited in {sec!r}")
+    if bad:
+        fails.append("the manuscript says no measurement rests on a preprint, but "
+                     f"{len(bad)} preprint citation(s) sit outside the Introduction and Related "
+                     f"Work: {'; '.join(sorted(set(bad))[:4])}")
+
+
 def _abstract(text):
     m = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", text, re.S)
     return m.group(1) if m else ""
@@ -80,7 +124,7 @@ LITERAL_PENDING = [
     ('0.00', 'agnostic, scoring 0.00 on'),
     ('0.00', 'rpose SAST scores 0.00)}};'),
     ('0.283', 'to 0.283, so roughly seven'),
-    ('0.013', 'ion by the same $+0.013$, but \\emph{not o'),
+    ('0.013', 'the same $+0.013$, but \\emph{not on the'),
     # 0.893 left this list on 2026-08-17: the sentence now prints \WpBlockRate, so the debt is paid
     # and a tolerated literal that no longer exists is a hole, not a record.
     ('0.00', 'baselines score 0.00.'),
@@ -323,6 +367,7 @@ def main(check_bbl=True):
         main_tex = open(MAIN, encoding="utf-8").read()
         if "\\input{PAPER_MACROS_V3" not in main_tex and "\\input{PAPER_MACROS_V3.tex" not in main_tex:
             fails.append("manuscript does not \\input{PAPER_MACROS_V3} (numbers not macro-sourced)")
+        check_preprints_are_not_load_bearing(main_tex, fails)
 
         # 4. abstract must carry no literal primary number (decimal rate / ratio / kappa).
         #    Strip only DEFINED macro calls so their expansion is not scanned, but keep plain

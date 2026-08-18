@@ -35,13 +35,21 @@ import os
 # by eval/monotone_diff_v3.py, which exits non-zero on any instability.
 #
 # v1.2 behaviour is recoverable with WISP_MONOTONE_PROPS=0 and WISP_PER_KEY_CAP=4.
-# One released engine, one tag. Earlier drafts named the ablation's baseline arm as a second tag,
-# wisp-scanner-v1.2, which was never accurate: the arms were produced by toggling the two defaults
-# below on a single engine, not by checking out an older release. Naming the configuration says what
-# was actually run and stays checkable from the one released version. A future engine goes to v1.1.
-ENGINE_TAG = "wisp-scanner-v1.0"
+# Four different things, kept apart on purpose. The first two are PROVENANCE: they are the build
+# labels the result JSONs stamped when each run happened, and the regression suite binds shipped
+# results to them, so repurposing either one silently decouples the guard from what it guards. An
+# earlier attempt set ENGINE_TAG to the release name and four tests caught it, which is the suite
+# working.
+ENGINE_TAG = "wisp-scanner-v1.3"        # build label stamped in every run manifest
+BASELINE_TAG = "wisp-scanner-v1.2"      # build label of the convergence ablation's baseline arm
+# The third is the PUBLISHED name. The repository releases one engine and a later paper goes to
+# v1.1, so the release name is not the development build label and is not stamped in any result.
+RELEASE_TAG = "wisp-scanner-v1.0"
+# The fourth is what the baseline arm actually was: a configuration of the one engine, produced by
+# setting these two variables, not an older release anyone checked out. The paper names the
+# configuration rather than a tag, because that is what was run and it stays checkable from the
+# single released version.
 BASELINE_CONFIG = "WISP_PER_KEY_CAP=4 WISP_MONOTONE_PROPS=0"
-BASELINE_TAG = BASELINE_CONFIG   # kept as an alias so older result JSONs still resolve
 BASELINE_SHA256 = "012279d6c67e9454075b139d7231b0853c10d7a3845233c86b1565e30d039b1a"
 
 _ENGINE_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),

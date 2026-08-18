@@ -439,6 +439,13 @@ def build():
                     add(f"Ext{tn}{ln}", r3(c["rate"]), EX, f"cells.{tool}.{label}.rate")
             add(f"Ext{tn}Coverage", r3(ex["coverage"][tool]), EX, f"coverage.{tool}")
         add("ExtNonConv", str(ex["wisp_non_converged"]), EX, "wisp_non_converged")
+        # The count is 1 on this set, so a sentence written as "N records" reads "1 records". A
+        # macro that carries only the number cannot agree with its own noun, so emit the noun too.
+        _nc = int(ex["wisp_non_converged"])
+        add("ExtNonConvRec", f"{_nc} record" + ("" if _nc == 1 else "s"), EX,
+            "wisp_non_converged, with its noun")
+        add("ExtNonConvVerb", "does" if _nc == 1 else "do", EX,
+            "verb agreeing with wisp_non_converged")
         add("ExtN", str(ex["n_records"]), EX, "n_records")
 
     # Per-class emission on the full corpus, the three WordPress-specific classes the paper argues
@@ -1098,14 +1105,14 @@ def build():
         # the one released version carries in the public repository, read from the code constant.
         # The sha256 below is what actually determines behaviour and is the same under either name.
         from eval import wisp_contract as _WC
-        add("EngineRelease", _WC.ENGINE_TAG, "eval/wisp_contract.py", "ENGINE_TAG")
+        add("EngineRelease", _WC.RELEASE_TAG, "eval/wisp_contract.py", "RELEASE_TAG")
         add("EngineTag", cfg["engine_tag"], src, "provenance.wisp_config.engine_tag")
         add("EngineSha", cfg["engine_sha256"][:8], src, "provenance.wisp_config.engine_sha256[:8]")
         # The baseline arm is a configuration of the one released engine, not a second release, so
         # this prints the flags that produced it. They carry underscores, which are active in LaTeX
         # text mode, so escape them here rather than hoping every call site wraps them in \code.
-        add("EngineBaselineTag", cfg["engine_baseline_tag"].replace("_", r"\_"), src,
-            "provenance.wisp_config.engine_baseline_tag")
+        add("EngineBaselineTag", _WC.BASELINE_CONFIG.replace("_", r"\_"),
+            "eval/wisp_contract.py", "BASELINE_CONFIG")
         add("EngineBaselineSha", cfg["engine_baseline_sha256"][:8], src,
             "provenance.wisp_config.engine_baseline_sha256[:8]")
         break
