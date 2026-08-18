@@ -1,0 +1,13 @@
+{
+ "zips": 1003,
+ "zip_errors": 0,
+ "total_php_files": 366960,
+ "skipped_no_open_tag": 1251,
+ "parsed_files": 365709,
+ "files_with_error": 1024,
+ "parsed_bytes": 2802805588,
+ "error_bytes": 2257670,
+ "pct_skipped": 0.341,
+ "pct_files_with_error": 0.28,
+ "pct_error_bytes": 0.0806
+}
