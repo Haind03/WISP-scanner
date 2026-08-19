@@ -1374,6 +1374,13 @@ def build():
                   ("on_exact_changed_line", "Exact")):
         add(f"DsGeo{nm}", dsr(ds["geometry_same_sample"][g]["pooled"]["rate"]), DS,
             f"payload.geometry_same_sample.{g}.pooled.rate")
+        # Two decimals round the file rung's 0.485 down to 0.48, and 0.48 over the blind arm's 0.08
+        # is 6.0 where the reported factor is 6.1. A reader who divides the two printed rates then
+        # gets a different number from the one the sentence states, which is the defect an outside
+        # reviewer raised. Three decimals is the printing at which the headline reproduces, so the
+        # prose that states the factor uses this macro.
+        add(f"DsGeo{nm}Exact", r3(ds["geometry_same_sample"][g]["pooled"]["rate"]), DS,
+            f"payload.geometry_same_sample.{g}.pooled.rate")
     ag = ds["agreement"]["root_cause_relation"]
     add("DsKappa", f"{ag['cohens_kappa']:.2f}", DS, "payload.agreement.root_cause_relation.cohens_kappa")
     add("DsKappaLo", f"{ag['kappa_ci95_record_cluster'][0]:.2f}", DS,
