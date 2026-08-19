@@ -425,7 +425,7 @@ def main(check_bbl=True):
                 sources.append((stem[:-4] + ".bbl", r"\\bibitem\{wispsoftware\}(.*?)(?=\\bibitem|\\end\{thebibliography\})"))
         for fname, pat in sources:
             path = os.path.join(LATEX, fname)
-            if not os.path.isfile(path) or "EngineTag" not in defined:
+            if not os.path.isfile(path) or "EngineRelease" not in defined:
                 continue
             txt = open(path, encoding="utf-8").read()
             m = re.search(pat, txt, re.S)
@@ -435,7 +435,14 @@ def main(check_bbl=True):
                                  f"resolves to cannot be checked against \\EngineTag")
                 continue        # a .bbl for a document that does not cite the software is fine
             entry = m.group(1)
-            for macro, what in (("EngineTag", "tag"), ("EngineSha", "engine sha256")):
+            # The rule changed once and the change is the point. This used to demand \EngineTag,
+            # the internal build label the run manifests stamp, and that is not a thing a reader
+            # can fetch: the repository publishes exactly one tag, the release. Demanding the build
+            # label sent the citation to a tag that does not exist on the remote, which is a worse
+            # failure than the one this check was written for. \EngineRelease and \EngineTag name
+            # the same bytes, and the sha256 checked below is what actually pins the engine, so the
+            # citation names the release and the identity is carried by the hash.
+            for macro, what in (("EngineRelease", "release tag"), ("EngineSha", "engine sha256")):
                 want = defined[macro]
                 if want not in entry:
                     fails.append(
@@ -443,9 +450,10 @@ def main(check_bbl=True):
                         f"under: \\{macro} = {want!r} appears nowhere in it, so the citation sends "
                         f"the reader to a different engine"
                         + (" (run bibtex: the .bbl is stale)" if fname.endswith(".bbl") else ""))
-            for stale, why in (("wisp-scanner-v1.2", "the baseline tag"),
+            for stale, why in (("wisp-scanner-v1.2", "the baseline build label"),
+                               ("wisp-scanner-v1.3", "the development build label, not a published tag"),
                                ("012279d6", "the baseline engine sha256")):
-                if stale in entry and stale not in (defined.get("EngineTag"),
+                if stale in entry and stale not in (defined.get("EngineRelease"),
                                                     defined.get("EngineSha")):
                     fails.append(
                         f"{fname} wispsoftware entry still names {stale!r} ({why}), which is not "

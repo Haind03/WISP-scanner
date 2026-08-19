@@ -1,0 +1,148 @@
+ÁP QUY TẮC "vùng liên quan = cùng HÀM bị vá, không phải cùng FILE"
+vào 42 dòng cụm A=RELATED_AREA_DIFFERENT_DEFECT / B=UNRELATED
+==============================================================================
+
+NHÓM 1 — QUY TẮC CỦA A TỰ QUYẾT ĐƯỢC: UNRELATED (trùng nhãn B)   [24 dòng]
+------------------------------------------------------------------------------
+  dòng  2  themesflat-addons-for-elementor  (CVE-2026-39500, xss)
+          tf-function.php:548
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng  3  user-registration  (CVE-2026-25425, other)
+          modules/payment-history/AJAX.php:452
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng  5  automatorwp  (CVE-2026-42775, other)
+          includes/ajax-functions.php:899
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng  6  geo-mashup  (CVE-2026-27427, xss)
+          edit-form.php:193
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng  8  ultimate-addons-for-gutenberg  (CVE-2026-42648, auth)
+          blocks-config/post-timeline/class-uagb-post-timeline.php:1008
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 11  ultimate-addons-for-gutenberg  (CVE-2026-42648, auth)
+          blocks-config/google-map/class-uagb-google-map.php:197
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 12  new-user-approve  (CVE-2025-69063, auth)
+          includes/end-points/mobile-api.php:344
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 13  cleantalk-spam-protect  (CVE-2022-3302, sqli)
+          inc/cleantalk-ajax.php:723
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 15  wp-google-map-plugin  (CVE-2026-39492, other)
+          core/class.controller.php:115
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 16  cp-contact-form-with-paypal  (CVE-2026-32433, sqli)
+          cp_contactformpp_admin_int_list.inc.php:92
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 18  groundhogg  (CVE-2026-40727, other)
+          api/v4/contacts-api.php:567
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 21  advanced-coupons-for-woocommerce-free  (CVE-2026-39508, xss)
+          Models/Emails.php:278
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 25  mw-wp-form  (CVE-2023-6316, upload)
+          classes/models/class.form.php:219
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 27  new-user-approve  (CVE-2025-69063, auth)
+          freemius/includes/fs-plugin-info-dialog.php:1043
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 28  themesflat-addons-for-elementor  (CVE-2026-39500, xss)
+          tf-function.php:548
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 30  themesflat-addons-for-elementor  (CVE-2026-39500, xss)
+          tf-function.php:558
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 31  the-post-grid  (CVE-2026-49054, auth)
+          app/Controllers/Admin/SetupWizardController.php:732
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 32  site-mailer  (CVE-2025-1319, xss)
+          classes/services/client.php:93
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 38  cleantalk-spam-protect  (CVE-2022-3302, sqli)
+          inc/cleantalk-ajax.php:740
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 40  quickwebp  (CVE-2026-42756, lfi)
+          admin/components/checkbox.php:10
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 43  elementor  (CVE-2026-32445, auth)
+          vendor/elementor/wp-one-package/src/Admin/Controllers/Settings.php:82
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 47  automatorwp  (CVE-2026-42775, other)
+          libraries/ct/includes/class-ct-rest-controller.php:409
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 51  mw-wp-form  (CVE-2023-6316, upload)
+          classes/models/class.directory.php:202
+          file của phát hiện KHÔNG bị vá dòng nào
+  dòng 55  themesflat-addons-for-elementor  (CVE-2026-39500, xss)
+          tf-function.php:559
+          file của phát hiện KHÔNG bị vá dòng nào
+
+NHÓM 5 — QUY TẮC CỦA A CHO KẾT QUẢ NGƯỢC VỚI B   [1 dòng]
+------------------------------------------------------------------------------
+  dòng 36  userfeedback-lite  (CVE-2026-39475, sqli)
+          includes/admin/class-userfeedback-metabox.php:134
+          CHÍNH dòng phát hiện nằm trong các dòng bị vá
+
+NHÓM 3 — PHẢI NHÌN: dòng bị vá ở ngay gần   [5 dòng]
+------------------------------------------------------------------------------
+  dòng 24  alttext-ai  (CVE-2026-25348, auth)
+          includes/class-atai-attachment.php:612
+          dòng bị vá gần nhất cách 9 dòng -> cần xác nhận có cùng hàm không
+  dòng 26  products-file-upload-for-woocommerce  (CVE-2026-25328, lfi)
+          yeekit/document.php:60
+          dòng bị vá gần nhất cách 2 dòng -> cần xác nhận có cùng hàm không
+  dòng 34  advanced-iframe  (CVE-2026-25453, xss)
+          advanced-iframe.php:1444
+          dòng bị vá gần nhất cách 39 dòng -> cần xác nhận có cùng hàm không
+  dòng 52  products-file-upload-for-woocommerce  (CVE-2026-25328, lfi)
+          backend/index.php:108
+          dòng bị vá gần nhất cách 3 dòng -> cần xác nhận có cùng hàm không
+  dòng 56  litespeed-cache  (CVE-2024-51915, xss)
+          src/esi.cls.php:417
+          dòng bị vá gần nhất cách 18 dòng -> cần xác nhận có cùng hàm không
+
+NHÓM 4 — PHẢI NHÌN: diff không có dòng bị sửa   [3 dòng]
+------------------------------------------------------------------------------
+  dòng 48  b2bking-wholesale-for-woocommerce  (CVE-2026-27346, auth)
+          admin/class-b2bking-admin.php:1603
+          diff chỉ thêm dòng, không sửa/xoá dòng nào -> cần nhìn
+  dòng 50  b2bking-wholesale-for-woocommerce  (CVE-2026-27346, auth)
+          admin/class-b2bking-admin.php:2979
+          diff chỉ thêm dòng, không sửa/xoá dòng nào -> cần nhìn
+  dòng 53  userfeedback-lite  (CVE-2026-39475, sqli)
+          lite/includes/admin/class-userfeedback-connect.php:182
+          diff chỉ thêm dòng, không sửa/xoá dòng nào -> cần nhìn
+
+NHÓM 2 — nghiêng về UNRELATED, nên liếc qua cho chắc   [9 dòng]
+------------------------------------------------------------------------------
+  dòng  4  yml-for-yandex-market  (CVE-2026-32567, lfi)
+          yml-for-yandex-market.php:269
+          dòng bị vá gần nhất cách 205 dòng
+  dòng  7  yml-for-yandex-market  (CVE-2026-32567, lfi)
+          admin/class-y4ym-admin.php:761
+          dòng bị vá gần nhất cách 207 dòng
+  dòng 19  fluent-cart  (CVE-2025-67971, xss)
+          app/Modules/Tax/TaxModule.php:386
+          dòng bị vá gần nhất cách 46 dòng
+  dòng 20  advanced-iframe  (CVE-2026-25453, xss)
+          advanced-iframe-admin-page.php:346
+          dòng bị vá gần nhất cách 87 dòng
+  dòng 22  cleantalk-spam-protect  (CVE-2022-3302, sqli)
+          cleantalk.php:1828
+          dòng bị vá gần nhất cách 1821 dòng
+  dòng 37  alttext-ai  (CVE-2026-25348, auth)
+          admin/partials/bulk-generate.php:342
+          dòng bị vá gần nhất cách 242 dòng
+  dòng 39  alttext-ai  (CVE-2026-25348, auth)
+          admin/partials/bulk-generate.php:312
+          dòng bị vá gần nhất cách 212 dòng
+  dòng 42  woocustomizer  (CVE-2026-27046, auth)
+          freemius/includes/class-freemius.php:4288
+          dòng bị vá gần nhất cách 209 dòng
+  dòng 44  backwpup  (-, rce)
+          app/libs/aws/lib/requestcore/requestcore.class.php:595
+          dòng bị vá gần nhất cách 498 dòng
+
+==============================================================================
+TỔNG: 24 dòng quy tắc tự quyết  |  18 dòng cần hai người nhìn
+Ngoài 42 dòng này còn 13 dòng khác kiểu, phải xét riêng từng dòng.

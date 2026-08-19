@@ -1,9 +1,18 @@
 """AB. The software citation must resolve to the engine the paper says it scored under.
 
-The availability paragraph is macro-driven and says the scans are scored under \\EngineTag with
-\\code{taint\\_engine.py} sha256 \\EngineSha. The bibliography is not macro-driven. When the engine
-moved from wisp-scanner-v1.2 to v1.3, @misc{wispsoftware} kept naming v1.2 and 012279d6, so the paper
-contradicted itself one line apart and every check passed, because nothing read the bibliography.
+The availability paragraph is macro-driven and says the scans are scored on the engine released as
+\\EngineRelease with \\code{taint\\_engine.py} sha256 \\EngineSha. The bibliography is not
+macro-driven. When the engine moved from wisp-scanner-v1.2 to v1.3, @misc{wispsoftware} kept naming
+v1.2 and 012279d6, so the paper contradicted itself one line apart and every check passed, because
+nothing read the bibliography.
+
+It then went wrong a second way, and the second way is why the mutations below changed. The guard
+was written to demand \\EngineTag, the development build label the run manifests stamp. That label
+is not a thing a reader can fetch: the repository publishes exactly one tag, the release. So the
+guard was enforcing a citation that pointed at a tag which does not exist on the remote. The rule is
+now that the bib names the release, the sha256 carries the identity, and the build label is the
+value the bib must NOT name. These tests mutate the release tag into the build label, which is the
+defect that actually shipped.
 
 Correcting references.bib was not enough either. The build ran pdflatex twice and never ran bibtex,
 so the PDF kept printing v1.2 out of a .bbl that no step regenerated. A corrected source that never
@@ -65,9 +74,9 @@ def test_the_guard_passes_on_the_tree_as_it_stands():
 
 
 def test_a_stale_tag_in_the_bib_fails_the_guard():
-    with _mutated(BIB, "wisp-scanner-v1.3", "wisp-scanner-v1.2"):
+    with _mutated(BIB, "wisp-scanner-v1.0", "wisp-scanner-v1.3"):
         rc, out = _guard()
-    assert rc != 0, "references.bib naming the baseline tag did not fail the guard"
+    assert rc != 0, ("references.bib naming the development build label instead of the published\n                     release tag did not fail the guard, which is the state it shipped in")
     assert "references.bib" in out and "wispsoftware" in out, (
         f"the guard failed but did not name the bibliography as the reason:\n{out}")
 
@@ -80,7 +89,7 @@ def test_a_stale_sha_in_the_bib_fails_the_guard():
 
 def test_a_stale_compiled_bibliography_fails_the_guard():
     """The defect that actually shipped for one build: .bib right, .bbl stale, PDF wrong."""
-    with _mutated(BBL, "wisp-scanner-v1.3", "wisp-scanner-v1.2"):
+    with _mutated(BBL, "wisp-scanner-v1.0", "wisp-scanner-v1.3"):
         rc, out = _guard()
     assert rc != 0, (
         "a .bbl naming a different engine from the one the paper claims did not fail the guard, "
@@ -91,7 +100,7 @@ def test_a_stale_compiled_bibliography_fails_the_guard():
 def test_the_pre_latex_gate_skips_the_bbl_so_the_build_cannot_deadlock():
     """The .bbl is an output of the build. If the pre-LaTeX gate demanded it be current, a stale
     .bbl could never be regenerated: the guard would abort before bibtex ever ran."""
-    with _mutated(BBL, "wisp-scanner-v1.3", "wisp-scanner-v1.2"):
+    with _mutated(BBL, "wisp-scanner-v1.0", "wisp-scanner-v1.3"):
         rc, _ = _guard(check_bbl=False)
     assert rc == 0, ("the pre-LaTeX gate rejects a stale .bbl, so a build that would have fixed it "
                      "can never reach bibtex")

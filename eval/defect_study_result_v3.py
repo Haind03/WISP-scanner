@@ -174,8 +174,15 @@ def _score(units):
     # supplement, so they have to be generated like every other number in this paper, and the
     # archived workbook is the source.
     import openpyxl
-    RECON_XLSX = os.path.join(C.ADJ_DIR, "RETURNED-2026-08-17",
-                              "reconciliation_returned_excluded.xlsx")
+    # The archived workbook lives outside the bundle, so inside the bundle this block used to come
+    # out None while the working tree filled it. That is a real reproducibility hole and the
+    # reproduce kit caught it as a MISMATCH: the supplement prints n_resolved, adopted_annotator_B
+    # and pooled_rate_if_included from here, and a reader could not recompute any of them. The
+    # workbook ships now, and the shipped copy is preferred, so both trees take the same path.
+    RECON_XLSX = os.path.join(ROOT, "defect-study", "reconciliation_returned_excluded.xlsx")
+    if not os.path.isfile(RECON_XLSX):
+        RECON_XLSX = os.path.join(C.ADJ_DIR, "RETURNED-2026-08-17",
+                                  "reconciliation_returned_excluded.xlsx")
     excl = None
     if os.path.isfile(RECON_XLSX):
         ws = openpyxl.load_workbook(RECON_XLSX)["DOI CHIEU"]
@@ -199,7 +206,7 @@ def _score(units):
                 "value_spread": dict(vals),
                 "adopted_annotator_A": to_a, "adopted_annotator_B": to_b,
                 "pooled_rate_if_included": round(n_sd / len(units), 4),
-                "source": os.path.relpath(RECON_XLSX, SYS_ROOT),
+                "source": os.path.basename(RECON_XLSX),
                 "excluded_because": ("its working note shows the rows were pre-sorted by patch "
                                      "geometry computed outside the blinded packets, and a defect "
                                      "label derived from the geometry under test cannot be "
