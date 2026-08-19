@@ -1,6 +1,11 @@
 cff-version: 1.2.0
 message: "If you use WISP or its benchmark, please cite the paper and the dataset."
+type: software
 title: "WISP: A WordPress-Aware Symbolic Taint Scanner for Plugin Vulnerabilities"
+version: "wisp-scanner-v1.0"
+commit: 6074bb4dc4e3053ee278833978d4ee87045285c6
+date-released: "2026-08-18"
+repository-code: "https://github.com/Haind03/WISP-scanner"
 authors:
   - family-names: Nguyen
     given-names: Dinh Hai

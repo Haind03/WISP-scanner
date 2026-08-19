@@ -54,7 +54,13 @@ def main():
             ]) + r" \\"
         )
     lines.append(r"\midrule")
-    lines.append(r"\multicolumn{7}{@{}l@{}}{\emph{Published but not re-scanned}} \\")
+    # These rows are not published advisories. The JSON records them under not_scanned with the
+    # reason, and reports_without_published_cve names the same plugins: support closed before a
+    # fixed release existed, so there is no release pair to diff and no identifier to carry. The
+    # old heading said "Published but not re-scanned", which asserted publication the data denies,
+    # and it survived because it is a hardcoded string in this generator rather than a number any
+    # macro guard reads.
+    lines.append(r"\multicolumn{7}{@{}l@{}}{\emph{Reported, no published advisory, not re-scanned}} \\")
     for slug, why in sorted(d["not_scanned"].items()):
         lines.append(r"\multicolumn{7}{@{}l@{}}{\quad \code{" + esc(slug) + "}: "
                      + esc(why) + r"} \\")

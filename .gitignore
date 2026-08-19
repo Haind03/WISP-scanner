@@ -29,4 +29,5 @@ venv/
 AUTHORS-MAP.txt
 build-fresh-history.py
 push-to-new-repo.sh
+RELEASE-PAGE-TEXT.md
 texput.log

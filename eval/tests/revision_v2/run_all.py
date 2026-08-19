@@ -21,10 +21,18 @@ from . import _common  # noqa: F401  (adds repo root to sys.path)
 # the property under test onto the live v3 protocol rather than by repairing the retired v2
 # builder that no longer feeds any claim. Add an entry here the moment a new bug is found and
 # not yet fixed; an empty list is a statement, not a default.
+# AF was opened here on 2026-08-19 and closed the same day. It was listed while the JSON and the
+# macros carried a paired slug-cluster interval and the manuscript still printed the superseded
+# plug-in endpoints, which is a half-landed correction and was recorded as one. The manuscript now
+# prints the paired interval in the defect-study paragraph, so the entry moved to FIXED rather than
+# being deleted, because a pending bug that disappears without a recorded fix is indistinguishable
+# from one that was quietly dropped.
 PENDING = [
 ]
 # bugs FIXED by a landed prompt: each test must now PASS
 FIXED = [
+    ("AF. documents cite the paired interval", ".test_af_paired_ratio_interval",
+     "test_the_documents_cite_the_paired_interval"),
     ("E. sanitizer default (Prompt 6)", ".test_e_sanitizer_default", "test_sanitizer_default_matches_manuscript"),
     ("F. fixpoint completion status (Prompt 6)", ".test_f_fixpoint_completion", "test_nonconvergence_is_surfaced"),
     ("A. reviewer context shows the changed line (v3)", ".test_a_patch_truncation",
@@ -326,8 +334,35 @@ FIXED = [
      "test_the_tool_manifest_reads_its_config_from_the_contract"),
     ("AE. old-vs-new derived from JSON", ".test_ae_provenance_is_per_cell",
      "test_old_vs_new_is_derived_from_the_canonical_jsons"),
+    ("AG. mixed memory matrix is not uniform", ".test_ag_mem_cap_uniformity",
+     "test_mixed_matrix_is_not_uniform"),
+    ("AG. uniform matrix still reports its value", ".test_ag_mem_cap_uniformity",
+     "test_truly_uniform_matrix_still_reports_its_value"),
+    ("AG. two ceilings are not uniform", ".test_ag_mem_cap_uniformity",
+     "test_two_different_ceilings_are_not_uniform"),
+    ("AG. shipped rollup matches its own cells", ".test_ag_mem_cap_uniformity",
+     "test_shipped_rollup_tells_the_truth_about_its_own_cells"),
     ("AE. reproduction compares, not just runs", ".test_ae_provenance_is_per_cell",
      "test_reproduction_never_passes_a_target_it_did_not_compare"),
+    # AF. Added 2026-08-19. The overstatement factor is a ratio of two rates read off one sample of
+    # 200 findings, and its shipped interval was built by holding the numerator at its point
+    # estimate and dividing by the endpoints of the denominator's interval. That gives the numerator
+    # no variance and never sees the correlation between the two. The replacement resamples plugin
+    # slugs and recomputes both rates inside each replicate. These guard the construction rather
+    # than the value, because the regression that matters is the new field filled from the old
+    # formula, not the new field deleted.
+    ("AF. shipped result carries a paired interval", ".test_af_paired_ratio_interval",
+     "test_the_shipped_result_carries_a_paired_cluster_interval"),
+    ("AF. paired interval is not the plug-in one", ".test_af_paired_ratio_interval",
+     "test_the_paired_interval_is_not_the_plug_in_interval"),
+    ("AF. the bootstrap resamples the numerator", ".test_af_paired_ratio_interval",
+     "test_a_paired_bootstrap_moves_the_numerator_too"),
+    ("AF. ratio bootstrap follows the house draw", ".test_af_paired_ratio_interval",
+     "test_the_ratio_bootstrap_follows_the_house_draw"),
+    ("AF. macros point at the paired interval", ".test_af_paired_ratio_interval",
+     "test_the_reported_macros_point_at_the_paired_interval"),
+    ("AF. corrected interval still excludes 1.0", ".test_af_paired_ratio_interval",
+     "test_the_corrected_interval_still_excludes_one"),
 ]
 # data-level invariants that only go green once the contract re-scans have landed
 PENDING_DATA = [

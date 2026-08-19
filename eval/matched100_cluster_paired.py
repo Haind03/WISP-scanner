@@ -50,6 +50,43 @@ def mcnemar_exact(b, c):
     return min(1.0, 2 * tail)
 
 
+def perm_cluster_exact(x, y, slugs):
+    """Exact two-sided cluster sign-flip test. No seed, no replicate count, no Monte Carlo error.
+
+    Flipping a plugin exchanges the two tools' labels for every record of that plugin at once, so a
+    plugin contributes its summed difference d_k to the statistic and a flip negates it. The null
+    distribution of sum(+/- d_k) is a convolution over the plugins whose d_k is nonzero, and a
+    plugin with d_k = 0 is unaffected by its own flip and drops out, which is what keeps the
+    convolution small enough to enumerate.
+
+    This replaces a Monte Carlo permutation whose answer moved with its seed. Re-running the family
+    under 200 seeds gave Holm survivor counts from 18 to 21, and the single exact-line comparison
+    the paper singles out survived in about half of them. A headline that turns on --seed is not a
+    statement about the data.
+    """
+    by = collections.defaultdict(int)
+    for a, b, s in zip(x, y, slugs):
+        by[s] += a - b
+    obs = abs(sum(by.values()))
+    ds = [d for d in by.values() if d != 0]
+    if not ds:
+        return 1.0
+    # Probabilities rather than counts. Counting sign assignments makes every weight an integer of
+    # len(ds) bits, and at this scale that is hundreds of bits carried through millions of
+    # additions, which turned a build step into twenty minutes of big-integer arithmetic. Each flip
+    # is independent and fair, so carrying probability mass costs nothing in accuracy and keeps
+    # every number a machine float.
+    dist = {0: 1.0}
+    for d in ds:
+        nxt = collections.defaultdict(float)
+        for t, c in dist.items():
+            half = c * 0.5
+            nxt[t + d] += half
+            nxt[t - d] += half
+        dist = nxt
+    return sum(c for t, c in dist.items() if abs(t) >= obs)
+
+
 def perm_cluster(x, y, slugs, B, seed):
     """Two-sided permutation test that exchanges the two tools' labels for all
     records of a plugin at once. The unit of exchangeability is the plugin."""
@@ -95,7 +132,12 @@ def holm(pairs):
     for i, (name, p) in enumerate(order):
         v = min(1.0, (m - i) * p)
         run = max(run, v)
-        adj[name] = round(run, 6)
+        # Six decimal places destroys a genuinely tiny p. The exact permutation test produces
+        # values down to 1e-16, and rounding those to 0.0 both loses the number and hands a zero to
+        # a formatter that loops on it. The Monte Carlo test this replaced could never go below
+        # 1/(B+1), so its floor hid the problem rather than solving it. Significant figures keep a
+        # small value small and still cut float noise off a large one.
+        adj[name] = float(f"{run:.6g}")
     return adj
 
 

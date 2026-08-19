@@ -21,9 +21,13 @@
 # Every pass is class recall (eval.recall), which is the endpoint the ablation
 # table reports. 10-way sharded like every other full-corpus pass here.
 set -u
-cd /mnt/d/System-ScanInfosec/wisp-artifact || exit 1
+# Paths are derived rather than hardcoded. This script shipped with the author machine
+# baked in, which made it unrunnable for anyone who cloned the public repository, and the
+# reviewer who tries it is the person the artifact exists for.
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO" || exit 1
 # systemd inherits neither the pyenv shim nor its PATH.
-PY=/home/haipanda/.pyenv/versions/3.11.9/bin/python3
+PY="${PY:-python3}"
 SHARDS=out/fill_20260714/shards
 BASE=out/ablations_20260717
 mkdir -p "$BASE"

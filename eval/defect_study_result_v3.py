@@ -29,7 +29,7 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 from eval import adjudication_v3_common as C
-from eval.analyze_v3 import boot_rate
+from eval.analyze_v3 import boot_rate, _slug_index
 
 SYS_ROOT = C.SYS_ROOT
 POP = os.path.join(SYS_ROOT, "revision-cns-v2", "data", "FINDING_POPULATION_V3.jsonl")
@@ -70,6 +70,54 @@ def _boot_kappa(units, a_of, b_of, reps=REPS, seed=SEED):
         return [None, None]
     lo, hi = np.percentile(out, [2.5, 97.5])
     return [round(float(lo), 4), round(float(hi), 4)]
+
+
+def boot_ratio(units, num, den, reps=REPS, seed=SEED):
+    """Paired slug-cluster bootstrap of a ratio of two rates measured on the same findings.
+
+    This is the ratio analogue of eval.analyze_v3.boot_diff and it is written to be the same
+    procedure in every respect that makes an interval comparable. It indexes the clusters with the
+    same eval.analyze_v3._slug_index, it draws one picks matrix of shape (reps, n_slugs) from
+    numpy's default_rng at the same seed, and it reads the percentile interval at 2.5 and 97.5.
+    boot_diff is the function it mirrors because boot_diff is the only existing bootstrap here that
+    carries two statistics through one draw, which is what pairing means: the same resampled
+    findings feed the numerator and the denominator, so the correlation between them is inside the
+    replicate rather than assumed away.
+
+    The interval this replaces divided a fixed point estimate of the numerator by the endpoints of
+    the denominator's own interval. That is wrong twice over. It gives the numerator no variance at
+    all, and it treats two rates read off one sample of 200 findings as if the sample had been drawn
+    twice. Both quantities are recomputed here inside each replicate.
+
+    num(u) and den(u) return booleans. The ratio is undefined in a replicate that draws no
+    denominator event, so those replicates are dropped and counted rather than being given a value.
+    """
+    slugs, idx = _slug_index(units)
+    kn = np.zeros(len(slugs))
+    kd = np.zeros(len(slugs))
+    n = np.zeros(len(slugs))
+    for u in units:
+        i = idx[u["slug"]]
+        n[i] += 1
+        kn[i] += 1 if num(u) else 0
+        kd[i] += 1 if den(u) else 0
+    if not kd.sum():
+        return {"point": None, "ci95": [None, None], "replicates": reps,
+                "replicates_defined": 0, "seed": seed, "cluster_unit": "plugin_slug"}
+    # both rates share the denominator n, so the ratio of rates is the ratio of counts
+    point = kn.sum() / kd.sum()
+    rng = np.random.default_rng(seed)
+    picks = rng.integers(0, len(slugs), size=(reps, len(slugs)))
+    Kn = kn[picks].sum(1)
+    Kd = kd[picks].sum(1)
+    ok = Kd > 0
+    ratios = np.divide(Kn, Kd, out=np.full(reps, np.nan), where=ok)
+    lo, hi = np.nanpercentile(ratios, [2.5, 97.5])
+    return {"point": round(float(point), 2),
+            "ci95": [round(float(lo), 2), round(float(hi), 2)],
+            "replicates": reps, "replicates_defined": int(ok.sum()), "seed": seed,
+            "cluster_unit": "plugin_slug",
+            "share_at_or_below_one": round(float(np.mean(ratios[ok] <= 1.0)), 4)}
 
 
 SHIPPED = os.path.join(ROOT, "defect-study", "defect_study_labels.csv")
@@ -239,11 +287,22 @@ def _score(units):
         res["overstatement_factor"][who] = {
             "point": round(gf / pl["rate"], 2) if pl["rate"] else None,
             "from_rate_ci95": [round(gf / hi, 1) if hi else None,
-                               round(gf / lo, 1) if lo else None]}
+                               round(gf / lo, 1) if lo else None],
+            "paired_cluster_bootstrap_ci95": boot_ratio(
+                units, lambda u: u["in_patched_file"], same_defect(who))}
     res["overstatement_factor"]["note"] = (
         "The blind reading gives the larger factor, so reporting it is not the conservative choice. "
         "It is chosen because it is the blind one, and the interval is carried so the factor is not "
-        "read as a constant.")
+        "read as a constant. Two intervals are carried for that factor and they are not "
+        "interchangeable. from_rate_ci95 is the superseded one: it divides the geometric rate, held "
+        "at its point estimate, by the endpoints of the annotator's own rate interval, so it gives "
+        "the numerator no uncertainty and it treats two rates measured on one sample of 200 "
+        "findings as if the sample had been drawn twice. It is kept because the earlier prose "
+        "quoted it and deleting it would erase that record. paired_cluster_bootstrap_ci95 is the "
+        "one the paper should cite: it resamples plugin slugs with replacement, the same cluster "
+        "and the same seed every other interval in this paper uses, recomputes both the geometric "
+        "rate and the annotator's same-defect rate inside each replicate, and reads the percentile "
+        "interval of the ratio, so the pairing between numerator and denominator is preserved.")
 
     res["annotators"] = {
         w: {k: meta[f"reviewer_{w}"].get(k) for k in
@@ -261,6 +320,7 @@ def _score(units):
                      "n_slugs": len({u["slug"] for u in units}),
                      "bootstrap_replicates": REPS, "seed": SEED,
                      "rate_bootstrap_unit": "plugin_slug",
+                     "ratio_bootstrap_unit": "plugin_slug",
                      "kappa_bootstrap_unit": "advisory_record",
                      "python": platform.python_version()}
     C.write_json(OUT, C.envelope("defect_study_result", res))
@@ -275,6 +335,13 @@ def _score(units):
     for t in tools:
         print(f"  {t:10} B {res['per_tool'][t]['B']['rate']} CI{res['per_tool'][t]['B']['ci95']}"
               f"   file {g['in_patched_file'][t]['rate']}   n={res['per_tool'][t]['B']['n']}")
+    of = res["overstatement_factor"]
+    for who in ("A", "B"):
+        pc = of[who]["paired_cluster_bootstrap_ci95"]
+        print(f"overstatement {who}: point {of[who]['point']}"
+              f"   paired slug-cluster CI {pc['ci95']}"
+              f"   superseded plug-in CI {of[who]['from_rate_ci95']}"
+              f"   reps {pc['replicates_defined']}/{pc['replicates']} seed {pc['seed']}")
     print(f"root-cause disagreements left unresolved: {len(disputed)}/{len(units)}")
     print("wrote", os.path.relpath(OUT, SYS_ROOT))
     return 0

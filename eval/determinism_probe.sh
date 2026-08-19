@@ -10,8 +10,12 @@
 # Hypothesis: PYTHONHASHSEED explains it. Three runs at the default (random) seed
 # should vary; three at a pinned seed should not.
 set -u
-cd /mnt/d/System-ScanInfosec/wisp-artifact || exit 1
-PY=/home/haipanda/.pyenv/versions/3.11.9/bin/python3
+# Paths are derived rather than hardcoded. This script shipped with the author machine
+# baked in, which made it unrunnable for anyone who cloned the public repository, and the
+# reviewer who tries it is the person the artifact exists for.
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO" || exit 1
+PY="${PY:-python3}"
 OUT=out/paired_20260717/determinism
 mkdir -p "$OUT"
 export WISP_NO_GDA=1

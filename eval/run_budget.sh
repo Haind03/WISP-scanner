@@ -7,15 +7,19 @@
 # at 60s, so capping it at 300 would burn hours on records that cannot finish;
 # 120s already covers the 25/60/120 points the paper reports for it.
 set -u
-cd /mnt/d/System-ScanInfosec/wisp-artifact || exit 1
-PY=/home/haipanda/.pyenv/versions/3.11.9/bin/python3
+# Paths are derived rather than hardcoded. This script shipped with the author machine
+# baked in, which made it unrunnable for anyone who cloned the public repository, and the
+# reviewer who tries it is the person the artifact exists for.
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO" || exit 1
+PY="${PY:-python3}"
 OUT=out/budget_20260717
 mkdir -p "$OUT"
 export PYTHONHASHSEED=0
 # same binaries the published runs used, recorded in their tool_identity blocks
-export PROGPILOT_BIN="${PROGPILOT_BIN:-/mnt/d/System-ScanInfosec/baselines/progpilot_ok.phar}"
-export WPT_BIN="${WPT_BIN:-/mnt/d/System-ScanInfosec/external/wp-taint-scan/bin/taint-scan}"
-export PATH="/home/haipanda/.pyenv/shims:$PATH"   # semgrep lives on the pyenv shim
+export PROGPILOT_BIN="${PROGPILOT_BIN:-$REPO/../baselines/progpilot_ok.phar}"
+export WPT_BIN="${WPT_BIN:-$REPO/../external/wp-taint-scan/bin/taint-scan}"
+# semgrep is expected on PATH. Set SEMGREP_BIN or prepend your own shim directory.
 
 run () {  # $1=tool $2=cap
   [ -f "$OUT/atk_$1.json" ] && { echo "== $1 already done"; return 0; }

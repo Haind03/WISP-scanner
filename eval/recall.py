@@ -52,11 +52,31 @@ def main():
                     help="parallel archive workers (default: 1; each worker has its own AST state)")
     args = ap.parse_args()
     rows = load_rows()
+    n_loaded = len(rows)
     if args.only_present:
         rows = [r for r in rows if os.path.exists(r["vuln_zip"])]
+        if not rows:
+            # Point a wrong plugin directory at this and every row fails the existence test, leaving
+            # an empty corpus that scores a clean sweep of zeros and exits 0. A reader running the
+            # artifact then has a results file that looks like a measurement and is a missing mount.
+            # Failing loudly is the only honest behaviour, and the message names what it looked for.
+            missing = [r["vuln_zip"] for r in load_rows()[:3]]
+            sys.stderr.write(
+                f"recall: --only-present kept 0 of {n_loaded} records, so the plugin archives are "
+                f"not where the manifest says. Looked for, among others:\n  "
+                + "\n  ".join(missing) + "\n")
+            return 2
     if args.sample:
         want = {s.strip() for s in open(args.sample) if s.strip()}
         rows = [r for r in rows if r["slug"] + "|" + r["cve"] in want]
+        if not rows:
+            sys.stderr.write(
+                f"recall: --sample {args.sample} matched 0 of {n_loaded} records, so the sample "
+                f"keys do not belong to this manifest. Nothing was scored.\n")
+            return 2
+    if not rows:
+        sys.stderr.write(f"recall: 0 of {n_loaded} records left to score.\n")
+        return 2
 
     per_class = defaultdict(lambda: [0, 0])   # cls -> [tp, total]
     details = []
@@ -105,4 +125,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main() returns a status, so it has to become the process status. Returning 2 into a caller
+    # that throws it away is a guard that cannot fail, which is worse than no guard at all.
+    sys.exit(main())

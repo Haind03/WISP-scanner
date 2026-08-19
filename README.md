@@ -52,6 +52,11 @@ grammar and PyYAML.
 
 ## Quickstart
 
+The command-line entry point is the script `scripts/scan.py`. WISP is not
+installed as a package and it exposes no module entry point, so
+`python -m wisp.cli` and `python -m wisp` do not exist and will fail with
+`No module named wisp.cli`. Run the script from the repository root.
+
 Scan the bundled example (the five-line handler from the paper):
 
 ```bash
@@ -213,6 +218,31 @@ the 122-case self-test still passes. Both are reported in the paper as smaller
 studies, and neither is needed to scan or to reproduce the core taint results.
 Configure the CLI through environment variables (see the docstrings). No key is
 committed.
+
+## Release identity
+
+The paper cites this artifact by git tag, not by branch. The reported numbers
+come from the engine as it stands at that tag.
+
+| Field | Value |
+|---|---|
+| Tag | `wisp-scanner-v1.0` |
+| Commit | `6074bb4dc4e3053ee278833978d4ee87045285c6` |
+| Tag date | 2026-08-18 |
+| `wisp/engine/taint_engine.py` sha256 | `d07a4bbc573dbd6855f390f223b93b069b2d33654a56972f4730c53e50d87c2f` |
+| `wisp/rules/wisp-rules.yaml` sha256 | `50f73df6f93a3d68235880b4773953ca5d8ea3dee96e3dd601ccf8cc738e95ad` |
+| `wisp/rules/wordpress-security.yaml` sha256 | `f872f475d07571e6866c57b1df2e9d7a2ee1051f99f3eeb9fce73effc8a7590a` |
+
+Check that you have the cited engine before running anything:
+
+```bash
+git checkout wisp-scanner-v1.0
+sha256sum wisp/engine/taint_engine.py
+# expect d07a4bbc573dbd6855f390f223b93b069b2d33654a56972f4730c53e50d87c2f
+```
+
+Later tags exist in this repository for internal revision rounds. Only
+`wisp-scanner-v1.0` is the released artifact for the paper.
 
 ## License and citation
 

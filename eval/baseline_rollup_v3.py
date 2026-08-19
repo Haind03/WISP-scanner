@@ -251,8 +251,17 @@ def main():
                                  for k, v in sorted(audits.items())}
     # The protocol the cells were actually measured under, read from the cells. Recorded as one
     # value only when every cell agrees, so a mixed matrix cannot be described as a uniform one.
-    caps = {v["mem_cap_mb"] for v in audits.values() if v["mem_cap_mb"]}
+    # The truthiness filter that used to sit here dropped every uncapped cell BEFORE the agreement
+    # test, so a matrix with four uncapped cells and eight at 6144 recorded 6144 and read as
+    # uniform. The comment above stated the invariant and the code did not enforce it, which is how
+    # the manuscript came to describe a protocol four of its twelve cells never ran under. None is
+    # a value here, not an absence, so it takes part in the agreement test.
+    caps = {v["mem_cap_mb"] for v in audits.values()}
     out["mem_cap_mb"] = caps.pop() if len(caps) == 1 else None
+    out["mem_cap_mb_applied_cells"] = sum(1 for v in audits.values() if v["mem_cap_mb"])
+    out["mem_cap_mb_total_cells"] = len(audits)
+    out["mem_cap_mb_where_applied"] = (sorted({v["mem_cap_mb"] for v in audits.values()
+                                               if v["mem_cap_mb"]}) or [None])[0]
     out["cell_mem_cap_mb"] = {k: v["mem_cap_mb"] for k, v in sorted(audits.items())}
     out["cell_workers"] = {k: (cells[k].get("workers") or audits[k]["workers"])
                            for k in sorted(cells)}

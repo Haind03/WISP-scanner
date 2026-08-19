@@ -124,7 +124,6 @@ LITERAL_PENDING = [
     ('0.00', 'agnostic, scoring 0.00 on'),
     ('0.00', 'rpose SAST scores 0.00)}};'),
     ('0.283', 'to 0.283, so roughly seven'),
-    ('0.013', 'the same $+0.013$, but \\emph{not on the'),
     # 0.893 left this list on 2026-08-17: the sentence now prints \WpBlockRate, so the debt is paid
     # and a tolerated literal that no longer exists is a hole, not a record.
     ('0.00', 'baselines score 0.00.'),
@@ -135,6 +134,10 @@ LITERAL_PENDING = [
 # from a shipped JSON has been converted; what stays here is what no shipped result file produces,
 # and every entry names the reason rather than being tolerated silently.
 SUPP_LITERAL_PENDING = [
+    # The mining-loop paragraph moved to the supplement when the manuscript was cut to the
+    # journal's word limit, so its one typed literal moved with it. The debt is unchanged, only
+    # the document holding it, and it stays listed rather than quietly re-tolerated.
+    ('0.013', 'the same $+0.013$, but \\emph{not on the'),
     # tab:vocab and its prose. A four-arm pre-contract ablation (stock Semgrep, transplanted taint
     # vocabulary, full transplant, WISP). Only the full arm was re-scanned under the contract, and
     # that one is a macro-generated column in the main table. The caption says the table predates

@@ -35,7 +35,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 SYS_ROOT = os.path.dirname(ROOT)
 
-from eval.matched100_cluster_paired import mcnemar_exact, perm_cluster, boot_delta, holm
+from eval.matched100_cluster_paired import (mcnemar_exact, perm_cluster,
+                                            perm_cluster_exact, boot_delta, holm)
 from eval import adjudication_v3_common as C
 
 POP = os.path.join(SYS_ROOT, "revision-cns-v2", "data", "FINDING_POPULATION_V3.jsonl")
@@ -148,6 +149,10 @@ def main():
             name = f"{ep} vs {t}"
             pm = mcnemar_exact(b, c)
             pp = perm_cluster(x, y, slugs, a.B, a.seed)
+            # The family is corrected over the EXACT sign-flip p-values. The Monte Carlo p above is
+            # kept beside it because it is what earlier revisions reported, but it must not drive
+            # the correction: under 200 seeds its Holm survivor count ran from 18 to 21.
+            pe = perm_cluster_exact(x, y, slugs)
             ci = boot_delta(x, y, slugs, a.B, a.seed)
             res["comparisons"][name] = {
                 "endpoint": ep, "baseline": t,
@@ -156,10 +161,11 @@ def main():
                 "delta": round((sum(x) - sum(y)) / len(keys), 4),
                 "discordant_wisp_only": b, "discordant_baseline_only": c,
                 "p_mcnemar_exact": pm, "p_cluster_permutation": pp,
+                "p_cluster_permutation_exact": pe,
                 "clustered_ci_delta": ci,
                 "ci_excludes_zero": bool(ci[0] > 0 or ci[1] < 0),
             }
-            family.append((name, pp))
+            family.append((name, pe))
 
     adj = holm(family)
     surv = 0

@@ -65,6 +65,11 @@ def build():
     add("NRecordsMatched", str(g["n_records_matched"]), GF, "n_records_matched")
     add("NRecordsAnswered", str(g["pooled"]["n_answered_records"]), GF, "pooled.n_answered_records")
     add("NFindingsPooled", str(g["pooled"]["n_findings"]), GF, "pooled.n_findings")
+    # The bootstrap seed, printed rather than described. The manuscript said "seed 42", which is the
+    # sampling seed for drawing the matched 100 and not the resampling seed any interval was built
+    # with. A reader following the paper reproduced nothing. It is a macro now so the two cannot
+    # drift apart again.
+    add("BootSeed", str(g["seed"]), GF, "seed")
 
     # geometric ladder, per tool: findings, counts and rates and CI for each rung
     rungs = [("InPatchedFile", "in_patched_file"),
@@ -351,6 +356,13 @@ def build():
             """A p-value as LaTeX math-mode content, so the prose can never hold a stale one."""
             if v is None:
                 return "--"
+            if v <= 0:
+                # A p-value is never zero, so a zero here means an upstream step destroyed one,
+                # and this loop used to spin forever on it rather than say so. Failing is the only
+                # honest option: a printed "0" would claim certainty no test can give.
+                raise ValueError(
+                    "p-value formatted as zero. A test or a rounding step lost it upstream, and "
+                    "printing zero would assert a certainty no permutation test can produce.")
             if v >= 1e-3:
                 return f"{v:.3f}"
             e = 0
@@ -564,14 +576,50 @@ def build():
     # From the rollup's cell-derived field, not from run-level provenance. The matrix file keeps the
     # provenance of the run that created it, which after a re-measurement describes a protocol none
     # of its cells were measured under, and that is exactly the number this sentence must not use.
-    mcap = b.get("mem_cap_mb")
+    # mem_cap_mb is None whenever the cells disagree, which they do: eight of the twelve carry the
+    # ceiling and four predate it. The ceiling itself is still a real number and the text still has
+    # to print it, so it is read from the cells that were measured under it rather than from a
+    # field that is None precisely because the matrix is not uniform. Printing it says what the
+    # ceiling was, not that every cell ran under it, and the text now says which cells did.
+    mcap = b.get("mem_cap_mb") or b.get("mem_cap_mb_where_applied")
+    src_ptr = ("mem_cap_mb" if b.get("mem_cap_mb") else "mem_cap_mb_where_applied")
     if mcap:
-        add("MemCapMb", str(mcap), "BASELINE_MATCHED100_V3.json", "mem_cap_mb")
-        add("MemCapGb", f"{mcap / 1024:.0f}", "BASELINE_MATCHED100_V3.json", "mem_cap_mb / 1024")
+        add("MemCapMb", str(mcap), "BASELINE_MATCHED100_V3.json", src_ptr)
+        add("MemCapGb", f"{mcap / 1024:.0f}", "BASELINE_MATCHED100_V3.json", src_ptr + " / 1024")
+        add("MemCapCells", str(b.get("mem_cap_mb_applied_cells")),
+            "BASELINE_MATCHED100_V3.json", "mem_cap_mb_applied_cells")
+        add("MemCapCellsTotal", str(b.get("mem_cap_mb_total_cells")),
+            "BASELINE_MATCHED100_V3.json", "mem_cap_mb_total_cells")
         # Two ceilings is the arithmetic behind the only concurrency this host provably holds, and
         # the text does that arithmetic, so it is generated rather than done in the sentence.
         add("MemCapTwiceGb", f"{2 * mcap / 1024:.0f}", "BASELINE_MATCHED100_V3.json",
-            "2 * mem_cap_mb / 1024")
+            "2 * " + src_ptr + " / 1024")
+
+    # The insertion-aware rung. A reviewer argued the exact-changed-line rung is structurally
+    # unwinnable for a taint tool, because the archetypal WordPress fix inserts a guard before an
+    # unchanged sink and findings are scored against the vulnerable tree, which has no line to
+    # match. These macros are the measurement of that argument rather than a reply to it.
+    ins_path = os.path.join(OUT, "INSERTION_LADDER_MATCHED_V1.json")
+    if os.path.isfile(ins_path):
+        ins = json.load(open(ins_path, encoding="utf-8"))
+        IF = "INSERTION_LADDER_MATCHED_V1.json"
+        arm = ins["headline_arm_for_this_dataset"]
+        w = ins["arms"][arm]["per_tool"]["wisp"]
+        base = f"arms.{arm}.per_tool.wisp"
+        for macro, rung in (("InsExactOrIns", "rung_exact_or_ins0"),
+                            ("InsExactOrInsTen", "rung_exact_or_ins10"),
+                            ("InsCallable", "rung_callable"),
+                            ("InsCallableOrIns", "rung_callable_or_inscallable")):
+            add(macro, f"{w[rung]['rate']:.3f}", IF, f"{base}.{rung}.rate")
+            add(macro + "Lo", f"{w[rung]['ci95'][0]:.3f}", IF, f"{base}.{rung}.ci95[0]")
+            add(macro + "Hi", f"{w[rung]['ci95'][1]:.3f}", IF, f"{base}.{rung}.ci95[1]")
+        cen = ins["census_step6"]["all_findings"]
+        for macro, key in (("InsNFindings", "n_findings"),
+                           ("InsInPatchedFile", "n_in_patched_file"),
+                           ("InsUntouchedAdjacent", "untouched_but_adjacent_to_insertion"),
+                           ("InsAnchorableButInsLocal", "anchorable_file_but_insertion_local"),
+                           ("InsUntouchedInCallable", "untouched_in_callable_with_insertion")):
+            add(macro, str(cen[key]), IF, f"census_step6.all_findings.{key}")
 
     mp_path = os.path.join(OUT, "MEM_PROFILE_V3.json")
     if os.path.isfile(mp_path):
@@ -1286,6 +1334,13 @@ def build():
     add("DsRecords", str(ds["config"]["n_records"]), DS, "payload.config.n_records")
     add("DsUnresolved", str(ds["disagreement"]["n_disputed_root_cause"]), DS,
         "payload.disagreement.n_disputed_root_cause")
+    # The overstatement factor and its interval. Two intervals are emitted because the study now
+    # carries two, and they are not interchangeable. DsFactor{A,B}{Lo,Hi} is the superseded plug-in
+    # interval: the geometric rate held at its point estimate, divided by the endpoints of the
+    # annotator's own rate interval. It gives the numerator no variance and it treats two rates read
+    # off one sample of 200 findings as if the sample had been drawn twice. It stays defined because
+    # the earlier prose quoted it. DsFactor{A,B}Paired{Lo,Hi} is the paired slug-cluster bootstrap
+    # and is the one a sentence about the factor should cite.
     of = ds["overstatement_factor"]
     for who in ("A", "B"):
         add(f"DsFactor{who}", f"{of[who]['point']:.1f}", DS,
@@ -1294,6 +1349,20 @@ def build():
             f"payload.overstatement_factor.{who}.from_rate_ci95[0]")
         add(f"DsFactor{who}Hi", f"{of[who]['from_rate_ci95'][1]:.1f}", DS,
             f"payload.overstatement_factor.{who}.from_rate_ci95[1]")
+        pc = of[who]["paired_cluster_bootstrap_ci95"]
+        add(f"DsFactor{who}PairedLo", f"{pc['ci95'][0]:.1f}", DS,
+            f"payload.overstatement_factor.{who}.paired_cluster_bootstrap_ci95.ci95[0]")
+        add(f"DsFactor{who}PairedHi", f"{pc['ci95'][1]:.1f}", DS,
+            f"payload.overstatement_factor.{who}.paired_cluster_bootstrap_ci95.ci95[1]")
+    _pcb = of["B"]["paired_cluster_bootstrap_ci95"]
+    add("DsFactorBootReps", f"{_pcb['replicates']:,}", DS,
+        "payload.overstatement_factor.B.paired_cluster_bootstrap_ci95.replicates "
+        "(comma-formatted)")
+    add("DsFactorBootSeed", str(_pcb["seed"]), DS,
+        "payload.overstatement_factor.B.paired_cluster_bootstrap_ci95.seed")
+    add("DsFactorBootUnit", str(_pcb["cluster_unit"]).replace("_", " "), DS,
+        "payload.overstatement_factor.B.paired_cluster_bootstrap_ci95.cluster_unit "
+        "(underscores to spaces)")
 
     ex = ds.get("excluded_reconciliation")
     if ex:
