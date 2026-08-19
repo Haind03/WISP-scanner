@@ -123,7 +123,10 @@ LITERAL_PENDING = [
     ('0.00', 'score 0.00 on them, wp-taint'),
     ('0.00', 'agnostic, scoring 0.00 on'),
     ('0.00', 'rpose SAST scores 0.00)}};'),
-    ('0.283', 'to 0.283, so roughly seven'),
+    # Re-keyed 2026-08-19: the sentence was shortened during the word-limit trim for the
+    # major-revision pass, so the old snippet stopped matching and the debt read as a new
+    # literal. The debt is unchanged, only the words around it.
+    ('0.283', 'to 0.283. We report the two'),
     # 0.893 left this list on 2026-08-17: the sentence now prints \WpBlockRate, so the debt is paid
     # and a tolerated literal that no longer exists is a hole, not a record.
     ('0.00', 'baselines score 0.00.'),

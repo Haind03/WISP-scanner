@@ -908,18 +908,60 @@ def build():
         ck = load("CORPUS_LADDER_KEPT_V3.json")
         add("ClKeptFindings", str(sum(v["n_findings"] for v in ck["per_tool"].values())), CK,
             "sum over per_tool[*].n_findings")
+        # Promoted to the main-paper Table 1 on 2026-08-19. The reviewer's first demand was that the
+        # headline ladder be the 1108-record corpus rather than the 100-record matched sample, and
+        # the corpus arm existed but only its file and exact rungs had macros, so the table could not
+        # be built without typing cells. Every cell of the promoted table is generated here: the
+        # four rungs with rate, raw count and denominator, an interval on each rung, and the
+        # conditional P(exact | already in a patched file).
+        ck_rungs = (("in_patched_file", "File"),
+                    ("same_callable_as_change", "Callable"),
+                    ("on_exact_changed_line", "Exact"),
+                    ("within_5_changed_lines", "ProxFive"))
         for tool, mac in (("wisp", "Wisp"), ("semgrep", "Semgrep"),
                           ("progpilot", "Progpilot"), ("wpt", "Wpt")):
             e = ck["per_tool"].get(tool)
             if not e or not e.get("n_findings"):
                 continue
-            for rung, rm in (("in_patched_file", "File"), ("on_exact_changed_line", "Exact")):
+            add(f"ClKept{mac}N", str(e["n_findings"]), CK, f"per_tool.{tool}.n_findings")
+            for rung, rm in ck_rungs:
                 r = e[rung]
                 add(f"ClKept{mac}{rm}", r3(r["rate"]), CK, f"per_tool.{tool}.{rung}.rate")
+                add(f"ClKept{mac}{rm}N", str(r["count"]), CK, f"per_tool.{tool}.{rung}.count")
+                add(f"ClKept{mac}{rm}D", str(r["n"]), CK, f"per_tool.{tool}.{rung}.n")
                 add(f"ClKept{mac}{rm}Lo", r3(r["ci95"][0]), CK,
                     f"per_tool.{tool}.{rung}.ci95[0]")
                 add(f"ClKept{mac}{rm}Hi", r3(r["ci95"][1]), CK,
                     f"per_tool.{tool}.{rung}.ci95[1]")
+            # P(exact changed line | already in a patched file). The unconditional rungs answer
+            # "how often does a finding land on the patch", this answers "having reached the right
+            # file, how often does it reach the right line", which is the quantity the file-endpoint
+            # claim is about. Counts, not rates, so the shared denominator cancels exactly.
+            _fc = e["in_patched_file"]["count"]
+            _ec = e["on_exact_changed_line"]["count"]
+            add(f"ClKept{mac}CondExactFile", r3(_ec / _fc) if _fc else "0", CK,
+                f"per_tool.{tool}.on_exact_changed_line.count / "
+                f"per_tool.{tool}.in_patched_file.count")
+        # The corpus-scale file -> exact drop, now with its interval. This used to ship as a bare
+        # point estimate subtracted here out of the two rung rates, because the arm file carried a
+        # clustered interval for each rung separately and none for the difference, and the two
+        # marginal intervals cannot be combined into one: the rungs are nested on the same findings
+        # and positively correlated, so differencing their endpoints overstates the width by an
+        # unknown amount. The interval has to come from resampling the plugin slugs and recomputing
+        # the difference inside each replicate. eval/corpus_ladder_v3.py does that now, with the
+        # estimator, cluster and seed the matched sample uses, so the drop and its interval are read
+        # from one block rather than one being read and the other arithmetic done here.
+        for tool, mac in (("wisp", "Wisp"), ("semgrep", "Semgrep"),
+                          ("progpilot", "Progpilot"), ("wpt", "Wpt")):
+            de = (ck.get("primary_effect") or {}).get(tool, {}).get("drop_to_exact_changed_line")
+            if not de:
+                continue
+            add(f"ClKept{mac}DropToExact", r3(de["diff"]), CK,
+                f"primary_effect.{tool}.drop_to_exact_changed_line.diff")
+            add(f"ClKept{mac}DropToExactCILo", r3(de["ci95"][0]), CK,
+                f"primary_effect.{tool}.drop_to_exact_changed_line.ci95[0]")
+            add(f"ClKept{mac}DropToExactCIHi", r3(de["ci95"][1]), CK,
+                f"primary_effect.{tool}.drop_to_exact_changed_line.ci95[1]")
 
     # Bibliography census. The related-work paragraph tells the reader how much of what it cites is
     # not yet peer-reviewed, and that used to be the word "most", which nothing checked.
@@ -928,7 +970,17 @@ def build():
         RC = "REFERENCE_CENSUS_V3.json"
         rc = load("REFERENCE_CENSUS_V3.json")
         add("RefsTotal", str(rc["n_references"]), RC, "n_references")
-        add("RefsPreprint", str(rc["n_preprints"]), RC, "n_preprints")
+        # The census counts preprints twice as of schema reference-census-v4: before the audit pass
+        # that chased every arXiv entry for a published version, and after it. \RefsPreprint is the
+        # bibliography as it stands, which is the only count the manuscript may quote. \RefsPreprintBefore
+        # exists because the response letter has to say what the reviewer's own count was and what
+        # the pass changed it to, and a number in the response that no macro backs is a number
+        # nothing rechecks. The old single key n_preprints is gone; reading it by name would have
+        # been a silent KeyError at build time, so the two names are read explicitly.
+        add("RefsPreprintBefore", str(rc["n_preprints_before"]), RC, "n_preprints_before")
+        add("RefsPreprint", str(rc["n_preprints_after"]), RC, "n_preprints_after")
+        add("RefsUpgraded", str(rc["n_upgraded_with_verified_doi"]), RC,
+            "n_upgraded_with_verified_doi")
         add("RefsReviewed", str(rc["n_peer_reviewed"]), RC, "n_peer_reviewed")
 
     # The WordPress-block aggregate, added 2026-08-14. The manuscript printed "424 of 475 records
@@ -1373,6 +1425,12 @@ def build():
         add("DsExclToA", str(ex["adopted_annotator_A"]), DS,
             "payload.excluded_reconciliation.adopted_annotator_A")
         add("DsExclPooled", dsr(ex["pooled_rate_if_included"]), DS,
+            "payload.excluded_reconciliation.pooled_rate_if_included")
+        # Two decimals round 0.075 to 0.07, one tick below the 0.08 the sentence compares it
+        # against, so the printed move reads as 0.01 where the true move is 0.005 and the artifact
+        # README, which states 0.005, stops agreeing with the paper. Three decimals is the only
+        # printing at which the two documents can be cross-checked, so the prose uses this one.
+        add("DsExclPooledExact", r3(ex["pooled_rate_if_included"]), DS,
             "payload.excluded_reconciliation.pooled_rate_if_included")
 
     # Rank correlation between the two ends of the ladder, at each unit of analysis. Four readings

@@ -21,8 +21,15 @@ That also makes the run verifiable offline: --verify recomputes both arms from t
 population and compares them to the shipped result files, which takes seconds instead of the half
 hour a rebuild of 1108 patch maps costs.
 
+Each arm also carries a primary_effect block: the corpus-scale drop from the patched-file rung to
+the exact-changed-line rung, per tool, with a plugin-clustered bootstrap interval on the difference
+itself. The two rungs are nested on the same findings, so the difference cannot be intervalled by
+subtracting the endpoints of the two marginal intervals, and it is resampled directly with the same
+estimator, cluster and seed the matched-sample ladder uses.
+
     python3 -m eval.corpus_ladder_v3
     python3 -m eval.corpus_ladder_v3 --verify
+    python3 -m eval.corpus_ladder_v3 --from-pop
 """
 from __future__ import annotations
 import os, sys, json, time, platform, argparse
@@ -79,11 +86,24 @@ def aggregate(units, tools, policy, n_ok, n_err):
         return bool(u[rung])
 
     per_tool = {}
+    primary_effect = {}
     for tool in tools:
         sub = [u for u in units if u["tool"] == tool]
         per_tool[tool] = {"n_findings": len(sub)}
         for rung in RUNGS + ("class_match",):
             per_tool[tool][rung] = A.boot_rate(sub, lambda u, r=rung: credited(u, r), 10000)
+        # The corpus-scale version of the matched sample's primary endpoint: how much of the
+        # patched-file rate survives the move to the exact changed line. It has to be resampled
+        # directly. The two rungs are nested on the same findings and positively correlated, so
+        # differencing the endpoints of their two marginal intervals gives a width that is wrong by
+        # an unknown amount and always in the conservative direction. Same estimator, same cluster
+        # and same seed as analyze_v3.geometric_ladder's primary_effect on the matched 100, so the
+        # two rows of the same quantity are produced by one implementation rather than two.
+        primary_effect[tool] = {
+            "drop_to_exact_changed_line": A.boot_diff(
+                sub,
+                lambda u: credited(u, "in_patched_file"),
+                lambda u: credited(u, "on_exact_changed_line"), 10000)}
     return {
         "schema_version": "corpus-ladder-v3",
         "script": "eval/corpus_ladder_v3.py",
@@ -97,6 +117,7 @@ def aggregate(units, tools, policy, n_ok, n_err):
         "records_unresolved": n_err,
         "topk": TOPK,
         "per_tool": per_tool,
+        "primary_effect": primary_effect,
         "timestamp_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "python_version": platform.python_version(),
     }
@@ -105,6 +126,72 @@ def aggregate(units, tools, policy, n_ok, n_err):
 def _comparable(d):
     """Everything in a result file except the two fields that move on every run by design."""
     return {k: v for k, v in d.items() if k not in ("timestamp_utc", "python_version")}
+
+
+def _load_population(pop_path):
+    """The shipped per-finding population, or None with a reason printed."""
+    if not os.path.isfile(pop_path):
+        print("no population file at " + pop_path)
+        return None
+    units = [json.loads(l) for l in open(pop_path, encoding="utf-8") if l.strip()]
+    if not units:
+        print("population file is empty")
+        return None
+    if not all(u.get("raw_geometry") for u in units):
+        print("population predates the raw-geometry schema, regenerate it first")
+        return None
+    return units
+
+
+def rewrite_from_population(pop_path, paths):
+    """Re-aggregate both arms from the shipped population and rewrite the result files.
+
+    This is the same code path --verify runs, so it recomputes rather than edits: nothing is copied
+    out of the old file except the two record counts, which are outputs of the scoring pass this
+    mode does not redo and which the population cannot supply (21 of the 1108 records contributed no
+    rank<=3 finding, so counting the population's records would silently report 1087 scored).
+
+    It exists so a new derived block can be added to files that already ship, without paying the
+    half hour a rescore of 1108 patch maps costs and without the rescore's exposure to an archive
+    that moved. It refuses to write if any field that was already in the file moves, which is the
+    property that makes the addition auditable: the only admissible difference is the new block.
+    """
+    units = _load_population(pop_path)
+    if units is None:
+        return 2
+    tools = sorted({u["tool"] for u in units})
+    fresh_by_path, bad = {}, 0
+    for path, policy in paths:
+        if not os.path.isfile(path):
+            print("rewrite: missing %s, run the full scoring pass instead" % os.path.basename(path))
+            return 2
+        shipped = json.load(open(path, encoding="utf-8"))
+        for k in ("records_scored", "records_unresolved"):
+            if k not in shipped:
+                print("rewrite: %s has no %s, run the full scoring pass instead"
+                      % (os.path.basename(path), k))
+                return 2
+        fresh = aggregate(units, tools, policy, shipped["records_scored"],
+                          shipped["records_unresolved"])
+        drift = {k: (shipped[k], fresh.get(k)) for k in _comparable(shipped)
+                 if fresh.get(k) != shipped[k]}
+        if drift:
+            print("rewrite: REFUSED on %s, a field that already shipped would change:"
+                  % os.path.basename(path))
+            for k, (was, now) in drift.items():
+                print("    %s: shipped %r, recomputed %r" % (k, was, now))
+            bad += 1
+            continue
+        added = sorted(set(_comparable(fresh)) - set(_comparable(shipped)))
+        print("rewrite: %-28s unchanged fields %d, added %s"
+              % (os.path.basename(path), len(_comparable(shipped)), added or "nothing"))
+        fresh_by_path[path] = fresh
+    if bad:
+        return 2
+    for path, fresh in fresh_by_path.items():
+        json.dump(fresh, open(path, "w"), indent=1, sort_keys=True)
+        print("wrote " + path)
+    return 0
 
 
 def verify(pop_path):
@@ -139,12 +226,19 @@ def verify(pop_path):
         print("verify: %-28s %s" % (os.path.basename(path), "MATCH" if ok else "MISMATCH"))
         if not ok:
             bad += 1
+            if "primary_effect" not in shipped:
+                print("    no primary_effect block in the shipped file, regenerate it")
             for tool in tools:
                 for rung in RUNGS + ("class_match",):
                     a_ = fresh["per_tool"].get(tool, {}).get(rung)
                     b_ = shipped.get("per_tool", {}).get(tool, {}).get(rung)
                     if a_ != b_:
                         print("    %s %s: recomputed %s, shipped %s" % (tool, rung, a_, b_))
+                for eff in ("drop_to_exact_changed_line",):
+                    a_ = fresh["primary_effect"].get(tool, {}).get(eff)
+                    b_ = (shipped.get("primary_effect") or {}).get(tool, {}).get(eff)
+                    if a_ != b_:
+                        print("    %s %s: recomputed %s, shipped %s" % (tool, eff, a_, b_))
     return 1 if bad else 0
 
 
@@ -158,10 +252,16 @@ def main():
     ap.add_argument("--pop", default="", help="population path override")
     ap.add_argument("--verify", action="store_true",
                     help="recompute both arms from the shipped population and compare, no rescan")
+    ap.add_argument("--from-pop", action="store_true",
+                    help="re-aggregate both arms from the shipped population and rewrite the "
+                         "result files, refusing if any field already in them would change")
     a = ap.parse_args()
 
     if a.verify:
         return verify(a.pop or POP)
+    if a.from_pop:
+        return rewrite_from_population(a.pop or POP,
+                                       ((a.out or OUT, "contract"), (a.kept_out or KEPT, "kept")))
 
     scans_in = dict(SCANS)
     if a.scan_dir:
@@ -242,9 +342,11 @@ def main():
         json.dump(res, open(path, "w"), indent=1, sort_keys=True)
         print(f"wrote {path}")
         for tool, v in res["per_tool"].items():
+            de = res["primary_effect"][tool]["drop_to_exact_changed_line"]
             print(f"  {policy:8} {tool:10} n={v['n_findings']:6} "
                   f"file={v['in_patched_file']['rate']} "
-                  f"exact={v['on_exact_changed_line']['rate']}")
+                  f"exact={v['on_exact_changed_line']['rate']} "
+                  f"drop={de['diff']} ci95={de['ci95']}")
     print(f"wrote {pop_path}")
     print(f"  {n_ok} records scored, {n_err} unresolved, {len(units)} findings")
     return 0
