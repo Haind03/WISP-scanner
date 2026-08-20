@@ -123,6 +123,21 @@ def boot_ratio(units, num, den, reps=REPS, seed=SEED):
 SHIPPED = os.path.join(ROOT, "defect-study", "defect_study_labels.csv")
 
 
+def _frame_composition():
+    """Per-tool composition of the population the 200 findings were drawn from.
+
+    A reviewer counted the sample's 11 Progpilot findings against the corpus finding population,
+    where Progpilot is 874 of 8467 and 21 of 200 would be proportional, and read the sample as short
+    of Progpilot. The frame is this file, where Progpilot's share is less than half of that, so 11
+    is above proportional and not below it. Neither count was wrong. The paper never named which
+    population the sample came from, so this records it.
+    """
+    if not os.path.isfile(POP):
+        return Counter()
+    with open(POP, encoding="utf-8") as fh:
+        return Counter(json.loads(ln)["tool"] for ln in fh if ln.strip())
+
+
 def _units_from_shipped():
     """Rebuild the analysis units from the shipped anonymised label sheet.
 
@@ -147,7 +162,7 @@ def _units_from_shipped():
 
 def main():
     if os.path.isfile(SHIPPED):
-        return _score(_units_from_shipped())
+        return _score(_units_from_shipped(), _frame_composition())
     key = C.read_json(os.path.join(C.TIER2_DIR, "BLINDING_KEY.json"))["payload"]["map"]
     labels = {r: C.read_json(os.path.join(C.TIER2_DIR, f"reviewer_{r}_findings.json"))["payload"]["labels"]
               for r in ("A", "B")}
@@ -177,10 +192,10 @@ def main():
                       "A": labels["A"][pid], "B": labels["B"][pid]})
     if len(units) != len(want):
         raise SystemExit(f"sample has {len(want)} findings but only {len(units)} joined to a packet")
-    return _score(units)
+    return _score(units, _frame_composition())
 
 
-def _score(units):
+def _score(units, frame):
     _meta_p = os.path.join(C.TIER1_DIR, "REVIEWER_METADATA_TEMPLATE.json")
     if not os.path.isfile(_meta_p):
         _meta_p = os.path.join(ROOT, "defect-study", "ANNOTATOR_METADATA.json")
@@ -315,6 +330,20 @@ def _score(units):
                    "annotator A declared knowledge of it. Both declared they are not authors. B is "
                    "therefore the blind reading and is reported as primary; A is reported beside it "
                    "and is the more generous of the two, so the primary rate is the lower one.")}
+    _fn = int(sum(frame.values()))
+    if _fn:
+        res["frame_composition"] = {
+            "population": os.path.relpath(POP, SYS_ROOT),
+            "n_findings": _fn,
+            "per_tool": {t: {"n_frame": int(frame[t]),
+                             "share": round(frame[t] / _fn, 4),
+                             "expected_in_sample": round(len(units) * frame[t] / _fn, 1),
+                             "n_sample": sum(1 for u in units if u["tool"] == t)}
+                         for t in sorted(frame)},
+            "note": ("the sample is drawn from this population, so a tool's share here is what "
+                     "its count in the sample is to be read against, not its share of the corpus "
+                     "finding population"),
+        }
     res["config"] = {"sample": os.path.relpath(SAMPLE, SYS_ROOT), "n_findings": len(units),
                      "n_records": len({u["record_uid"] for u in units}),
                      "n_slugs": len({u["slug"] for u in units}),
