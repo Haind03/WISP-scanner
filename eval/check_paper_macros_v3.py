@@ -120,9 +120,14 @@ LITERAL_OK_CONTEXT = {
 # literal not on this list and not in LITERAL_OK fails the build, so the debt can only shrink.
 # Keyed by (value, a snippet of its line) so it survives renumbering.
 LITERAL_PENDING = [
-    ('0.00', 'score 0.00 on them, wp-taint'),
+    # Re-keyed 2026-08-20: the introduction was recompressed for the word trim and the line
+    # rewrapped, so "wp-taint" moved to the next line and the old snippet stopped matching. The
+    # debt is unchanged, only where the line breaks.
+    ('0.00', 'Progpilot score 0.00 on them,'),
     ('0.00', 'agnostic, scoring 0.00 on'),
-    ('0.00', 'rpose SAST scores 0.00)}};'),
+    # Removed 2026-08-20: this one keyed the TikZ architecture caption, and that figure was
+    # replaced by two generated diagrams in the same pass. A tolerated literal whose line no
+    # longer exists is a hole rather than a record, the same reason 0.893 left this list.
     # Re-keyed 2026-08-19: the sentence was shortened during the word-limit trim for the
     # major-revision pass, so the old snippet stopped matching and the debt read as a new
     # literal. The debt is unchanged, only the words around it.

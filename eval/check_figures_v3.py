@@ -288,18 +288,22 @@ def fig_collapse(args):
         return
     pt = json.load(open(LADDER, encoding="utf-8"))["per_tool"]
     rung = "on_exact_changed_line"
-    lab = {t: "%.4f" % pt[t][rung]["rate"] for t in ORDER}
+    # THREE decimals, re-keyed 2026-08-20 (was %.4f). Table~\ref{tab:ladder} prints these same
+    # four quantities from this same JSON at three places, so the figure prints three too and the
+    # page shows one quantity one way. %.3f keeps the table's trailing zero, so this stays a
+    # digit-for-digit comparison rather than a looser one.
+    lab = {t: "%.3f" % pt[t][rung]["rate"] for t in ORDER}
 
     sp = spans(pdf)
     check_tokens(fig, sp, pdf)
     check_numeric_multiset(fig, sp, TICKS[fig] + STATIC[fig] + [lab[t] for t in ORDER])
 
-    # PAIRING: each %.4f label belongs to the tool whose panel-b tick label sits nearest in y.
+    # PAIRING: each %.3f label belongs to the tool whose panel-b tick label sits nearest in y.
     ticklabs = [s for s in sp if s["text"] in LABEL.values() and abs(s["size"] - 7.6) < 0.05]
     if len(ticklabs) != 4:
         fail(fig, "expected 4 panel-b tick labels at 7.6pt, found %d" % len(ticklabs))
         return
-    for s in [s for s in sp if re.fullmatch(r"0\.\d{4}", s["text"])]:
+    for s in [s for s in sp if re.fullmatch(r"0\.\d{3}", s["text"])]:
         tl = nearest(s, ticklabs)
         tool = [t for t, n in LABEL.items() if n == tl["text"]][0]
         if s["text"] != lab[tool]:
