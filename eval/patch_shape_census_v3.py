@@ -29,7 +29,7 @@ rows) and, for matched-100, the exact-line sensitivity over the shipped top-3 fi
 population.
 """
 from __future__ import annotations
-import os, sys, json, argparse, time
+import os, sys, json, argparse, time, hashlib
 from collections import Counter, defaultdict
 from multiprocessing import Pool
 
@@ -207,6 +207,30 @@ def _boot_rate(units, key, slug_of, reps=BOOT_REPS, seed=BOOT_SEED):
     return round(point, 4), round(lo, 4), round(hi, 4)
 
 
+def population_fingerprint():
+    """What the sensitivity block was actually computed over.
+
+    The block below reads the finding population, while the census rows above read the vendor
+    diffs. The two inputs move independently, and on 2026-08-20 they were found four ephemeris
+    apart: the rows were diffed on 2026-08-02 and the population was regenerated on 2026-08-13
+    when WISP's own findings changed, so the shipped block described 710 top-3 findings while
+    every other result file in the paper described 701. Nothing caught it, because a macro guard
+    compares a macro to its JSON and both agreed. Stamping the input the block was computed over
+    is what makes that visible without recomputing it.
+    """
+    h = hashlib.sha256()
+    n_lines = n_topk = 0
+    with open(POP, "rb") as fh:
+        for raw in fh:
+            h.update(raw)
+            if raw.strip():
+                n_lines += 1
+                if json.loads(raw)["rank"] <= TOPK:
+                    n_topk += 1
+    return {"path": os.path.relpath(POP, SYS_ROOT), "sha256": h.hexdigest(),
+            "n_findings": n_lines, "n_findings_at_topk": n_topk, "topk": TOPK}
+
+
 def exact_line_sensitivity(shape_rows):
     """Recompute the exact-line rung on matched-100 under the arms contract s2 asks for.
 
@@ -281,13 +305,43 @@ def exact_line_sensitivity(shape_rows):
     return out
 
 
+def _sensitivity_only(out_path):
+    """Re-derive the sensitivity block in place, leaving every diffed row exactly as it is."""
+    if not os.path.isfile(out_path):
+        raise SystemExit(f"no census at {out_path}: run the full census first, there are no rows "
+                         f"to re-derive from")
+    result = json.load(open(out_path))
+    if "matched-100" not in result.get("datasets", {}):
+        raise SystemExit("the census on disk carries no matched-100 dataset, so there is nothing "
+                         "the sensitivity block can be recomputed from")
+    before = result.get("exact_line_sensitivity_matched_100")
+    result["exact_line_sensitivity_matched_100"] = exact_line_sensitivity(
+        result["datasets"]["matched-100"]["records"])
+    result["sensitivity_population"] = population_fingerprint()
+    result["sensitivity_recomputed_utc"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    json.dump(result, open(out_path, "w"), indent=1, sort_keys=True)
+    moved = before != result["exact_line_sensitivity_matched_100"]
+    print(f"rewrote exact_line_sensitivity_matched_100 in {out_path}; "
+          f"{'values moved' if moved else 'values identical'}; population "
+          f"{result['sensitivity_population']['n_findings_at_topk']} findings at top-{TOPK}")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dataset", default="all",
                     choices=["all", "matched-100", "full-1108", "wordfence-100", "testset-325"])
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--out", default=OUT)
+    ap.add_argument("--sensitivity-only", action="store_true",
+                    help="recompute only exact_line_sensitivity_matched_100, from the census rows "
+                         "already on disk and the finding population as it stands now, and write "
+                         "it back. The rows come from the vendor diffs and do not depend on the "
+                         "population, so this re-derives the block without re-diffing 1108 records.")
     a = ap.parse_args()
+
+    if a.sensitivity_only:
+        return _sensitivity_only(a.out)
 
     result = {
         "schema_version": "patch-shape-census-v3",
@@ -314,6 +368,7 @@ def main():
     if "matched-100" in result["datasets"]:
         result["exact_line_sensitivity_matched_100"] = exact_line_sensitivity(
             result["datasets"]["matched-100"]["records"])
+        result["sensitivity_population"] = population_fingerprint()
 
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     json.dump(result, open(a.out, "w"), indent=1, sort_keys=True)

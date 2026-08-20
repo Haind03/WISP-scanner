@@ -31,3 +31,6 @@ build-fresh-history.py
 push-to-new-repo.sh
 RELEASE-PAGE-TEXT.md
 texput.log
+
+# repo metadata to paste into GitHub settings, not part of the artifact
+GITHUB-REPO-DETAILS.md

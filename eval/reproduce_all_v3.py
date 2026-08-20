@@ -265,6 +265,15 @@ def main():
     cbp = os.path.join(OUT, "COMMON_SUBSET_BIAS_V3.json")
     cst, _ = _verify("eval.common_subset_bias_v3", cbp)
     results.append(("common_subset_bias", "COMMON_SUBSET_BIAS_V3.json", "shipped", cst, cst))
+    # Per-tool split of the unanchorable-file share. Reads the census rows and the finding
+    # population, so it runs offline, and it refuses to write unless it first reproduces the
+    # pooled figures the census publishes, which is how the two files are held together.
+    upp = os.path.join(OUT, "UNANCHORABLE_PER_TOOL_V3.json")
+    if os.path.isfile(os.path.join(OUT, "PATCH_SHAPE_CENSUS_V3.json")):
+        ust, _ = _verify("eval.unanchorable_per_tool_v3", upp)
+    else:
+        ust = "SKIP"
+    results.append(("unanchorable_per_tool", "UNANCHORABLE_PER_TOOL_V3.json", "shipped", ust, ust))
     # The two finding denominators on the external set, reconciled from the one scan file.
     edp = os.path.join(OUT, "EXTERNAL_DENOMINATOR_V3.json")
     est, _ = _verify("eval.external_denominator_v3", edp)
