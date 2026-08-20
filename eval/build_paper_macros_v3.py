@@ -291,6 +291,39 @@ def build():
             add("ExactTargetOnlyN", str(drop["n_findings"]), PS,
                 "exact_line_sensitivity_matched_100.drop_findings_in_unanchorable_files."
                 "wisp.n_findings")
+            # The same two rates for wp-taint-scan, because the reviewer's objection is about
+            # taint tools and one tool's before/after cannot answer it. WISP moves 0.055 -> 0.057
+            # and wp-taint-scan 0.051 -> 0.057, so the gap between the two taint tools at this
+            # rung is patch shape, not analysis.
+            wpt_all = (sens.get("all_records") or {}).get("wpt") or {}
+            wpt_drop = (sens.get("drop_findings_in_unanchorable_files") or {}).get("wpt") or {}
+            if wpt_all and wpt_drop:
+                add("ExactAllRecordsWpt", r3(wpt_all["on_exact_changed_line"]["rate"]), PS,
+                    "exact_line_sensitivity_matched_100.all_records.wpt.on_exact_changed_line.rate")
+                add("ExactTargetOnlyWpt", r3(wpt_drop["on_exact_changed_line"]["rate"]), PS,
+                    "exact_line_sensitivity_matched_100.drop_findings_in_unanchorable_files."
+                    "wpt.on_exact_changed_line.rate")
+
+    # Per-tool split of the unanchorable-file share. Derived from the census and the finding
+    # population by eval/unanchorable_per_tool_v3.py, which refuses to write unless it first
+    # reproduces the pooled figures the census publishes.
+    up_p = os.path.join(OUT, "UNANCHORABLE_PER_TOOL_V3.json")
+    if os.path.isfile(up_p):
+        UP = "UNANCHORABLE_PER_TOOL_V3.json"
+        up = load(UP)
+        for t, nm in TOOLS.items():
+            v = (up.get("per_tool") or {}).get(t)
+            if not v:
+                continue
+            add(f"Unanch{nm}D", str(v["n_in_patched_file"]), UP,
+                f"per_tool.{t}.n_in_patched_file")
+            add(f"Unanch{nm}N", str(v["n_in_unanchorable_file"]), UP,
+                f"per_tool.{t}.n_in_unanchorable_file")
+            add(f"Unanch{nm}Share", r3(v["share_of_in_file_findings"]), UP,
+                f"per_tool.{t}.share_of_in_file_findings")
+        if (up.get("spread") or {}).get("ratio_highest_to_lowest"):
+            add("UnanchSpreadRatio", r2(up["spread"]["ratio_highest_to_lowest"]), UP,
+                "spread.ratio_highest_to_lowest")
 
     # how many records the exit-code check threw away, from the shipped pre-fix run itself
     broken = os.path.join(SYS_ROOT, "final", "supplementary-data", "reproduce", "data",
@@ -620,6 +653,62 @@ def build():
                            ("InsAnchorableButInsLocal", "anchorable_file_but_insertion_local"),
                            ("InsUntouchedInCallable", "untouched_in_callable_with_insertion")):
             add(macro, str(cen[key]), IF, f"census_step6.all_findings.{key}")
+
+    # 2026-08-20, P2-7. The same rung measured on the full corpus, which is the population the
+    # headline now sits on. The matched block above is WISP alone on 100 records; the reviewer's
+    # question is whether promoting the insertion-aware rung to co-primary would change the
+    # conclusion, and that question is about all four tools on all 1108. Both arms are emitted
+    # under explicit names rather than one under the dataset's declared headline arm, because the
+    # manuscript's corpus headline prints the kept arm while eval/corpus_ladder_v3.py calls the
+    # contract arm the corpus headline, and a macro named for "the headline" would silently pick
+    # one of the two.
+    # 2026-08-20, P1-3. The Data and Code Availability paragraph says a clean worktree at the
+    # release tag returns findings identical to the working tree, and until now it said so with the
+    # word "fourteen" typed into the prose. A count with no macro behind it is checked by nothing,
+    # which is how "Supplementary Table S3" survived becoming S7. These bind the sentence to the
+    # run that produced it, so the next time the sample size changes the guard moves the sentence
+    # rather than a person having to remember to.
+    ct_path = os.path.join(OUT, "ENGINE_CLEANTREE_EQUIVALENCE_100_V3.json")
+    if os.path.isfile(ct_path):
+        ct = json.load(open(ct_path, encoding="utf-8"))
+        CTF = "ENGINE_CLEANTREE_EQUIVALENCE_100_V3.json"
+        for macro, key in (("CleanTreeN", "n_records"),
+                           ("CleanTreeIdentical", "n_identical"),
+                           ("CleanTreeIdenticalFindings", "n_identical_findings"),
+                           ("CleanTreeIdenticalStatus", "n_identical_status"),
+                           ("CleanTreeDiffering", "n_differing")):
+            add(macro, str(ct[key]), CTF, key)
+        add("CleanTreeRef", str(ct["baseline_ref"]), CTF, "baseline_ref")
+        add("CleanTreeEngineSha", str(ct["baseline_engine_sha256"])[:8], CTF,
+            "baseline_engine_sha256[:8]")
+
+    insc_path = os.path.join(OUT, "INSERTION_LADDER_CORPUS_V1.json")
+    if os.path.isfile(insc_path):
+        insc = json.load(open(insc_path, encoding="utf-8"))
+        ICF = "INSERTION_LADDER_CORPUS_V1.json"
+        for arm, Ac in (("kept", "Kept"), ("contract", "Contract")):
+            A = insc["arms"][arm]
+            for tk, Tc in (("wisp", "Wisp"), ("semgrep", "Semgrep"),
+                           ("wpt", "Wpt"), ("progpilot", "Progpilot")):
+                t = A["per_tool"][tk]
+                for macro, rung in (("Exact", "rung_exact"),
+                                    ("ExactIns", "rung_exact_or_ins5"),
+                                    ("File", "rung_file")):
+                    add(f"InsCorpus{Ac}{Tc}{macro}", f"{t[rung]['rate']:.4f}", ICF,
+                        f"arms.{arm}.per_tool.{tk}.{rung}.rate")
+            P = A["pooled"]
+            for macro, rung in (("PooledFile", "rung_file"),
+                                ("PooledExact", "rung_exact"),
+                                ("PooledExactIns", "rung_exact_or_ins5")):
+                add(f"InsCorpus{Ac}{macro}", f"{P[rung]['rate']:.4f}", ICF,
+                    f"arms.{arm}.pooled.{rung}.rate")
+                add(f"InsCorpus{Ac}{macro}Lo", f"{P[rung]['ci95'][0]:.4f}", ICF,
+                    f"arms.{arm}.pooled.{rung}.ci95[0]")
+                add(f"InsCorpus{Ac}{macro}Hi", f"{P[rung]['ci95'][1]:.4f}", ICF,
+                    f"arms.{arm}.pooled.{rung}.ci95[1]")
+            add(f"InsCorpus{Ac}NFindings", str(P["n_findings"]), ICF,
+                f"arms.{arm}.pooled.n_findings")
+            add(f"InsCorpus{Ac}NSlugs", str(P["n_slugs"]), ICF, f"arms.{arm}.pooled.n_slugs")
 
     mp_path = os.path.join(OUT, "MEM_PROFILE_V3.json")
     if os.path.isfile(mp_path):
@@ -1116,6 +1205,13 @@ def build():
                 "own_records_in_corpus.delta_percentage_points")
             add("FvOwnMissed", str(len(own["missed_by_wisp"])), FV,
                 "len(own_records_in_corpus.missed_by_wisp)")
+            # The delta above is 0.0132 percentage points, which prints as 0.01 and reads to a
+            # reviewer as 0.0001. The two rates it is a difference of are what a reader can check
+            # against Table 1, so the paper states those and not the delta.
+            add("FvOwnEmissionAll", f"{own['class_emission_all']:.4f}", FV,
+                "own_records_in_corpus.class_emission_all")
+            add("FvOwnEmissionRest", f"{own['class_emission_rest']:.4f}", FV,
+                "own_records_in_corpus.class_emission_rest")
         CUT = {"all scanned": "All", "not a corpus record": "Fresh", "converged": "Conv",
                "focused patch (GT<=10 files)": "Focus", "focused patch and converged": "FocusConv"}
         KW = {"1": "One", "3": "Three", "5": "Five", "10": "Ten"}
@@ -1370,6 +1466,23 @@ def build():
         add(f"Ds{nm}N", str(b["n"]), DS, f"payload.per_tool.{t}.B.n")
         add(f"DsFile{nm}", dsr(ds["geometry_same_sample"]["in_patched_file"][t]["rate"]), DS,
             f"payload.geometry_same_sample.in_patched_file.{t}.rate")
+    # Which population the 200 were drawn from, and what each tool's share of it would put in a
+    # 200-finding sample. The reviewer read the sample's 11 Progpilot findings against the corpus
+    # population, where 21 would be proportional, and the paper never said the frame is a different
+    # population. The stratification axes are advisory class, patch shape and plugin size, so the
+    # tool mix is a consequence of those and not a quota, which is why WISP is under its own share.
+    fc = ds.get("frame_composition")
+    if fc:
+        add("DsFrameN", str(fc["n_findings"]), DS, "payload.frame_composition.n_findings")
+        for t, nm in DST.items():
+            if t not in fc["per_tool"]:
+                continue
+            ft = fc["per_tool"][t]
+            add(f"DsFrame{nm}N", str(ft["n_frame"]), DS,
+                f"payload.frame_composition.per_tool.{t}.n_frame")
+            add(f"DsFrame{nm}Expected", f"{ft['expected_in_sample']:.1f}", DS,
+                f"payload.frame_composition.per_tool.{t}.expected_in_sample")
+
     for g, nm in (("in_patched_file", "File"), ("same_callable_as_change", "Callable"),
                   ("on_exact_changed_line", "Exact")):
         add(f"DsGeo{nm}", dsr(ds["geometry_same_sample"][g]["pooled"]["rate"]), DS,
