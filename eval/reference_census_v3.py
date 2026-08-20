@@ -11,6 +11,19 @@ An entry counts as a preprint when its note field says so, which is the same sig
 bibliography shows the reader. Entry types are recorded too, so a reviewer can see the split
 without opening the .bib.
 
+Since 2026-08-19 the census file is no longer this script's to write. The reference audit that
+answered the reviewer's preprint count added a per-entry array and the counts that derive from it,
+before and after the pass, which arXiv id each entry was verified from, and which one gained a
+published DOI. This script cannot recover any of that from the .bib, and it used to overwrite the
+file with the older shape anyway, on every reproduce run, leaving a document that
+build_paper_macros_v3 reads two now-absent keys out of. The same staleness reached the other
+branch: with no .bib on disk it printed prev["n_preprints"], a key the current schema does not
+have, and the KeyError read as a missing bibliography that was never missing.
+
+So when the census on disk carries an entries array, this recounts the .bib and checks it against
+that array rather than replacing it, and writes nothing. It still writes the full document for a
+tree that has no census at all.
+
     python3 -m eval.reference_census_v3
 """
 from __future__ import annotations
@@ -25,15 +38,23 @@ ENTRY = re.compile(r"@(\w+)\s*\{\s*([^,\s]+)\s*,(.*?)\n\}", re.S)
 PREPRINT = re.compile(r"\bpreprint\b|\barxiv\b", re.I)
 
 
+def _preprints_now(prev):
+    """The count the current schema calls n_preprints_after, under whichever name it carries."""
+    for k in ("n_preprints_after", "n_preprints"):
+        if k in prev:
+            return prev[k]
+    return None
+
+
 def main() -> int:
+    prev = json.load(open(OUT, encoding="utf-8")) if os.path.isfile(OUT) else None
     if not os.path.isfile(BIB):
         # A tree without the .bib cannot recount, so the shipped census stands as the reference
         # rather than the target failing on a missing input it never had.
-        if os.path.isfile(OUT):
-            prev = json.load(open(OUT, encoding="utf-8"))
+        if prev is not None:
             print("no bibliography at %s, keeping the shipped census" % BIB)
-            print("  %d references, %d preprints, %d peer-reviewed"
-                  % (prev["n_references"], prev["n_preprints"], prev["n_peer_reviewed"]))
+            print("  %s references, %s preprints, %s peer-reviewed"
+                  % (prev.get("n_references"), _preprints_now(prev), prev.get("n_peer_reviewed")))
             return 0
         sys.exit("no bibliography at " + BIB)
     src = open(BIB, encoding="utf-8").read()
@@ -50,6 +71,40 @@ def main() -> int:
         by_type[etype.lower()] += 1
         if is_pre:
             preprints.append(key)
+    # The audited census owns the file. Check against it and leave it alone.
+    if prev is not None and prev.get("entries"):
+        audited = prev["entries"]
+        bad = []
+        in_bib, in_census = set(entries), {e["key"] for e in audited}
+        if in_bib - in_census:
+            bad.append("in the bibliography and not in the census: %s"
+                       % ", ".join(sorted(in_bib - in_census)))
+        if in_census - in_bib:
+            bad.append("in the census and not in the bibliography: %s"
+                       % ", ".join(sorted(in_census - in_bib)))
+        if prev.get("n_references") != len(entries):
+            bad.append("census n_references is %s, the bibliography has %d"
+                       % (prev.get("n_references"), len(entries)))
+        still = {e["key"] for e in audited if e.get("was_preprint") and not e.get("now_published")}
+        if still != set(preprints):
+            only_note = sorted(set(preprints) - still)
+            only_audit = sorted(still - set(preprints))
+            bad.append("the preprint note in the .bib and the audited entries disagree"
+                       + (", note only: %s" % ", ".join(only_note) if only_note else "")
+                       + (", audit only: %s" % ", ".join(only_audit) if only_audit else ""))
+        if _preprints_now(prev) != len(preprints):
+            bad.append("census preprint count is %s, the bibliography's notes give %d"
+                       % (_preprints_now(prev), len(preprints)))
+        if bad:
+            print("REFERENCE CENSUS FAIL: the bibliography and the audited census disagree.")
+            for b in bad:
+                print("  " + b)
+            return 1
+        print("reference census agrees with the bibliography, nothing rewritten")
+        print("  %d references, %d preprints, %d peer-reviewed"
+              % (len(entries), len(preprints), prev.get("n_peer_reviewed")))
+        return 0
+
     res = {
         "schema_version": "reference-census-v3",
         "script": "eval/reference_census_v3.py",

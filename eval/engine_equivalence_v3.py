@@ -32,6 +32,7 @@ Any difference is reported per record and the script exits non-zero.
 """
 from __future__ import annotations
 import os, sys, json, shutil, argparse, tempfile, subprocess
+import datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -49,6 +50,13 @@ from eval import wisp_contract as WC
 BASELINE_COMMIT = "d705be9"
 SAMPLE = os.path.join(SYS_ROOT, "revision-cns-v2", "baseline_v3", "matched100.sample")
 OUT = os.path.join(SYS_ROOT, "revision-cns-v2", "out", "ENGINE_EQUIVALENCE_V3.json")
+
+
+# 2026-08-20: CLEAN-TREE-EQUIVALENCE-2026-08-19.md, threat 2: "The result JSON carries no run
+# timestamp. The script does not stamp one." The run window had to be reconstructed from a log
+# and a file mtime, which is provenance recovered rather than provenance recorded.
+def _now() -> str:
+    return datetime.datetime.now().astimezone().isoformat(timespec="seconds")
 
 
 def git(*args: str) -> str:
@@ -114,6 +122,7 @@ def main():
     if len(expect) < 8:
         sys.exit(f"--expect-sha must be at least 8 hex characters, got {expect!r}")
 
+    started_at = _now()
     rows = {r["slug"] + "|" + r["cve"]: r for r in load_rows()}
     keys = [l.strip() for l in open(SAMPLE) if l.strip()][:a.n]
     sel = [rows[k] for k in keys if k in rows]
@@ -189,6 +198,8 @@ def main():
         "baseline_tag": WC.BASELINE_TAG, "baseline_sha256": WC.BASELINE_SHA256,
         "engine_tag": WC.ENGINE_TAG, "engine_sha256": WC.ENGINE_SHA256,
         "tree_commit": tree_commit, "tree_git_dirty": tree_dirty,
+        "started_at": started_at,
+        "finished_at": _now(),
         "sample": SAMPLE,
         "n_records": len(records),
         "n_identical": sum(1 for r in records if r["identical"]),
