@@ -38,6 +38,11 @@ C_MISS, C_POOL = "#B23A48", "#B23A48"
 C_MISS_LT = "#D9949C"
 
 plt.rcParams.update({
+    # matplotlib writes Type 3 PDF fonts by default, and Elsevier production refuses Type 3.
+    # 42 is TrueType, which embeds. Found 2026-08-20 by reading the built supplement's font table,
+    # where four figures put Type 3 faces on pages 6, 12, 15 and 17 while the body was clean.
+    "pdf.fonttype": 42,
+    "ps.fonttype": 42,
     "font.family": "serif",
     "font.serif": ["Nimbus Roman", "Times New Roman", "DejaVu Serif"],
     "mathtext.fontset": "stix",

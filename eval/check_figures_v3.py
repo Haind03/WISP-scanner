@@ -44,6 +44,7 @@ OUTDIR = os.path.join(SYS_ROOT, "revision-cns-v2", "out")
 LADDER = os.path.join(OUTDIR, "CORPUS_LADDER_KEPT_V3.json")
 DEFECT = os.path.join(OUTDIR, "DEFECT_STUDY_RESULT_V3.json")
 POP = os.path.join(OUTDIR, "CORPUS_FINDING_POPULATION_V3.jsonl")
+CENSUS = os.path.join(OUTDIR, "PATCH_SHAPE_CENSUS_V3.json")
 ESTIMATOR = os.path.join(ROOT, "eval", "analyze_v3.py")
 
 ORDER = ["wisp", "semgrep", "progpilot", "wpt"]
@@ -61,10 +62,26 @@ FORBIDDEN_CI = ["recall", "detection rate", "defect rate", "true positive rate",
 TICKS = {
     "fig_collapse": ["0.0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.00", "0.05", "0.10"],
     "fig_geom_vs_human": ["0.0", "0.2", "0.4", "0.6", "0.0", "0.2", "0.4", "0.6", "0.8"],
-    "fig_perclass": ["0.0", "0.2", "0.4", "0.6", "0.8", "1.0", "0.0", "0.2", "0.4", "0.6"],
+    # 2026-08-20: both panels now run 0 to 0.84 on ONE range with ONE set of ticks, so the
+    # multiset is two of each of five and the lone "1.0" is gone.
+    "fig_perclass": ["0.0", "0.2", "0.4", "0.6", "0.8", "0.0", "0.2", "0.4", "0.6", "0.8"],
+    # Panel (b) is a log axis with the decades written plainly, so the tick multiset is the four
+    # decades plus the three counts on the left.
+    "fig_gt_census": ["1", "10", "100", "1000", "0", "200", "400"],
 }
+# Binning is a choice, so it is DECLARED here rather than read out of the artifact being checked.
+# Reading it from fig_gt_census_data.json was the first version of this check and it was useless:
+# the guard re-binned with whatever the figure had just written, so the two agreed by construction
+# and changing the figure's rule fired nothing. The declaration is the check.
+GT_CENSUS_BINS_PER_DECADE = 3
 # Digit-bearing text that is a label rather than a measurement.
-STATIC = {"fig_collapse": ["prox@5"], "fig_geom_vs_human": [], "fig_perclass": []}
+# 2026-08-20: two figures now state on the plate what their error bars are, which puts "95" in
+# the text layer. Both strings are chrome, so they are declared here rather than derived.
+STATIC = {"fig_collapse": ["prox@5", "bars: 95% plugin-clustered CI"],
+          "fig_geom_vs_human": ["Error bars are 95% confidence intervals from a "
+                                "plugin-clustered bootstrap."],
+          "fig_perclass": [],
+          "fig_gt_census": []}
 
 FAILS: list[str] = []
 VERBOSE = False
@@ -126,7 +143,9 @@ def page_geometry(pdf):
 
 # ---------------------------------------------------------------- generic checks
 
-def check_tokens(fig, sp, pdf):
+def check_tokens(fig, sp, pdf, require_tools=True):
+    """require_tools=False for a plate that names no scanner, such as fig_gt_census, which is
+    about the ground truth rather than about any tool's findings."""
     joined = " ".join(s["text"] for s in sp)
     for pat in FORBIDDEN_CASE:
         for s in sp:
@@ -158,10 +177,13 @@ def check_tokens(fig, sp, pdf):
         for word in FORBIDDEN_CI:
             if re.sub(r"\s+", "", word) in g.lower():
                 fail(fig, "retired term %r in the ghostscript text extraction" % word)
-    for t in LABEL.values():
-        if t not in joined:
-            fail(fig, "tool label %r missing from the PDF text layer" % t)
-    ok("no retired token, all four tool labels present")
+    if require_tools:
+        for t in LABEL.values():
+            if t not in joined:
+                fail(fig, "tool label %r missing from the PDF text layer" % t)
+        ok("no retired token, all four tool labels present")
+    else:
+        ok("no retired token (this plate names no scanner, so no tool label is required)")
 
 
 def check_numeric_multiset(fig, sp, expected):
@@ -312,18 +334,39 @@ def fig_collapse(args):
         else:
             ok("%s -> %s" % (tl["text"], s["text"]))
 
-    # the panel names a winner, so the winner has to be the one the JSON holds
-    lowest = min(ORDER, key=lambda t: pt[t][rung]["rate"])
-    ann = [s for s in sp if s["text"] == "lowest of the four"]
-    if len(ann) != 1:
-        fail(fig, "expected exactly one 'lowest of the four' annotation, found %d" % len(ann))
+    # THE PANEL MAY NOT NAME A WINNER AT THIS RUNG (retired 2026-08-20). In the declared family
+    # of paired comparisons no exact-line comparison against Semgrep or against wp-taint-scan
+    # survives Holm, and the marginal intervals this panel draws overlap heavily, so an ordering
+    # annotation here contradicted the panel's own error bars. This check is now NEGATIVE, so the
+    # words cannot come back without failing the guard.
+    if [s for s in sp if "lowest of the four" in s["text"]]:
+        fail(fig, "the retired ordering annotation 'lowest of the four' is back on the plate")
     else:
-        near = nearest(ann[0], ticklabs)
-        if near["text"] != LABEL[lowest]:
-            fail(fig, "'lowest of the four' points at %s but the JSON minimum at %s is %s"
-                 % (near["text"], rung, LABEL[lowest]))
+        ok("no ordering annotation at the exact-line rung")
+
+    # What the panel MAY say is that intervals overlap, and which ones is re-derived here: the
+    # longest run of tools, ascending by rate, whose 95% intervals share a common range.
+    asc = sorted(ORDER, key=lambda t: pt[t][rung]["rate"])
+    best = ([], None, None)
+    for i in range(len(asc)):
+        lo, hi, runset = -1.0, 2.0, []
+        for t in asc[i:]:
+            a, b = pt[t][rung]["ci95"]
+            if max(lo, a) > min(hi, b):
+                break
+            lo, hi = max(lo, a), min(hi, b)
+            runset.append(t)
+        if len(runset) > len(best[0]):
+            best = (runset, lo, hi)
+    if len(best[0]) < 2:
+        fail(fig, "no two exact-line intervals overlap, so the panel's overlap band has no source")
+    else:
+        want = "%s intervals overlap" % {2: "two", 3: "three", 4: "all four"}[len(best[0])]
+        ann = [s for s in sp if s["text"] == want]
+        if len(ann) != 1:
+            fail(fig, "expected exactly one %r annotation, found %d" % (want, len(ann)))
         else:
-            ok("'lowest of the four' points at %s, the JSON minimum" % LABEL[lowest])
+            ok("%r matches the run that shares [%.4f, %.4f]" % (want, best[1], best[2]))
 
     if not args.no_reproduce:
         check_reproduces(fig, script)
@@ -359,16 +402,27 @@ def fig_geom_vs_human(args):
             ("annotator %s, knew the aim" % A, p["pooled"][A]),
             ("annotator %s, blind, 1 annotator" % B, p["pooled"][B])]
     TOOLS = ["wisp", "semgrep", "wpt", "progpilot"]
-    zero = [t for t in TOOLS if p["per_tool"][t][A]["count"] == 0 and p["per_tool"][t][B]["count"] == 0]
+    # 2026-08-20: a group is MARKED underpowered, and prints raw numerator/denominator on all
+    # THREE of its bars, when any of its three intervals is degenerate (lo == hi, what a cluster
+    # bootstrap over zero events returns) or wider than half a unit of share. Re-derived here
+    # rather than trusting the figure script's own rule.
+    WIDE = 0.5
 
-    expect = list(TICKS[fig])
+    def _cells(t):
+        return [g["in_patched_file"][t], p["per_tool"][t][A], p["per_tool"][t][B]]
+
+    thin = [t for t in TOOLS
+            if any(c["ci95"][0] == c["ci95"][1] or c["ci95"][1] - c["ci95"][0] > WIDE
+                   for c in _cells(t))]
+
+    expect = list(TICKS[fig]) + list(STATIC[fig])
     expect += ["%.3f" % cell["rate"] for _, cell in rows]
     expect += ["= %.3f" % kappa]
     expect += ["Share of the same %d adjudicated findings" % n]
     expect += ["=%d" % p["per_tool"][t][B]["n"] for t in TOOLS]
     expect += ["annotator %s, blind, 1 annotator" % B]
-    for t in zero:
-        expect += ["0 of %d" % p["per_tool"][t][B]["n"]] * 2
+    for t in thin:
+        expect += ["%d of %d" % (c["count"], c["n"]) for c in _cells(t)]
 
     sp = spans(pdf)
     check_tokens(fig, sp, pdf)
@@ -449,6 +503,13 @@ def fig_perclass(args):
                     fail(fig, "panel (a) %s/%s recomputes to %r, companion JSON holds %r"
                          % (c, t, got, pa[c][t]))
         ok("all %d panel cells recomputed from the population" % (len(classes) * 7))
+        got_range = [min(pa[c][t]["n"] for c in classes for t in ORDER),
+                     max(pa[c][t]["n"] for c in classes for t in ORDER)]
+        if got_range != list(d["panel_a_cell_n_range"]):
+            fail(fig, "panel (a) cell n range recomputes to %r, the companion JSON holds %r"
+                 % (got_range, d["panel_a_cell_n_range"]))
+        else:
+            ok("panel (a) cell n range %r reproduces from the population" % (got_range,))
         # and the per-tool marginal must still be the shipped ladder Figure 1 draws
         shipped = json.load(open(LADDER, encoding="utf-8"))["per_tool"]
         for t in ORDER:
@@ -459,7 +520,14 @@ def fig_perclass(args):
                 fail(fig, "per-tool marginal for %s disagrees with CORPUS_LADDER_KEPT_V3.json" % t)
         ok("per-tool marginals reproduce CORPUS_LADDER_KEPT_V3.json")
 
-    expect = list(TICKS[fig]) + ["=%d" % pb[c]["in_patched_file"]["n"] for c in classes]
+    # 2026-08-20: panel (a) now states its OWN denominator range in its axis label, because the
+    # class total down the right-hand edge is panel (b)'s and used to read as panel (a)'s. Both
+    # ends come from the companion JSON, which the reproduce layer above re-derives, so this stays
+    # a derivation and not a transcription.
+    n_lo, n_hi = d["panel_a_cell_n_range"]
+    expect = (list(TICKS[fig])
+              + ["=%d" % pb[c]["in_patched_file"]["n"] for c in classes]
+              + ["that land in the patched file  (%d to %d per mark)" % (n_lo, n_hi)])
     sp = spans(pdf)
     check_tokens(fig, sp, pdf)
     check_numeric_multiset(fig, sp, expect)
@@ -476,6 +544,22 @@ def fig_perclass(args):
              % (seen, classes))
     else:
         ok("class axis ordering matches class_order_low_to_high")
+    # 2026-08-20: the two panels must be drawn at ONE scale and ONE range, and that is checkable
+    # from the plate itself rather than taken on the script's word: each panel prints five x tick
+    # labels, and every gap between consecutive labels must be the same distance in points, within
+    # a panel and across the two. If a panel is ever retuned on its own, the gaps stop matching.
+    tickspans = sorted([s for s in sp if re.fullmatch(r"0\.\d", s["text"])],
+                       key=lambda s: s["x"])
+    if len(tickspans) != 10:
+        fail(fig, "expected 10 x tick labels over the two panels, found %d" % len(tickspans))
+    else:
+        gaps = [round(q[i + 1]["x"] - q[i]["x"], 2)
+                for q in (tickspans[:5], tickspans[5:]) for i in range(4)]
+        if max(gaps) - min(gaps) > 0.5:
+            fail(fig, "the panels are not at one scale, tick gaps in points are %r" % (gaps,))
+        else:
+            ok("both panels at one scale, %.1f pt per gridline interval" % gaps[0])
+
     for s in [s for s in sp if re.fullmatch(r"=\d+", s["text"])]:
         cl = nearest(s, clslabs)
         wantn = "=%d" % pb[cl["text"]]["in_patched_file"]["n"]
@@ -489,6 +573,138 @@ def fig_perclass(args):
         check_reproduces(fig, script, companions=("fig_perclass_data.json",))
 
 
+# ---------------------------------------------------------------- figure 2, the census
+
+
+def _census_quantile(sorted_vals, p):
+    """The figure script's index rule, re-implemented rather than imported."""
+    return sorted_vals[int(round(p * (len(sorted_vals) - 1)))]
+
+
+def _census_bins(hi, per_decade):
+    """Geometric edges snapped to integers, re-implemented rather than imported."""
+    edges, i = [1], 1
+    while edges[-1] <= hi:
+        edges.append(max(edges[-1] + 1, int(round(10 ** (i / float(per_decade))))))
+        i += 1
+    return edges
+
+
+def fig_gt_census(args):
+    fig = "fig_gt_census"
+    pdf = os.path.join(LATEX, fig + ".pdf")
+    script = os.path.join(LATEX, fig + ".py")
+    data = os.path.join(LATEX, "fig_gt_census_data.json")
+    print("== %s" % fig)
+    if not check_stale(fig, pdf, [CENSUS, script], extra_outputs=[data]):
+        return
+    d = json.load(open(data, encoding="utf-8"))
+
+    # Re-derive the whole plate from the census, independently of the companion JSON.
+    cen = json.load(open(CENSUS, encoding="utf-8"))
+    if cen.get("schema_version") != "patch-shape-census-v3":
+        fail(fig, "PATCH_SHAPE_CENSUS_V3.json is not schema patch-shape-census-v3")
+        return
+    ds = cen["datasets"][d["dataset"]]
+    pf = ds["php_files"]
+    if pf["modified"] != pf["anchored"] + pf["pure_insertion"] or \
+       pf["scored"] != pf["modified"] + pf["deleted"]:
+        fail(fig, "the census no longer partitions: modified/anchored/pure_insertion/deleted "
+                  "do not add up, so panel (a) is not a partition")
+        return
+    total = pf["scored"] + pf["added"]
+    unanch = pf["deleted"] + pf["pure_insertion"]
+    share = round(unanch / float(pf["scored"]), 4)
+    n_records = ds["n_records"]
+    recs = ds["records"]
+    breadth = sorted(len(r["changed_php_files"]) for r in recs)
+    pos = [b for b in breadth if b > 0]
+    n_pos = len(pos)
+    q1 = _census_quantile(pos, 0.25)
+    med = _census_quantile(pos, 0.50)
+    q3 = _census_quantile(pos, 0.75)
+    # the empty-ground-truth record and the no-exact-line-target record must be the same record
+    empty = sorted(r["key"] for r in recs if not r["changed_php_files"])
+    no_tgt = sorted(r["key"] for r in recs if not r.get("has_exact_line_target"))
+    if empty != no_tgt:
+        fail(fig, "the empty-GT record and the no-exact-line-target record diverged: %r vs %r"
+             % (empty, no_tgt))
+    if d["bins_per_decade"] != GT_CENSUS_BINS_PER_DECADE:
+        fail(fig, "panel (b) was binned at %r per decade, this guard declares %r; if the rule is "
+                  "meant to change, change it here too and say why"
+             % (d["bins_per_decade"], GT_CENSUS_BINS_PER_DECADE))
+    edges = _census_bins(max(pos), GT_CENSUS_BINS_PER_DECADE)
+    counts = [0] * (len(edges) - 1)
+    for x in pos:
+        for i in range(len(edges) - 1):
+            if edges[i] <= x < edges[i + 1]:
+                counts[i] += 1
+                break
+    if sum(counts) != n_pos:
+        fail(fig, "the guard's own binning lost %d records" % (n_pos - sum(counts)))
+
+    for name, got, want in (("total_changed_php_files", d["total_changed_php_files"], total),
+                            ("unanchorable_in_gt", d["unanchorable_in_gt"], unanch),
+                            ("unanchorable_share_of_gt", d["unanchorable_share_of_gt"], share),
+                            ("n_records", d["n_records"], n_records),
+                            ("n_records_with_at_least_one_changed_php_file",
+                             d["n_records_with_at_least_one_changed_php_file"], n_pos),
+                            ("bin_edges", d["bin_edges"], edges),
+                            ("bin_counts", d["bin_counts"], counts),
+                            ("empty_ground_truth_records",
+                             sorted(d["empty_ground_truth_records"]), empty),
+                            ("breadth q1", d["breadth_quartiles"]["q1"], q1),
+                            ("breadth median", d["breadth_quartiles"]["median"], med),
+                            ("breadth q3", d["breadth_quartiles"]["q3"], q3)):
+        if got != want:
+            fail(fig, "companion JSON %s is %r, the census gives %r" % (name, got, want))
+    ok("every quantity on the plate re-derived from PATCH_SHAPE_CENSUS_V3.json")
+
+    # panel (a) must be a partition of every changed PHP file, in the order the plate draws it
+    want_rows = [("modified, has a changed line", pf["anchored"], True),
+                 ("deleted", pf["deleted"], True),
+                 ("modified, inserts only", pf["pure_insertion"], True),
+                 ("added, absent from $V$", pf["added"], False)]
+    if sum(r[1] for r in want_rows) != total:
+        fail(fig, "panel (a) rows do not partition the %d changed PHP files" % total)
+    got_rows = [(r["label"], r["value"], r["in_gt"]) for r in d["panel_a_rows"]]
+    if got_rows != want_rows:
+        fail(fig, "panel (a) rows are %r, the census gives %r" % (got_rows, want_rows))
+
+    expect = list(TICKS[fig]) + list(STATIC[fig])
+    expect += ["(a)  the %d PHP files the %d patches touched" % (total, n_records)]
+    expect += ["%d" % v for _, v, _ in want_rows]
+    expect += ["median %d" % med, "quartiles %d to %d" % (q1, q3)]
+    expect += ["(b)  over the %d patches that rewrote at least one" % n_pos]
+    # mathtext splits the sentence at $p$, so the digit-bearing span stops at "GT(".
+    expect += ["hatched: the %.0f%% of GT(" % round(share * 100)]
+
+    sp = spans(pdf)
+    check_tokens(fig, sp, pdf, require_tools=False)
+    check_numeric_multiset(fig, sp, expect)
+
+    # PAIRING: every bar value must sit beside its OWN row, matched by nearest row label in y.
+    # The label reaches the PDF with its mathtext split off, so compare on that form.
+    plain = {}
+    for lab, val, _ in want_rows:
+        plain[re.sub(r"\$[^$]*\$", "", lab)] = val
+    rowlabs = [s for s in sp if s["text"] in plain]
+    if len(rowlabs) != len(want_rows):
+        fail(fig, "expected %d panel (a) row labels, found %d" % (len(want_rows), len(rowlabs)))
+    else:
+        for s in [s for s in sp if re.fullmatch(r"\d{3,6}", s["text"]) and s["x0"] > 90
+                  and s["y"] < 90]:
+            rl = nearest(s, rowlabs)
+            if s["text"] != "%d" % plain[rl["text"]]:
+                fail(fig, "panel (a) prints %s beside %r, the census gives %d"
+                     % (s["text"], rl["text"], plain[rl["text"]]))
+            else:
+                ok("%r -> %s" % (rl["text"], s["text"]))
+
+    if not args.no_reproduce:
+        check_reproduces(fig, script, companions=("fig_gt_census_data.json",))
+
+
 # ---------------------------------------------------------------- fonts / layout
 
 COLUMNWIDTH_PT = 252.0      # elsarticle [final,5p,times,twocolumn], measured from the built log
@@ -497,7 +713,7 @@ TEXTWIDTH_PT = 522.0
 
 def report_layout():
     print("== layout and fonts")
-    for fig in ("fig_collapse", "fig_geom_vs_human", "fig_perclass"):
+    for fig in ("fig_collapse", "fig_geom_vs_human", "fig_perclass", "fig_gt_census"):
         pdf = os.path.join(LATEX, fig + ".pdf")
         if not os.path.exists(pdf):
             continue
@@ -517,7 +733,9 @@ def report_layout():
 def main():
     global VERBOSE
     ap = argparse.ArgumentParser()
-    ap.add_argument("--figure", choices=["fig_collapse", "fig_geom_vs_human", "fig_perclass"])
+    ap.add_argument("--figure",
+                    choices=["fig_collapse", "fig_geom_vs_human", "fig_perclass",
+                             "fig_gt_census"])
     ap.add_argument("--no-reproduce", action="store_true",
                     help="skip the re-run layer (fast, but blind to unlabelled values)")
     ap.add_argument("-v", "--verbose", action="store_true")
@@ -525,7 +743,7 @@ def main():
     VERBOSE = args.verbose
 
     todo = {"fig_collapse": fig_collapse, "fig_geom_vs_human": fig_geom_vs_human,
-            "fig_perclass": fig_perclass}
+            "fig_perclass": fig_perclass, "fig_gt_census": fig_gt_census}
     for name, fn in todo.items():
         if args.figure and name != args.figure:
             continue
@@ -538,7 +756,7 @@ def main():
         for f in FAILS:
             print("  - %s" % f)
         return 1
-    print("FIGURE GUARD PASS: 3 figures, values re-derived from the result JSONs, "
+    print("FIGURE GUARD PASS: 4 figures, values re-derived from the result JSONs, "
           "no retired token, nothing stale.")
     return 0
 
