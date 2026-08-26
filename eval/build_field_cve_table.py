@@ -25,6 +25,18 @@ def esc(s):
     return str(s).replace("_", r"\_").replace("&", r"\&").replace("#", r"\#")
 
 
+def cvelink(cve):
+    """A CVE identifier that a reader can click through to the CVE Program record.
+
+    Added 2026-08-26. An identifier printed as plain text asks the reader to retype it, and a
+    24-row table asks that 24 times. The URL form is the one CVE.org itself publishes, so it does
+    not depend on any mirror staying up. Both documents load hyperref, so \href resolves in each.
+    The visible text stays the bare identifier, because the link must not change what the table
+    says on paper.
+    """
+    return r"\href{https://www.cve.org/CVERecord?id=" + cve + "}{" + esc(cve) + "}"
+
+
 def rank(v):
     """The cutoff at which the rung was first reached, or 'none' when it never was."""
     return "none" if v is None else f"$K{{=}}{v}$"
@@ -48,7 +60,7 @@ def main():
     for r in recs:
         lines.append(
             " & ".join([
-                esc(r["cve"]) if r["cve"] else r"\emph{not recorded}",
+                cvelink(r["cve"]) if r["cve"] else r"\emph{not recorded}",
                 r"\code{" + esc(r["slug"]) + "}",
                 CLS.get(r["cls"], r["cls"]),
                 r"\code{" + esc(r["patched_version"]) + "}",
@@ -111,11 +123,11 @@ def main():
     ]
     for i in range(half):
         a = left[i]
-        cells = [esc(a["cve"]), r"\code{" + slugbreak(a["slug"]) + "}",
+        cells = [cvelink(a["cve"]), r"\code{" + slugbreak(a["slug"]) + "}",
                  r"\code{" + esc(a["patched_version"]) + "}"]
         if i < len(right):
             b = right[i]
-            cells += [esc(b["cve"]), r"\code{" + slugbreak(b["slug"]) + "}",
+            cells += [cvelink(b["cve"]), r"\code{" + slugbreak(b["slug"]) + "}",
                       r"\code{" + esc(b["patched_version"]) + "}"]
         else:
             cells += ["", "", ""]
