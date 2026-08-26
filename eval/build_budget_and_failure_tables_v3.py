@@ -129,9 +129,20 @@ def cell_problems(d):
     return missing, bad
 
 
+# 2026-08-21, P1-1. The 25 s column is not reproducible and therefore cannot carry a comparison.
+# The supplement records the Semgrep cell at that budget completing 26, then 39, then 63 records
+# on the same command at the same worker count, with patch-file success@1 following it from 0.07
+# to 0.10 to 0.21, and the cause traced to filesystem cache warmth rather than to the tool. The
+# main table therefore starts at the smallest budget that reproduces, and the full sweep stays in
+# the supplement, where the three readings are printed beside each other. The JSON is untouched:
+# every cell is still there, still checked by check_matrix, only the main table stops printing it.
+MAIN_TABLE_DROPS_BUDGETS = (25,)
+
+
 def build_matrix_fragment(d):
     cells = d["cells"]
     tools, budgets = matrix_shape(d)
+    budgets = [b for b in budgets if b not in MAIN_TABLE_DROPS_BUDGETS]
     n = d["n_records"]
     metrics = [("coverage", "ans"),
                ("patch_file_success_at_1", "pf@1"),
@@ -251,12 +262,21 @@ def matrix_caption(d, order, budgets, modal):
         f"Equal-budget comparison of all {word(len(order))} scanners on the matched "
         f"{n}-record sample.",
         f"Every tool, WISP included, gets the same per-plugin wall clock, swept at {blist} "
-        "seconds, and a record not answered inside the budget is a miss over the full denominator.",
-        f"ans is the share of the {n} records answered, pf@1 and pf@3 are patch-file success at the "
-        f"first finding and within the first three, all three scored over the {n} records.",
-        "Bold is the best value in its column and the last row is WISP minus the best baseline "
-        "there, so a negative entry is a column a baseline wins.",
-        "A marker on a block's answered share covers that tool's whole block at that budget.",
+        "seconds, and an unanswered record is a miss over the full denominator.",
+        f"A {MAIN_TABLE_DROPS_BUDGETS[0]}\\,s sweep was also run and is reported in the "
+        "supplement, because it did not reproduce between runs on this host.",
+        # The column holds /cells/<tool>@<budget>/coverage, which is completed divided by
+        # dataset_n, not the answered rate of the endpoint table. Progpilot at 60 s completes 61
+        # records and emits on 34 of them, so calling this column "answered" made one tool look
+        # like it answered 0.610 here and 0.30 in the ladder, which a reviewer read as a
+        # contradiction. It was two different quantities wearing one word. Corrected 2026-08-20.
+        f"ans is the share of the {n} records completed inside the budget, not the answered share of "
+        "the endpoint table, because a tool can complete a record and emit nothing.",
+        f"pf@1 and pf@3 are patch-file success at the first finding and within the first three, "
+        f"both over the {n} records.",
+        "Bold is the best value in its column and the last row is WISP minus the best baseline there, "
+        "so a negative entry is a column a baseline wins.",
+        "A marker on a block's completed share covers that whole block.",
     ]
     for k in dag:
         c = cells[k]
@@ -272,8 +292,7 @@ def matrix_caption(d, order, budgets, modal):
                  + ", ".join(bits) + ".")
     if ddag:
         s.append(f"A double dagger marks the {word(len(ddag))} blocks measured before the memory "
-                 "budget existed, recording neither a worker count nor a memory outcome, so they "
-                 "are the least like for like here.")
+                 "budget existed, recording neither a worker count nor a memory outcome.")
     return " ".join(s)
 
 

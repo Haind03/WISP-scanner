@@ -24,6 +24,16 @@ back out of the fragment and compared to a derivation written here, from the JSO
 from __future__ import annotations
 import os, sys, re, json
 
+# 2026-08-21, P1-1. The main table stops printing the 25 s column because it does not reproduce
+# between runs. The list is IMPORTED from the generator rather than restated here, so the guard
+# and the table can never drift apart on which columns are supposed to exist. The JSON still holds
+# every cell and check_matrix still requires them all, this only governs what the main table prints.
+try:
+    from eval.build_budget_and_failure_tables_v3 import MAIN_TABLE_DROPS_BUDGETS
+except ImportError:  # run as a bare script rather than a module
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from eval.build_budget_and_failure_tables_v3 import MAIN_TABLE_DROPS_BUDGETS
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SYS_ROOT = os.path.dirname(ROOT)
 OUTDIR = os.path.join(SYS_ROOT, "revision-cns-v2", "out")
@@ -138,7 +148,8 @@ def check_matrix(fails):
     name = os.path.basename(MATRIX_TEX)
     checked = 0
 
-    budgets = sorted({c["budget_s"] for c in cells.values()})
+    budgets = sorted({c["budget_s"] for c in cells.values()}
+                     - set(MAIN_TABLE_DROPS_BUDGETS))
     tools = sorted({c["tool"] for c in cells.values()})
     fields = ["coverage", "patch_file_success_at_1", "patch_file_success_at_3"]
 
@@ -263,7 +274,8 @@ def check_matrix_caption(tex, d, modal, name, fails):
         return 0
     cells = d["cells"]
     n = d["n_records"]
-    budgets = sorted({c["budget_s"] for c in cells.values()})
+    budgets = sorted({c["budget_s"] for c in cells.values()}
+                     - set(MAIN_TABLE_DROPS_BUDGETS))
     tools = sorted({c["tool"] for c in cells.values()})
     checked = 0
 

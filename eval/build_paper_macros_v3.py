@@ -455,7 +455,11 @@ def build():
                 if not c:
                     continue
                 holm = _fmt(c["p_holm_adjusted"])
-                if not c["survives_holm"]:
+                # 2026-08-21, P1-2. Bold marked NON-survivors here while the main text's compact
+                # family table bolds SURVIVORS, so one submission carried two opposite conventions
+                # for the same quantity. Unified on bold = survives, which is what the main text
+                # states and what check_family_enumeration verifies cell by cell.
+                if c["survives_holm"]:
                     holm = r"\textbf{" + holm + "}"
                 lines.append("%s & %s & %d & %d & %s & %s & %s \\\\" % (
                     LABEL[ep], NAME[base], c["discordant_wisp_only"],
@@ -1198,6 +1202,16 @@ def build():
             "count(records where converged is false)")
         add("FvZeroFindings", str(sum(1 for r in fv["records"] if r["n_findings"] == 0)), FV,
             "count(records where n_findings == 0)")
+        # Records where the patch-file rung was never reached at any cutoff. The main text uses this
+        # to say that a vendor confirmed and fixed a defect the geometric endpoint never credited,
+        # which is the paper's own thesis observed in the field. Recomputed from the records here
+        # rather than read from the stored key, so a stale key cannot outlive the records it
+        # summarises, and asserted equal to the stored key so the two cannot drift apart silently.
+        _pf_never = sum(1 for r in fv["records"] if r["pf"] is None)
+        if fv.get("pf_never") is not None and int(fv["pf_never"]) != _pf_never:
+            raise SystemExit(f"FIELD_VALIDATION pf_never says {fv['pf_never']} but the records "
+                             f"give {_pf_never}. Fix the source, do not print either.")
+        add("FvPfNever", str(_pf_never), FV, "count(records where pf is null)")
         own = fv.get("own_records_in_corpus")
         if own:
             add("FvOwnN", str(own["n"]), FV, "own_records_in_corpus.n")
@@ -1304,6 +1318,10 @@ def build():
         add("EngineRelease", _WC.RELEASE_TAG, "eval/wisp_contract.py", "RELEASE_TAG")
         add("EngineTag", cfg["engine_tag"], src, "provenance.wisp_config.engine_tag")
         add("EngineSha", cfg["engine_sha256"][:8], src, "provenance.wisp_config.engine_sha256[:8]")
+        # The paper printed only the first eight hex characters everywhere, which is enough to
+        # collide against by accident and not enough to verify against. The full digest is printed
+        # once, in Data and Code Availability, and the short form stays where it reads as a label.
+        add("EngineShaFull", cfg["engine_sha256"], src, "provenance.wisp_config.engine_sha256")
         # The baseline arm is a configuration of the one released engine, not a second release, so
         # this prints the flags that produced it. They carry underscores, which are active in LaTeX
         # text mode, so escape them here rather than hoping every call site wraps them in \code.
@@ -1443,6 +1461,26 @@ def build():
     # The pointers below name the real path including that envelope, not a tidied one.
     ds = load("DEFECT_STUDY_RESULT_V3.json")["payload"]
     DS = "DEFECT_STUDY_RESULT_V3.json"
+
+    # 2026-08-21, P0-2. Conditional precision of the blind judgment given each geometric rung.
+    # This replaces an argument that set two marginal rates beside each other, which was close to
+    # coincidence. Every value is a slug-clustered bootstrap at the shared seed, and the raw count
+    # travels with the rate because the exact-line cell rests on twelve findings.
+    DCP = "DEFECT_CONDITIONAL_PRECISION_V3.json"
+    dcp = load(DCP)
+    for ann, tag in (("A", "A"), ("B", "B")):
+        for key, short in (("on_exact_changed_line", "Exact"),
+                           ("in_patched_file", "File"),
+                           ("not_in_patched_file", "NotFile")):
+            b = dcp["annotators"][ann][key]
+            base = f"Dcp{tag}{short}"
+            add(base, f"{b['rate']:.3f}", DCP, f"annotators.{ann}.{key}.rate")
+            add(base + "N", str(b["count"]), DCP, f"annotators.{ann}.{key}.count")
+            add(base + "D", str(b["n"]), DCP, f"annotators.{ann}.{key}.n")
+            add(base + "Lo", f"{b['ci95'][0]:.3f}", DCP, f"annotators.{ann}.{key}.ci95.0")
+            add(base + "Hi", f"{b['ci95'][1]:.3f}", DCP, f"annotators.{ann}.{key}.ci95.1")
+        add(f"Dcp{tag}Ratio", f"{dcp['annotators'][ann]['exact_over_file_ratio']:.2f}",
+            DCP, f"annotators.{ann}.exact_over_file_ratio")
 
     def dsr(x):
         """Two decimals, leading zero kept. An earlier version stripped it on the belief that the
@@ -1727,6 +1765,45 @@ def build():
             "same_hunk_without_proximity5.n")
         add("PredProxNotHunk", str(lp["proximity5_without_same_hunk"]["n"]), LP,
             "proximity5_without_same_hunk.n")
+
+        # Records with at least one finding, per tool, in the contract corpus rescan that feeds the
+        # geometric ladder. These were prose literals, and that is how a reviewer came to divide a
+        # finding count from this run by a record count from the earlier pre-contract run and find
+        # 2202 top-3 findings sitting on 684 records, which is impossible for a top-3 prefix.
+        # Neither number was wrong. The pairing was, and no guard could see it because the record
+        # counts were bound to nothing. Bound here. Added 2026-08-20.
+        for _tag, _key, _Nm in (("WISP", "wisp", "Wisp"), ("SEMGREP", "semgrep", "Semgrep"),
+                                ("WPT", "wpt", "Wpt"), ("PROGPILOT", "progpilot", "Progpilot")):
+            _f = f"CORPUS1108_{_tag}_CONTRACT_V3.json"
+            _d = load(_f)
+            _n = sum(1 for _r in _d["details"] if len((_r.get(_key) or {}).get("findings") or []) > 0)
+            add(f"LadderEmitting{_Nm}", str(_n), _f,
+                "count of details[] whose <tool>.findings is non-empty")
+
+        # The same quantity on the earlier pre-contract pass, which is what the failure-audit table
+        # accounts for. Both passes are now macro-bound, so the two can be printed side by side and
+        # named, and neither can be silently retyped.
+        # The same equal-budget cell measured three times inside one day. The supplement uses these
+        # to show that a 25 s cell is not reproducible on this host and that the cause tracks
+        # filesystem cache warmth, not load. Bound to their three run files so the spread cannot be
+        # retyped. Added 2026-08-20 after the re-measurement.
+        for _tag, _f in (("A", "BASELINE_MATRIX_V3.pre-membudget-2026-08-10.json"),
+                         ("B", "BASELINE_MATRIX_V3_RERUN2026-08-20.json"),
+                         ("C", "BASELINE_MATRIX_V3.json")):
+            _c = load(_f)["cells"]["semgrep@25"]
+            add(f"ReproSgTwentyFive{_tag}Done", str(_c["completed"]), _f,
+                "cells.semgrep@25.completed")
+            add(f"ReproSgTwentyFive{_tag}Pf", r2(float(_c["patch_file_success_at_1"])), _f,
+                "cells.semgrep@25.patch_file_success_at_1")
+            add(f"ReproSgTwentyFive{_tag}Med", f"{float(_c['median_elapsed_s']):.1f}", _f,
+                "cells.semgrep@25.median_elapsed_s")
+
+        _fm = "FULLCORPUS_FAILURE_AS_MISS_V3.json"
+        _wf = load(_fm)["accounting"]["full_1108"]["with_findings"]
+        for _key, _Nm in (("wisp", "Wisp"), ("semgrep", "Semgrep"),
+                          ("wpt", "Wpt"), ("progpilot", "Progpilot")):
+            add(f"PreContractEmitting{_Nm}", str(_wf[_key]), _fm,
+                f"accounting.full_1108.with_findings.{_key}")
 
 
 def emit():
