@@ -65,7 +65,21 @@ _CLASS_PATTERNS = [
 
 
 def map_class(label):
+    # Semgrep derives check_id from the config file's PATH when rules are pinned as local files,
+    # so an id arrives as "mnt.d.System-ScanInfosec.<...>.p_php.<rule>". That prefix is not part of
+    # the rule's identity and it poisons the match: "System-ScanInfosec" lowercases to contain
+    # "system", which is an rce pattern, and rce is ordered ahead of deserial, ssrf, upload, auth
+    # and csrf. A rule that should read csrf or upload then reads rce. Verified 2026-08-26:
+    # ".../p_security_audit.missing-nonce-check" mapped to rce, and the same rule under its
+    # registry id "php.lang.security.audit.missing-nonce-check" maps to csrf.
+    # The fix drops everything up to and including the pinned rule-file component, leaving the id a
+    # registry run would emit. A registry id has no such component and is untouched.
     s = (label or "").lower()
+    for _marker in ("p_php.", "p_security_audit."):
+        i = s.find(_marker)
+        if i >= 0:
+            s = s[i + len(_marker):]
+            break
     for cls, pats in _CLASS_PATTERNS:
         if any(p in s for p in pats):
             return cls
