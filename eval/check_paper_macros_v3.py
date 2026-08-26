@@ -124,7 +124,10 @@ LITERAL_PENDING = [
     # rewrapped, so "wp-taint" moved to the next line and the old snippet stopped matching. The
     # debt is unchanged, only where the line breaks.
     ('0.00', 'Progpilot score 0.00 on them,'),
-    ('0.00', 'agnostic, scoring 0.00 on'),
+    # re-keyed 2026-08-26: the prose-style pass rewrote this clause. Same literal, same
+    # meaning, the sentence now reads 'they are domain-agnostic and score 0.00 on access
+    # control and CSRF'. Old key: 'agnostic, scoring 0.00 on'.
+    ('0.00', 'domain-agnostic and score 0.00 on'),
     # Removed 2026-08-20: this one keyed the TikZ architecture caption, and that figure was
     # replaced by two generated diagrams in the same pass. A tolerated literal whose line no
     # longer exists is a hole rather than a record, the same reason 0.893 left this list.

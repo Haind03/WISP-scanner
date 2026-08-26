@@ -28,6 +28,7 @@ The public entry points:
 Nothing here mutates production scoring; callers opt in.
 """
 from __future__ import annotations
+import errno
 import os, sys, json, hashlib, hmac, uuid, difflib, tempfile, shutil, zipfile
 from dataclasses import dataclass, field, asdict
 
@@ -295,6 +296,13 @@ def build_patchmap_from_archives(row: dict) -> PatchMap:
     from eval.localize import _unzip
     vzip, pzip = row["vuln_zip"], row["patched_zip"]
     vroot = proot = None
+    # A zip that is ABSENT and a zip that is CORRUPT are different failures and must not share
+    # one exception. The suite skips a test whose input is absent, so folding "corrupt" into that
+    # class would let real corruption ride through as a green skip. Absence is reported as a
+    # missing file, extraction failure on a file that exists stays a hard error.
+    for _z in (vzip, pzip):
+        if not os.path.exists(_z):
+            raise FileNotFoundError(errno.ENOENT, "plugin archive not on disk", _z)
     try:
         vroot, proot = _unzip(vzip), _unzip(pzip)
         if not (vroot and proot):
