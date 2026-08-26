@@ -1212,6 +1212,32 @@ def build():
             raise SystemExit(f"FIELD_VALIDATION pf_never says {fv['pf_never']} but the records "
                              f"give {_pf_never}. Fix the source, do not print either.")
         add("FvPfNever", str(_pf_never), FV, "count(records where pf is null)")
+
+    # The four-tool field comparison. The main text prints only the LEVEL, the best rate any of the
+    # four reaches, because the ordering is not defensible: two baselines have ceilings above WISP's
+    # measured rate once their unanswered records are charged as hits, and the budgets were not
+    # equal. Printing max() rather than WISP's own value is deliberate, so the sentence cannot be
+    # read as a claim about our own scanner.
+    FC = os.path.join(OUT, "FIELD_COMPARISON_V1.json")
+    if os.path.isfile(FC):
+        fc = load("FIELD_COMPARISON_V1.json")
+        _tools = fc["tools"]
+        for macro, rung in (("FieldBestPf", "pf_at_k"), ("FieldBestCf", "cf_at_k")):
+            best = max(t["aggregate_failure_as_miss"][rung]["10"] for t in _tools.values())
+            add(macro, f"{best:.2f}", "FIELD_COMPARISON_V1.json",
+                f"max over tools of aggregate_failure_as_miss.{rung}.10")
+        add("FieldCmpTools", str(len(_tools)), "FIELD_COMPARISON_V1.json", "count(tools)")
+        # Per-tool pf@10 and cf@10, so the superlative guard can verify that FieldBestPf and
+        # FieldBestCf really are the maxima over the four rather than taking the word "best" on
+        # trust. These four are not printed anywhere, they exist to give the claim a family.
+        _disp = {"wisp": "Wisp", "wpt": "Wpt", "semgrep": "Semgrep", "progpilot": "Progpilot"}
+        for _t, _n in _disp.items():
+            if _t in _tools:
+                agg = _tools[_t]["aggregate_failure_as_miss"]
+                add(f"Field{_n}PfTen", f"{agg['pf_at_k']['10']:.2f}", "FIELD_COMPARISON_V1.json",
+                    f"tools.{_t}.aggregate_failure_as_miss.pf_at_k.10")
+                add(f"Field{_n}CfTen", f"{agg['cf_at_k']['10']:.2f}", "FIELD_COMPARISON_V1.json",
+                    f"tools.{_t}.aggregate_failure_as_miss.cf_at_k.10")
         own = fv.get("own_records_in_corpus")
         if own:
             add("FvOwnN", str(own["n"]), FV, "own_records_in_corpus.n")
