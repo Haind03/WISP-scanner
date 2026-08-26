@@ -61,7 +61,10 @@ def main():
         "% Every cell is a JSON pointer, not a transcription. Do not edit by hand.",
         "\\begin{table*}[!t]", "\\centering\\small",
         "\\caption{" + cap + "}", "\\label{tab:s-fieldcmp}",
-        "\\setlength{\\tabcolsep}{5pt}",
+        # 2026-08-26: was 5pt, which put the 11-column table 21.8pt past \textwidth and the
+        # build never looked at an overfull warning, so it shipped that way. 3pt clears it
+        # with room. If a column is ever added, re-measure rather than assuming this still fits.
+        "\\setlength{\\tabcolsep}{3pt}",
         "\\begin{tabular}{@{}lcc cccc c cc c@{}}", "\\toprule",
         "& & & \\multicolumn{4}{c}{patch-file success@$K$} & & "
         "\\multicolumn{2}{c}{class-and-file@$K$} & \\\\",
