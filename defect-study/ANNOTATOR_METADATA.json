@@ -28,7 +28,7 @@
   },
   "declaration_provenance": {
    "collected": "2026-08-18, relayed by the corresponding author from each annotator",
-   "note": "Annotator A first answered is_paper_author=yes on the original form and corrected it to no when re-asked on an unambiguous form. The original wording did not distinguish being named in the manuscript's author list from contributing labels to the study. The manuscript's author list is Dinh Hai Nguyen, Truong Duy Dinh, Dinh Hieu Nguyen and neither annotator is on it. Both answers are recorded here rather than only the second.",
+   "note": "Annotator A first answered is_paper_author=yes on the original form and corrected it to no when re-asked on an unambiguous form. The original wording did not distinguish being named in the manuscript's author list from contributing labels to the study. The manuscript's author list is Dinh Hai Nguyen, Dinh Hieu Nguyen and neither annotator is on it. Both answers are recorded here rather than only the second.",
    "first_pass_reviewer_A_is_paper_author": "yes (superseded, ambiguous question)"
   }
  }
