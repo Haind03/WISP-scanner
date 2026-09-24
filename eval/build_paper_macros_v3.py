@@ -1076,6 +1076,20 @@ def build():
             "n_upgraded_with_verified_doi")
         add("RefsReviewed", str(rc["n_peer_reviewed"]), RC, "n_peer_reviewed")
 
+    # Chance level at the exact-line rung. A reviewer asked what P(exact line | patched file) would
+    # be for a finding carrying no information at all, and without that number the reported
+    # conditional is a level with no scale. Measured on the untouched 325-plugin set, which is the
+    # corpus whose archives are on this machine and which is slug-disjoint from development.
+    cb_path = os.path.join(OUT, "CHANCE_BASELINE_V3.json")
+    if os.path.isfile(cb_path):
+        CB = "CHANCE_BASELINE_V3.json"
+        cb = load("CHANCE_BASELINE_V3.json")
+        add("ChancePooled", "%.3f" % cb["chance_pooled"], CB, "chance_pooled")
+        add("ChanceMedian", "%.3f" % cb["chance_record_median"], CB, "chance_record_median")
+        add("ChanceRecords", str(cb["n_records_scored"]), CB, "n_records_scored")
+        add("ChanceChangedLines", "{:,}".format(cb["total_changed_lines"]), CB, "total_changed_lines")
+        add("ChanceTotalLines", "{:,}".format(cb["total_lines"]), CB, "total_lines")
+
     # The WordPress-block aggregate, added 2026-08-14. The manuscript printed "424 of 475 records
     # ... reach 0.893" by hand, which is the non-convergence-ignored basis, in a sentence whose
     # surrounding claims are all on the contract basis. PERCLASS_CONTRACT_V3.json says 419 of 475 and

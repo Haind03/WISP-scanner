@@ -123,12 +123,12 @@ def main():
     ]
     for i in range(half):
         a = left[i]
-        cells = [cvelink(a["cve"]), r"\code{" + slugbreak(a["slug"]) + "}",
-                 r"\code{" + esc(a["patched_version"]) + "}"]
+        cells = [cvelink(a["cve"]), slugbreak(a["slug"]),
+                 esc(a["patched_version"])]
         if i < len(right):
             b = right[i]
-            cells += [cvelink(b["cve"]), r"\code{" + slugbreak(b["slug"]) + "}",
-                      r"\code{" + esc(b["patched_version"]) + "}"]
+            cells += [cvelink(b["cve"]), slugbreak(b["slug"]),
+                      esc(b["patched_version"])]
         else:
             cells += ["", "", ""]
         m.append(" & ".join(cells) + r" \\")
